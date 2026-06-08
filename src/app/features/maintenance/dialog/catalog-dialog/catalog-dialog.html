@@ -1,0 +1,81 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div>
+      <h2>Detalle del producto</h2>
+      <span class="dialog-subtitle"> Información del catálogo </span>
+    </div>
+    <button class="btn-close" (click)="closeDialog()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    <div class="info-grid">
+      <div class="info-card">
+        <label>ID</label>
+
+        <span>
+          {{ data.id }}
+        </span>
+      </div>
+
+      <div class="info-card">
+        <label>Código auxiliar</label>
+
+        <span>
+          {{ data.auxiliar.id }}
+        </span>
+      </div>
+    </div>
+
+    <div class="section">
+      <label>Nombre</label>
+
+      <div class="value">
+        {{ data.nombre }}
+      </div>
+    </div>
+
+    <div class="section">
+      <label>Definición del producto</label>
+
+      <div class="description">
+        {{ data.definicionProducto }}
+      </div>
+    </div>
+
+    <div class="section">
+      <label>Sinónimos</label>
+
+      <div class="chips">
+        @for (item of data.sinonimos.split(','); track item) {
+          <span class="chip">
+            {{ item }}
+          </span>
+        }
+      </div>
+    </div>
+
+    <div class="section">
+      <label>Información auxiliar</label>
+
+      <div class="aux-card">
+        <div>
+          <small>Cuenta</small>
+
+          <strong>
+            {{ data.auxiliar.id }}
+          </strong>
+        </div>
+
+        <div>
+          <small>Denominación</small>
+
+          <strong>
+            {{ data.auxiliar.denominacion }}
+          </strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

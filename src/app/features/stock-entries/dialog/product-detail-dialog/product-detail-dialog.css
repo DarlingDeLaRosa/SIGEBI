@@ -1,0 +1,44 @@
+.catalog-card {
+    background: #f8fafc;
+    border: 1px solid #eef2f7;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.catalog-card h5 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.catalog-card p {
+    margin: 0;
+    color: #555;
+    line-height: 1.7;
+}
+
+.warehouse-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.warehouse-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8fafc;
+    border: 1px solid #eef2f7;
+    border-radius: 14px;
+    padding: 16px 20px;
+}
+
+.warehouse-card small {
+    display: block;
+    color: #777;
+    margin-bottom: 4px;
+}
+
+.warehouse-card strong {
+    font-size: 15px;
+}

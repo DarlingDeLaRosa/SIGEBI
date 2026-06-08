@@ -1,0 +1,54 @@
+<h2>Tipos de salidas</h2>
+
+<form
+  [formGroup]="stock_output_form"
+  (submit)="save(stock_output_form, 'idTipoSalida')"
+  class="row gx-1 gy-1"
+>
+  <div class="col-md-6 form-floating">
+    <input
+      placeholder="Nombre de tipo de salida"
+      type="text"
+      class="form-control"
+      formControlName="nombre"
+      id="typeStockOutputName"
+    />
+    <label for="typeStockOutputName">Nombre de tipo de salida</label>
+  </div>
+
+  <div class="col-md-6 form-floating">
+    <input
+      placeholder="Descripción de tipo de salida"
+      type="text"
+      class="form-control"
+      formControlName="descripcion"
+      id="typeStockOutputDesc"
+    />
+    <label for="typeStockOutputDesc">Descripción de tipo de salida</label>
+  </div>
+
+  <app-form-actions
+    [editing]="stock_output_form.dirty || (stock_output_form.value.idTipoSalida ?? 0) > 0"
+    [disabled]="!stock_output_form.valid || loading()"
+    (clear)="stock_output_form.reset()"
+  >
+  </app-form-actions>
+</form>
+
+<app-input-filter [(filter)]="search" [placeholder]="'Buscar tipo de salidas'" />
+
+<app-table-of-content
+  [tableTitle]="'Listado de tipos de salida'"
+  [trackByField]="'idTipoSalida'"
+  [tableData]="data()?.data || []"
+  [tableColumns]="tableColums"
+  [totalItems]="pagination().totalItems"
+  [showPagination]="true"
+  [totalPages]="pagination().totalPages"
+  [currentPage]="pagination().currentPage"
+  [pageSize]="pagination().pageSize"
+  (pageChange)="changePage($event)"
+  (pageSizeChange)="changePageSize($event)"
+  (edit)="setEditForm(stock_output_form, $event)"
+  (remove)="remove($event.idTipoSalida)"
+></app-table-of-content>

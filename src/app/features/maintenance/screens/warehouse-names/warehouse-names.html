@@ -1,0 +1,43 @@
+<h2>Nombre de almacenes</h2>
+
+<form
+  [formGroup]="warehouse_names_form"
+  (submit)="save(warehouse_names_form, 'idTipoAlm')"
+  class="row g-2"
+>
+  <div class="form-floating">
+    <input
+      placeholder="Nombre de almacen"
+      type="text"
+      class="form-control"
+      formControlName="nombre"
+      id="warename"
+    />
+    <label for="warename">Nombre de almacen</label>
+  </div>
+
+  <app-form-actions
+    [editing]="warehouse_names_form.dirty || (warehouse_names_form.value.idTipoAlm ?? 0) > 0"
+    [disabled]="!warehouse_names_form.valid || loading()"
+    (clear)="warehouse_names_form.reset()"
+  >
+  </app-form-actions>
+</form>
+
+<app-input-filter [(filter)]="search" [placeholder]="'Buscar almacenes'" />
+
+<app-table-of-content
+  [tableTitle]="'Listado de almacenes'"
+  [trackByField]="'idTipoAlm'"
+  [tableData]="data()?.data || []"
+  [tableColumns]="tableColums"
+  [totalItems]="pagination().totalItems"
+  [showPagination]="true"
+  [totalPages]="pagination().totalPages"
+  [currentPage]="pagination().currentPage"
+  [pageSize]="pagination().pageSize"
+  (pageChange)="changePage($event)"
+  (pageSizeChange)="changePageSize($event)"
+  (edit)="setEditForm(warehouse_names_form, $event)"
+  (remove)="remove($event.idTipoAlm)"
+></app-table-of-content>

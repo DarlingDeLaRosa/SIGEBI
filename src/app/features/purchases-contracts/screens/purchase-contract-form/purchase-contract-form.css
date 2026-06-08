@@ -1,0 +1,12 @@
+h2{
+    font-size: 17px;
+    margin-bottom: 10px;
+}
+
+.Total{
+    display: flex;
+    gap: 20px;
+    background-color: #f8f9fa;
+    border: dashed 2px green;
+    padding: 10px;
+}

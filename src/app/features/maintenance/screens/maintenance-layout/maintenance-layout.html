@@ -1,0 +1,83 @@
+<div class="config-container">
+  
+  <div class="box">
+
+    <a
+      class="item-menu"
+      [routerLink]="['/layout/mantenimientos/catalogo']"
+      routerLinkActive="active"
+    >
+      <i class="bi bi-newspaper"></i> Catálogo
+    </a>
+
+    <a
+      class="item-menu"
+      [routerLink]="['/layout/mantenimientos/usuarios']"
+      routerLinkActive="active"
+    >
+      <i class="bi bi-people"></i> Usuarios
+    </a>
+
+    <a
+      class="item-menu"
+      [routerLink]="['/layout/mantenimientos/proveedores']"
+      routerLinkActive="active"
+    >
+      <i class="bi bi-truck-flatbed"></i> Proveedores
+    </a>
+
+    <a
+      class="item-menu"
+      [routerLink]="['/layout/mantenimientos/tipo-entrada']"
+      routerLinkActive="active"
+    >
+      <i class="bi bi-box-arrow-in-down"></i> Tipo de entrada
+    </a>
+
+    <a
+      class="item-menu"
+      [routerLink]="['/layout/mantenimientos/tipo-salida']"
+      routerLinkActive="active"
+    >
+      <i class="bi bi-box-arrow-up"></i> Tipo de salida
+    </a>
+
+    <a
+      class="item-menu"
+      [routerLink]="['/layout/mantenimientos/tipo-entrega']"
+      routerLinkActive="active"
+    >
+      <i class="bi bi-truck"></i> Tipo de entrega
+    </a>
+
+    <a
+      class="item-menu"
+      [routerLink]="['/layout/mantenimientos/tipos-productos']"
+      routerLinkActive="active"
+    >
+      <i class="bi bi-box-seam"></i> Tipos productos
+    </a>
+
+    <a
+      class="item-menu"
+      [routerLink]="['/layout/mantenimientos/nombre-almacen']"
+      routerLinkActive="active"
+    >
+      <i class="bi bi-building"></i> Nombre de almacén
+    </a>
+    
+    <a
+      class="item-menu"
+      [routerLink]="['/layout/mantenimientos/unidad-medida']"
+      routerLinkActive="active"
+    >
+      <i class="bi bi-rulers"></i> Unidad de medida
+    </a>
+    
+  </div>
+
+  <div class="box">
+    <router-outlet></router-outlet>
+  </div>
+  
+</div>

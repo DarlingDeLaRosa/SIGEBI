@@ -1,0 +1,112 @@
+.table-container h2 {
+  margin-bottom: 20px;
+  font-size: 17px;
+}
+
+.tabla {
+  width: 100%;
+  padding: 0 10px;
+}
+
+.tabla-header,
+.tabla-row {
+  display: grid;
+  gap: 10px;
+  align-items: center;
+}
+
+.tabla-header {
+  font-size: 13px;
+  color: #555;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.tabla-row {
+  padding: 16px 0;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.acciones {
+  display: flex;
+  gap: 15px;
+}
+
+.acc{
+  cursor: pointer;
+}
+
+.item-edit:hover {
+  background-color: #ffc107 ;
+  color: white ;
+}
+
+.item-delete:hover {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+.item-detail:hover {
+  background-color: #0d6efd !important;
+  color: white !important;
+}
+
+.pagination-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pagination-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-page {
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: #f1f5f9;
+}
+
+.active-page {
+    background: #004b8d;
+    color: white;
+}
+
+.page-size-select {
+    width: 80px;
+    border-radius: 10px;
+}
+
+.empty-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  text-align: center;
+  color: #6b7280;
+}
+
+.empty-table i {
+  font-size: 55px;
+  color: #d1d5db;
+}
+
+.empty-table h3 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.empty-table p {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #9ca3af;
+}

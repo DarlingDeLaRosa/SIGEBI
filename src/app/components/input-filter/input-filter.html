@@ -1,0 +1,11 @@
+<div class="mt-2 mb-3 col-md-4 position-relative">
+  <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3"></i>
+
+  <input
+    [value]="filter()"
+    (input)="filter.set( $any($event.target).value )"
+    type="text"
+    class="form-control ps-5"
+    [placeholder]="placeholder()"
+  />
+</div>

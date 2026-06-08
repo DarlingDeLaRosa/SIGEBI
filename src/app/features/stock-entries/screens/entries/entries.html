@@ -1,0 +1,32 @@
+<div class="title">
+  <h1>Entradas</h1>
+
+  <span class="d-flex gap-1">
+    <button class="btn navigate"  (click)="this.filteringProduct = !this.filteringProduct;" >
+      {{ filteringProduct ? 'Ocultar filtros' : 'Filtrar productos' }}
+    </button>
+
+    <button class="btn navigate"  [routerLink]="['../gestionar-Entradas']"  >
+      Crear producto
+    </button>
+  </span>
+</div>
+
+<div class="box">
+    <!-- [tableColumns]="tableColums" -->
+  <app-table-of-content
+    [showDetail]="true"
+    [tableTitle]="'Listado de entradas'"
+    [trackByField]="'idEntrada'"
+    [tableData]="data()?.data || []"
+    [totalItems]="pagination().totalItems"
+    [showPagination]="true"
+    [totalPages]="pagination().totalPages"
+    [currentPage]="pagination().currentPage"
+    [pageSize]="pagination().pageSize"
+    (pageChange)="changePage($event)"
+    (pageSizeChange)="changePageSize($event)"
+    (remove)="remove($event.idEntrada)"
+    ></app-table-of-content>
+    <!-- (edit)="setProduct($event)" -->
+</div>

@@ -1,1 +1,310 @@
 /* You can add global styles to this file, and also import other style files */
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
+.item-menu {
+  display: grid;
+  color: black;
+  cursor: pointer;
+  padding: 10px 20px 10px 23px;
+  border-radius: 30px;
+  align-items: center;
+  text-decoration: none;
+  color: #444;
+  box-sizing: border-box;
+  margin: 0 15px;
+  grid-template-columns: 40px 130px;
+  font-size: 16px;
+}
+
+.main-content-wrapper {
+  width: 75%;
+}
+
+a i {
+  font-size: 19px;
+}
+
+.box {
+  background-color: #fff;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.title h1 {
+  font-size: 26px;
+}
+
+.btn i {
+  margin-right: 5px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  border: none;
+  border-radius: 10px;
+  color: white;
+}
+
+.navigate {
+  background-color: #4caf50;
+}
+
+.save {
+  background-color: #004b8d;
+}
+
+.save:disabled {
+  background-color: #cbd5e1;
+  color: #64748b;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.remove {
+  background-color: #bbb;
+}
+
+.remove:hover {
+  background-color: #888;
+  color: white;
+}
+
+.navigate:hover {
+  background-color: #45a049;
+  color: white;
+}
+
+.save:hover {
+  background-color: #003b6b;
+  color: white;
+}
+
+.app-swal-popup {
+  border-radius: 22px;
+  padding: 24px;
+  width: 380px;
+  font-family: inherit;
+}
+
+.app-swal-title {
+  font-size: 23px;
+  font-weight: 500;
+  color: #0d1b2a;
+}
+
+.app-swal-text {
+  font-size: 15px;
+  color: #6b7280;
+}
+
+.app-swal-confirm {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 600;
+}
+
+.app-swal-confirm:hover {
+  background-color: #bb2d3b;
+}
+
+.app-swal-cancel {
+  background-color: #f3f4f6;
+  margin-right: 5px;
+  color: #111827;
+  border-radius: 12px;
+  padding: 10px 18px;
+  border: 1px solid #e5e7eb;
+  font-weight: 600;
+}
+
+div:where(.swal2-container) {
+  z-index: 999999;
+}
+
+.dialog-container {
+  background: white;
+  border-radius: 24px;
+  padding: 28px;
+  max-width: 95vw;
+  max-height: 90vh;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog-header {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ececec;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 500;
+  color: #123;
+}
+
+.dialog-subtitle {
+  color: #888;
+  font-size: 14px;
+}
+
+.dialog-body {
+  flex: 1;
+  padding: 5px;
+  overflow-y: auto;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dialog-body::-webkit-scrollbar {
+    width: 3px;
+}
+
+.dialog-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dialog-body::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 20px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.info-card {
+  background: #f8fafc;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid #eef2f7;
+}
+
+.info-card label {
+  display: block;
+  font-size: 13px;
+  color: #777;
+  margin: 0 0 4px 0;
+}
+
+.info-card span {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section label {
+  font-weight: 600;
+  color: #444;
+}
+
+.btn-close {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  font-size: 20px;
+}
+
+.btn-close:focus,
+.btn-close:active {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
+.value {
+  background: #fafafa;
+  padding: 18px;
+  border-radius: 14px;
+}
+
+.description {
+  background: #fafafa;
+  padding: 20px;
+  border-radius: 16px;
+  line-height: 1.7;
+  color: #555;
+}
+
+.chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  background: #e9f6ec;
+  color: #3f9142;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+}
+
+.aux-card {
+  display: grid;
+  grid-template-columns:
+    1fr 2fr;
+  gap: 16px;
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.aux-card small {
+  display: block;
+  color: #777;
+  margin-bottom: 6px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: end;
+  padding-top: 20px;
+}
+
+@media (max-width: 1350px) {
+  .main-content-wrapper {
+    width: 90%;
+  }
+}

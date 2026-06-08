@@ -1,0 +1,43 @@
+<h2>Unidad de medidas</h2>
+
+<form
+  [formGroup]="units_measure_form"
+  (submit)="save(units_measure_form, 'idUnidadMe')"
+  class="row g-2"
+>
+  <div class="form-floating">
+    <input
+      placeholder="Nombre de unidad de medida"
+      type="text"
+      class="form-control"
+      formControlName="descripcion"
+      id="unitOfMeasure"
+    />
+    <label for="unitOfMeasure">Nombre de unidad de medida</label>
+  </div>
+
+  <app-form-actions
+    [editing]="units_measure_form.dirty || (units_measure_form.value.idUnidadMe ?? 0) > 0"
+    [disabled]="!units_measure_form.valid || loading()"
+    (clear)="units_measure_form.reset()"
+  >
+  </app-form-actions>
+</form>
+
+<app-input-filter [(filter)]="search" [placeholder]="'Buscar unidad de medida'" />
+
+<app-table-of-content
+  [tableTitle]="'Listado de unidades de medida'"
+  [trackByField]="'idUnidadMe'"
+  [tableData]="data()?.data || []"
+  [tableColumns]="tableColums"
+  [totalItems]="pagination().totalItems"
+  [showPagination]="true"
+  [totalPages]="pagination().totalPages"
+  [currentPage]="pagination().currentPage"
+  [pageSize]="pagination().pageSize"
+  (pageChange)="changePage($event)"
+  (pageSizeChange)="changePageSize($event)"
+  (edit)="setEditForm(units_measure_form, $event)"
+  (remove)="remove($event.idUnidadMe)"
+></app-table-of-content>

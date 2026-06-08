@@ -1,0 +1,54 @@
+<h2>Tipos de entrega</h2>
+
+<form
+  [formGroup]="delivery_type_form"
+  (submit)="save(delivery_type_form, 'idTipoEntrega')"
+  class="row gx-1 gy-1"
+>
+  <div class="col-md-6 form-floating">
+    <input
+      placeholder="Nombre de tipo de entrega"
+      type="text"
+      class="form-control"
+      formControlName="nombre"
+      id="typeDeliveryName"
+    />
+    <label for="typeDeliveryName">Nombre de tipo de entrega</label>
+  </div>
+
+  <div class="col-md-6 form-floating">
+    <input
+      placeholder="Descripción de tipo de entrega"
+      type="text"
+      class="form-control"
+      formControlName="descripcion"
+      id="typeDeliveryDesc"
+    />
+    <label for="typeDeliveryDesc">Descripción de tipo de entrega</label>
+  </div>
+
+  <app-form-actions
+    [editing]="delivery_type_form.dirty || (delivery_type_form.value.idTipoEntrega ?? 0) > 0"
+    [disabled]="!delivery_type_form.valid || loading()"
+    (clear)="delivery_type_form.reset()"
+  >
+  </app-form-actions>
+</form>
+
+<app-input-filter [(filter)]="search" [placeholder]="'Buscar tipo de entrega'" />
+
+<app-table-of-content
+  [tableTitle]="'Listado de tipos de entrega'"
+  [trackByField]="'idTipoEntrega'"
+  [tableData]="data()?.data || []"
+  [tableColumns]="tableColums"
+  [totalItems]="pagination().totalItems"
+  [showPagination]="true"
+  [totalPages]="pagination().totalPages"
+  [currentPage]="pagination().currentPage"
+  [pageSize]="pagination().pageSize"
+  (pageChange)="changePage($event)"
+  (pageSizeChange)="changePageSize($event)"
+  (edit)="setEditForm(delivery_type_form, $event)"
+  (remove)="remove($event.idTipoEntrega)"
+></app-table-of-content>

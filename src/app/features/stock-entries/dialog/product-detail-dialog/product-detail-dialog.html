@@ -1,0 +1,162 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div>
+      <h2>Detalle del producto</h2>
+      <span class="dialog-subtitle">
+        Información general del producto
+      </span>
+    </div>
+
+    <button class="btn-close" (click)="closeDialog()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    <!-- Datos principales -->
+    <div class="info-grid">
+      <div class="info-card">
+        <label>ID Producto</label>
+        <span>{{ data.idProducto }}</span>
+      </div>
+
+      <div class="info-card">
+        <label>Código Institucional</label>
+        <span>{{ data.codInstitucional }}</span>
+      </div>
+
+      <div class="info-card">
+        <label>Precio</label>
+        <span>{{ data.precio | currency: 'DOP':'symbol':'1.2-2' }}</span>
+      </div>
+
+      <div class="info-card">
+        <label>ITBIS</label>
+        <span>{{ data.itbis }}%</span>
+      </div>
+
+      <div class="info-card">
+        <label>Stock Actual</label>
+        <span>{{ data.stock }}</span>
+      </div>
+
+      <div class="info-card">
+        <label>Stock Mínimo</label>
+        <span>{{ data.stockMinimo }}</span>
+      </div>
+    </div>
+
+    <!-- Nombre -->
+    <div class="section">
+      <label>Nombre</label>
+
+      <div class="value">
+        {{ data.nombre }}
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div class="section">
+      <label>Descripción</label>
+
+      <div class="description">
+        {{ data.descripcion }}
+      </div>
+    </div>
+
+    <!-- Clasificación -->
+    <div class="section">
+      <label>Clasificación</label>
+
+      <div class="aux-card">
+        <div>
+          <small>Tipo de artículo</small>
+          <strong>
+            {{ data.tipoArticuloObj.nombre }}
+          </strong>
+        </div>
+
+        <div>
+          <small>Unidad de medida</small>
+          <strong>
+            {{ data.unidadMedidaObj.descripcion }}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información catálogo -->
+    <div class="section">
+      <label>Información del catálogo</label>
+
+      <div class="catalog-card">
+        <h5>{{ data.catalogoObj.nombre }}</h5>
+
+        <p>
+          {{ data.catalogoObj.definicionProducto }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Sinónimos -->
+    <div class="section">
+      <label>Sinónimos</label>
+
+      <div class="chips">
+        @for(item of data.catalogoObj.sinonimos.split(','); track item) {
+        <span class="chip">
+          {{ item }}
+        </span>
+        }
+      </div>
+    </div>
+
+    <!-- Existencia por almacén -->
+    <div class="section">
+      <label>Existencia por almacén</label>
+
+      <div class="warehouse-list">
+        @for(item of data.stockPorAlmacen; track item.idTipoAlmacen) {
+        <div class="warehouse-card">
+          <div>
+            <small>Almacén</small>
+
+            <strong>
+              {{ item.tipoAlmacenObj.nombre }}
+            </strong>
+          </div>
+
+          <div>
+            <small>Cantidad</small>
+
+            <strong>
+              {{ item.cantidad }}
+            </strong>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Auditoría -->
+    <div class="section">
+      <label>Auditoría</label>
+
+      <div class="aux-card">
+        <div>
+          <small>Fecha creación</small>
+          <strong>
+            {{ data.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
+          </strong>
+        </div>
+
+        <div>
+          <small>Última modificación</small>
+          <strong>
+            {{ data.fechaModif | date:'dd/MM/yyyy HH:mm' }}
+          </strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<h2>Tipos de productos</h2>
+
+<form
+  [formGroup]="product_type_form"
+  (submit)="save(product_type_form, 'idTipoArt')"
+  class="row g-2"
+>
+  <div class="form-floating">
+    <input
+      placeholder="Nombre de tipo de producto"
+      type="text"
+      class="form-control"
+      formControlName="nombre"
+      id="ProdType"
+    />
+    <label for="ProdType">Nombre de tipo de producto</label>
+  </div>
+
+  <app-form-actions
+    [editing]="product_type_form.dirty || (product_type_form.value.idTipoArt ?? 0) > 0"
+    [disabled]="!product_type_form.valid || loading()"
+    (clear)="product_type_form.reset()"
+  >
+  </app-form-actions>
+</form>
+
+<app-input-filter [(filter)]="search" [placeholder]="'Buscar tipo de producto'" />
+
+<app-table-of-content
+  [tableTitle]="'Listado de tipos de productos'"
+  [trackByField]="'idTipoArt'"
+  [tableData]="data()?.data || []"
+  [tableColumns]="tableColums"
+  [showPagination]="true"
+  [totalPages]="pagination().totalPages"
+  [currentPage]="pagination().currentPage"
+  [pageSize]="pagination().pageSize"
+  [totalItems]="pagination().totalItems"
+  (pageChange)="changePage($event)"
+  (pageSizeChange)="changePageSize($event)"
+  (edit)="setEditForm(product_type_form, $event)"
+  (remove)="remove($event.idTipoArt)"
+></app-table-of-content>

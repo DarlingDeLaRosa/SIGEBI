@@ -1,0 +1,86 @@
+<app-loading-toast></app-loading-toast>
+<mat-sidenav-container class="sidenavContainer">
+  <mat-sidenav class="sideNav" mode="side" [(opened)]="sidenavOpened">
+    <img class="logo" src="SIGEBIsm.png" alt="Relaciones Laborales" />
+
+    <a class="item-menu" [routerLink]="['/layout/inicio']" routerLinkActive="active">
+      <i class="bi bi-house-door"></i>Inicio
+    </a>
+
+    <a class="item-menu" [routerLink]="['/layout/orden-de-compra']" routerLinkActive="active">
+      <i class="bi bi-cart-check"></i>Orden de compra
+    </a>
+
+    <a class="item-menu" [routerLink]="['/layout/entradas']" routerLinkActive="active">
+      <i class="bi bi-box-arrow-in-down"></i>Entradas
+    </a>
+
+    <a class="item-menu" [routerLink]="['/layout/salidas']" routerLinkActive="active">
+      <i class="bi bi-box-arrow-up"></i>Salidas
+    </a>
+
+    <a class="item-menu" [routerLink]="['/layout/consiliaciones']" routerLinkActive="active">
+      <i class="bi bi-arrow-left-right"></i>Conciliaciones
+    </a>
+
+    <a class="item-menu" [routerLink]="['/layout/productos']" routerLinkActive="active">
+      <i class="bi bi-box-seam"></i>Productos
+    </a>
+
+    <a class="item-menu" [routerLink]="['/layout/solicitudes']" routerLinkActive="active">
+      <i class="bi bi-clipboard-check"></i>Solicitudes
+    </a>
+
+    <a class="item-menu" [routerLink]="['/layout/reportes']" routerLinkActive="active">
+      <i class="bi bi-bar-chart"></i>Reportes
+    </a>
+
+    <a class="item-menu" [routerLink]="['/layout/mantenimientos']" routerLinkActive="active">
+      <i class="bi bi-tools"></i>Mantenimientos
+    </a>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="componentsContent">
+    <mat-toolbar class="navbar">
+      <div class="btnMenuContainer">
+        <button class="btnMenu" (click)="sidenavOpened = !sidenavOpened">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <h2 class="departamento">REC</h2>
+      </div>
+
+      <div class="logout">
+        <h3 class="nombre">
+          <span style="color: #004b8d; font-weight: 600">{{ 'user.role' }}</span
+          >, {{ 'user.Firstname' }} {{ 'user.Lastname' }}
+        </h3>
+
+        <div class="dropdown">
+          <i
+            data-bs-toggle="dropdown"
+            class="bi bi-person"
+            role="button"
+            style="font-size: 30px"
+          ></i>
+
+          <ul class="dropdown-menu">
+            <li>
+              <button class="dropdown-item item-detail">
+                <!--(click)="logout()"-->
+                <i class="bi bi-box-arrow-left me-2"></i>
+                Cerrar sesión
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </mat-toolbar>
+
+    <div class="routerOuletContainer">
+      <div class="main-content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

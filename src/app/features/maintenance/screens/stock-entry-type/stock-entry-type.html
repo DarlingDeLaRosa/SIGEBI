@@ -1,0 +1,54 @@
+<h2>Tipos de entradas</h2>
+
+<form
+  [formGroup]="stock_entry_form"
+  (submit)="save(stock_entry_form, 'idTipoEntrada')"
+  class="row gx-1 gy-1"
+>
+  <div class="col-md-6 form-floating">
+    <input
+      placeholder="Nombre de tipo de entrada"
+      type="text"
+      class="form-control"
+      formControlName="nombre"
+      id="typeStockEntryName"
+    />
+    <label for="typeStockEntryName">Nombre de tipo de entrada</label>
+  </div>
+
+  <div class="col-md-6 form-floating">
+    <input
+      placeholder="Descripción de tipo de entrada"
+      type="text"
+      class="form-control"
+      formControlName="descripcion"
+      id="typeStockEntryDesc"
+    />
+    <label for="typeStockEntryDesc">Descripción de tipo de entrada</label>
+  </div>
+
+  <app-form-actions
+    [editing]="stock_entry_form.dirty || (stock_entry_form.value.idTipoEntrada ?? 0) > 0"
+    [disabled]="!stock_entry_form.valid || loading()"
+    (clear)="stock_entry_form.reset()"
+  >
+  </app-form-actions>
+</form>
+
+<app-input-filter [(filter)]="search" [placeholder]="'Buscar tipo de entrada'" />
+
+<app-table-of-content
+  [tableTitle]="'Listado de tipos de entrada'"
+  [trackByField]="'idTipoEntrada'"
+  [tableData]="data()?.data || []"
+  [tableColumns]="tableColums"
+  [totalItems]="pagination().totalItems"
+  [showPagination]="true"
+  [totalPages]="pagination().totalPages"
+  [currentPage]="pagination().currentPage"
+  [pageSize]="pagination().pageSize"
+  (pageChange)="changePage($event)"
+  (pageSizeChange)="changePageSize($event)"
+  (edit)="setEditForm(stock_entry_form, $event)"
+  (remove)="remove($event.idTipoEntrada)"
+></app-table-of-content>

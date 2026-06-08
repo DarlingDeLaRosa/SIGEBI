@@ -1,0 +1,130 @@
+.sidenavContainer {
+    height: 100vh;
+}
+
+.sideNav {
+    width: 265px;
+    background-color: #ffffff;
+}
+
+.active {
+    background-color: #004b8d;
+    color: white;
+}
+
+.componentsContent {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #e0e0e0;
+    background-color: #fafafa;
+    box-sizing: border-box;
+}
+
+.navbar {
+    box-sizing: border-box;
+    background-color: transparent;
+    justify-content: space-between;
+}
+
+.btnMenuContainer {
+    display: flex;
+    align-items: center;
+}
+
+.btnMenuContainer .btnMenu {
+    border: none;
+    background-color: transparent;
+}
+
+.btnMenuContainer .departamento {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 300;
+}
+
+.btnMenuContainer {
+    position: relative;
+}
+
+.btnMenuContainer .btnMenu {
+    border: none;
+    background-color: transparent;
+}
+
+.btnMenuContainer .departamento {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 300;
+}
+
+.logout {
+    display: flex;
+    align-items: center;
+}
+
+.logout .closeAccount {
+    width: 40px;
+    border: none;
+    color: white;
+    font-size: 20px;
+    border-radius: 100px;
+    background-color: #004b8d;
+}
+
+.logout .userName {
+    display: grid;
+    align-items: start;
+    grid-template-rows: 1fr 1fr;
+}
+
+.nombre {
+    margin-right: 10px;
+    font-size: 17px;
+}
+
+.logo {
+    width: 244.49px;
+    margin: 10px ;
+}
+
+.routerOuletContainer {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    width: 100%;
+    overflow-y: auto;
+    background-color: #fafafa;
+    box-sizing: border-box;
+}
+
+::ng-deep .routerOuletContainer::-webkit-scrollbar {
+    width: 5px;
+}
+
+::ng-deep .routerOuletContainer::-webkit-scrollbar-track {
+    background: #fafafa;
+}
+
+::ng-deep .routerOuletContainer::-webkit-scrollbar-thumb {
+    background-color: #004b8d;
+    border-radius: 5px;
+    /* border-left: 8px solid #ffffff; */
+}
+
+::ng-deep .routerOuletContainer::-webkit-scrollbar-thumb:hover {
+    background-color: #003366;
+}
+
+.componentsContent,
+.mat-drawer-content,
+.navbar,
+.logout {
+    overflow: visible !important;
+}
+
+.dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+}

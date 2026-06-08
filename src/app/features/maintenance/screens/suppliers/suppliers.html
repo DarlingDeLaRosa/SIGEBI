@@ -1,0 +1,81 @@
+<h2>Proveedores</h2>
+
+<form
+  [formGroup]="suppliers_form"
+  class="row gx-1 gy-1"
+  (submit)="save(suppliers_form, 'idProveedor', () => clearForm())"
+>
+  <div class="col-md-4 form-floating">
+    <input type="text" class="form-control" placeholder="RNC" formControlName="rnc" id="rnc" />
+    <label for="rnc">RNC</label>
+  </div>
+
+  <app-search-select
+    class="col-md-4"
+    placeholder="Razón Social"
+    [items]="suppliers()"
+    [initialItems]="suppliers()"
+    [displayField]="'razonSocial'"
+    [value]="suppliers_form.get('razonSocial')?.value"
+    (search)="consultSuppliers($event)"
+    (selected)="setSupplier($event)"
+  />
+
+  <div class="col-md-4 form-floating">
+    <input
+      placeholder="Nombre comercial"
+      type="text"
+      class="form-control"
+      formControlName="nombreComercial"
+      id="nombreComercial"
+    />
+    <label for="nombreComercial">Nombre comercial</label>
+  </div>
+
+  <div class="col-md-6 form-floating">
+    <input
+      placeholder="Representante"
+      type="text"
+      class="form-control"
+      formControlName="representante"
+      id="representante"
+    />
+    <label for="representante">Representante</label>
+  </div>
+
+  <div class="col-md-6 form-floating">
+    <input
+      placeholder="Contacto del representante"
+      type="text"
+      class="form-control"
+      formControlName="telRepresentante"
+      id="telRepresentante"
+    />
+    <label for="telRepresentante">Contacto del representante</label>
+  </div>
+
+  <app-form-actions
+    [editing]="suppliers_form.dirty || (suppliers_form.value.idProveedor ?? 0) > 0"
+    [disabled]="!suppliers_form.valid || loading()"
+    (clear)="clearForm()"
+  >
+  </app-form-actions>
+</form>
+
+<app-input-filter [(filter)]="search" [placeholder]="'Buscar proveedores'" />
+
+<app-table-of-content
+  [tableTitle]="'Listado de proveedores'"
+  [trackByField]="'idProveedor'"
+  [tableData]="data()?.data || []"
+  [tableColumns]="tableColums"
+  [totalItems]="pagination().totalItems"
+  [showPagination]="true"
+  [totalPages]="pagination().totalPages"
+  [currentPage]="pagination().currentPage"
+  [pageSize]="pagination().pageSize"
+  (pageChange)="changePage($event)"
+  (pageSizeChange)="changePageSize($event)"
+  (edit)="setEditForm(suppliers_form, $event)"
+  (remove)="remove($event.idProveedor)"
+></app-table-of-content>

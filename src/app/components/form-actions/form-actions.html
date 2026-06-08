@@ -1,0 +1,13 @@
+<div class="col-12 d-flex justify-content-end gap-1">
+  @if (editing()) {
+    <button class="btn remove" type="button" (click)="clear.emit()">
+      <i class="bi bi-eraser"></i>
+      limpiar  
+    </button>
+  }
+  
+  <button class="btn save" type="submit" [disabled]="disabled()">
+    <i [class]="iconActionBoton()"></i>
+    {{ nameActionBoton() }} 
+  </button>
+</div>

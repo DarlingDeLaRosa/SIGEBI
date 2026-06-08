@@ -1,0 +1,76 @@
+<h2>Catálogo</h2>
+
+<form [formGroup]="catalog_form" (submit)="save(catalog_form)" class="row gx-1 gy-1">
+  <div class="col-md-4 form-floating">
+    <input
+      placeholder="Nombre"
+      type="text"
+      class="form-control"
+      formControlName="nombre"
+      id="catalogName"
+    />
+    <label for="catalogName">Nombre</label>
+  </div>
+
+  <div class="col-md-8 form-floating">
+    <input
+      placeholder="Definición de producto"
+      type="text"
+      class="form-control"
+      formControlName="definicionProducto"
+      id="defProd"
+    />
+    <label for="defProd">Definición de producto</label>
+  </div>
+
+  <div class="col-md-8 form-floating">
+    <input
+      placeholder="Sinonimos"
+      type="text"
+      class="form-control"
+      formControlName="sinonimos"
+      id="sinonimus"
+    />
+    <label for="sinonimus">Sinonimos</label>
+  </div>
+
+  <app-search-select
+    class="col-md-4"
+    placeholder="Cuenta de producto auxiliar"
+    [items]="auxiliar()"
+    [initialItems]="auxiliar()"
+    [displayField]="'denominacion'"
+    [valueField]="'id'"
+    [value]="catalog_form.get('auxiliar')?.value"
+    (search)="getAuxiliar($event)"
+    [selectedItem]="auxiliarSelected()"
+    (selected)="setAuxiliar($event)"
+  />
+
+  <app-form-actions
+    [editing]="catalog_form.dirty || (catalog_form.value.id ?? 0) > 0"
+    [disabled]="!catalog_form.valid || loading()"
+    (clear)="catalog_form.reset()"
+  >
+  </app-form-actions>
+</form>
+
+<app-input-filter [(filter)]="search" [placeholder]="'Buscar cuenta de producto'" />
+
+<app-table-of-content
+  [showDetail]="true"
+  (showDialog)="openDialog($event)"
+  [tableTitle]="'Listado de cuentas y productos del catálogo'"
+  [trackByField]="'id'"
+  [tableData]="data()?.data || []"
+  [tableColumns]="tableColums"
+  [totalItems]="pagination().totalItems"
+  [showPagination]="true"
+  [totalPages]="pagination().totalPages"
+  [currentPage]="pagination().currentPage"
+  [pageSize]="pagination().pageSize"
+  (pageChange)="changePage($event)"
+  (pageSizeChange)="changePageSize($event)"
+  (edit)="setCatalogData($event)"
+  (remove)="remove($event.id)"
+></app-table-of-content>

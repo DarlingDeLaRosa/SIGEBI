@@ -1,0 +1,154 @@
+<div class="title">
+  <h1>Gestionar ordenes de compra</h1>
+
+  <span class="d-flex gap-1">
+    <button class="btn navigate" [routerLink]="['../ordenes-de-compra']">
+      Listado de ordenes de compra
+    </button>
+  </span>
+</div>
+
+<form>
+  <div class="box row gx-1 gy-1">
+    <h2>Creación de orden de compra</h2>
+
+    <div class="col-md-3 form-floating">
+      <input
+        type="text"
+        class="form-control"
+        id="noExpediente"
+        placeholder="Numero de expediente"
+      />
+      <label for="noExpediente">Numero de expediente</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="noOrden" placeholder="Numero de orden" />
+      <label for="noOrden">Numero de orden</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input
+        type="text"
+        class="form-control"
+        id="Modalidaddecompra"
+        placeholder="Modalidad de compra"
+      />
+      <label for="Modalidaddecompra">Modalidad de compra</label>
+    </div>
+
+    <app-search-select class="col-md-4" placeholder="Tipo de producto" />
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="Anticipo" placeholder="Anticipo" />
+      <label for="Anticipo">Anticipo</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="Formadepago" placeholder="Forma de pago" />
+      <label for="Formadepago">Forma de pago</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input
+        type="text"
+        class="form-control"
+        id="plazoDePago"
+        placeholder="plazo de pago con recepción conforme"
+      />
+      <label for="plazoDePago">Plazo de pago con recepción conforme</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="MontoTotal" placeholder="Monto Total" />
+      <label for="MontoTotal">Monto Total</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="descripcion" placeholder="Descripción" />
+      <label for="descripcion">Descripción</label>
+    </div>
+  </div>
+
+  <div class="box row gx-1 gy-1 mt-2">
+    <h2>Detalles de la orden</h2>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="item" placeholder="Item" />
+      <label for="item">Item</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="producto" placeholder="Producto" />
+      <label for="producto">Producto</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="unidad" placeholder="Unidad" />
+      <label for="unidad">Unidad de medida</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="codigo" placeholder="Código" />
+      <label for="codigo">Código</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="cantidad" placeholder="Cantidad" />
+      <label for="cantidad">Cantidad</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="itbis" placeholder="ITBIS" />
+      <label for="itbis">ITBIS</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="moneda" placeholder="Moneda" />
+      <label for="moneda">Moneda</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="Descuento" placeholder="Descuento" />
+      <label for="Descuento">Descuento</label>
+    </div>
+
+    <div class="col-md-3 form-floating">
+      <input type="text" class="form-control" id="descripcion" placeholder="Descripción" />
+      <label for="descripcion">Descripción</label>
+    </div>
+  </div>
+
+  <div class="box mt-2">
+    <!-- (showDialog)="openDialog($event)" -->
+    <app-table-of-content
+      [showDetail]="true"
+      [showContent]="true"
+      [tableTitle]="'Listado de productos'"
+      [trackByField]="'idProducto'"
+      [tableData]="data()?.data || []"
+      [tableColumns]="tableColums"
+      [totalItems]="pagination().totalItems"
+      [showPagination]="true"
+      [totalPages]="pagination().totalPages"
+      [currentPage]="pagination().currentPage"
+      [pageSize]="pagination().pageSize"
+      (pageChange)="changePage($event)"
+      (pageSizeChange)="changePageSize($event)"
+      (remove)="remove($event.idProducto)"
+    >
+      <div class="d-flex justify-content-end">
+        <div class="Total">
+          <div>Subtotal: 5200</div>
+          <div>Total: 5200</div>
+        </div>
+      </div>
+    </app-table-of-content>
+    <!-- (edit)="setProduct($event)" -->
+  </div>
+
+  <div class="box mt-2">
+    <app-form-actions>
+    </app-form-actions>
+  </div>
+</form>

@@ -1,0 +1,92 @@
+<div class="title">
+  <h1>Ordenes de compra</h1>
+
+  <span class="d-flex gap-1">
+    <button class="btn navigate" (click)="this.filteringProduct = !this.filteringProduct;">
+      {{ filteringProduct ? 'Ocultar filtros' : 'Filtrar productos' }}
+    </button>
+
+    <button class="btn navigate"  [routerLink]="['../gestionar-ordenes-de-compra']"> Gestionar orden de compra </button>
+  </span>
+</div>
+
+@if (filteringProduct) {
+  <!-- <form [formGroup]="filter_form" (submit)="loadData(filter_form.getRawValue())" class="box mb-2">
+    <app-create-conditional-box [formName]="'Filtrar productos'">
+      <div class="col-md-4 form-floating">
+        <input
+          type="text"
+          formControlName="filter"
+          class="form-control"
+          [placeholder]="'Nombre de producto'"
+        />
+        <label for="filter">Nombre de producto</label>
+      </div>
+
+      <app-search-select
+        class="col-md-4"
+        placeholder="Tipo de producto"
+        [items]="productType()"
+        [initialItems]="productType()"
+        [displayField]="'nombre'"
+        [valueField]="'idTipoArt'"
+        [value]="filter_form.get('idTipoArticulo')?.value"
+        (search)="getProductType($event)"
+        [selectedItem]="filterSelections.productType()"
+        [showAll]="true"
+        (selected)="
+          setSelection(
+            filterSelections.productType,
+            filter_form,
+            'idTipoArticulo',
+            $event,
+            'idTipoArt'
+          )
+        "
+      />
+
+      <app-search-select
+        class="col-md-4"
+        placeholder="Catalogo"
+        [items]="catalog()"
+        [initialItems]="catalog()"
+        [displayField]="'nombre'"
+        [valueField]="'id'"
+        [value]="filter_form.get('idCatalogo')?.value"
+        (search)="getCatalog($event)"
+        [selectedItem]="filterSelections.catalog()"
+        [showAll]="true"
+        (selected)="setSelection(filterSelections.catalog, filter_form, 'idCatalogo', $event, 'id')"
+      />
+
+      <app-form-actions
+        [nameActionBoton]="'Filtrar'"
+        [iconActionBoton]="'bi bi-search'"
+        [editing]="filter_form.dirty"
+        [disabled]="!filter_form.dirty || loading()"
+        (clear)="clearForm(); loadData()"
+      >
+      </app-form-actions>
+    </app-create-conditional-box>
+  </form> -->
+}
+
+<div class="box">
+    <!-- (showDialog)="openDialog($event)" -->
+  <app-table-of-content
+    [showDetail]="true"
+    [tableTitle]="'Listado de ordenes de compra'"
+    [trackByField]="'idOrden'"
+    [tableData]="data()?.data || []"
+    [tableColumns]="tableColums"
+    [totalItems]="pagination().totalItems"
+    [showPagination]="true"
+    [totalPages]="pagination().totalPages"
+    [currentPage]="pagination().currentPage"
+    [pageSize]="pagination().pageSize"
+    (pageChange)="changePage($event)"
+    (pageSizeChange)="changePageSize($event)"
+    (remove)="remove($event.idOrden)"
+    ></app-table-of-content>
+    <!-- (edit)="setProduct($event)" -->
+</div>

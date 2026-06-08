@@ -1,0 +1,12 @@
+<div
+  class="loading-toast"
+  [class.show]="loadingService.loading()"
+  [class.hide]="!loadingService.loading()"
+>
+  <div class="spinner"></div>
+
+  <div class="loading-content">
+    <h3>Cargando</h3>
+    <p>Espere un momento...</p>
+  </div>
+</div>

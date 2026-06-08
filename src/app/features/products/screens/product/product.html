@@ -1,0 +1,213 @@
+<div class="title">
+  <h1>Productos</h1>
+
+  <span class="d-flex gap-1">
+    <button class="btn navigate" (click)="toggleFilters()">
+      {{ filteringProduct ? 'Ocultar filtros' : 'Filtrar productos' }}
+    </button>
+
+    <button class="btn navigate" (click)="toggleCreate()">
+      {{ creatingProduct ? 'Ocultar formulario' : 'Crear producto' }}
+    </button>
+  </span>
+</div>
+
+@if (creatingProduct) {
+  <form class="box mb-2" [formGroup]="product_form" (submit)="save(product_form, 'idProducto')">
+    <app-create-conditional-box [formName]="'Crear producto'">
+      
+      <div class="col-md-6 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="nombre"
+          placeholder="Nombre de producto"
+          id="prodName"
+        />
+            <label for="prodName">Nombre de producto</label>
+
+      </div>
+
+      <div class="col-md-2 form-floating">
+        <input
+          placeholder="Precio"
+          type="number"
+          class="form-control"
+          formControlName="precio"
+          id="price"
+        />
+        <label for="price">Precio</label>
+      </div>
+
+      <div class="col-md-2 form-floating">
+        <input
+          placeholder="ITBIS"
+          type="number"
+          class="form-control"
+          formControlName="itbis"
+          id="itbis"
+        />
+        <label for="itbis">ITBIS</label>
+      </div>
+
+      <div class="col-md-2 form-floating">
+        <input
+          placeholder="Existencia minima"
+          type="number"
+          class="form-control"
+          formControlName="stockMinimo"
+          id="stockMin"
+        />
+        <label for="stockMin">Existencia mínima</label>
+      </div>
+
+      <app-search-select
+        class="col-md-4"
+        placeholder="Unidad de medida"
+        [items]="unitsOfMeasure()"
+        [initialItems]="unitsOfMeasure()"
+        [displayField]="'descripcion'"
+        [valueField]="'idUnidadMe'"
+        [value]="product_form.get('idUnidadMe')?.value"
+        (search)="getUnitsOfMeasure($event)"
+        [selectedItem]="formSelections.unitOfMeasure()"
+        (selected)="
+          setSelection(
+            formSelections.unitOfMeasure,
+            product_form,
+            'idUnidadMe',
+            $event,
+            'idUnidadMe'
+          )
+        "
+      />
+
+      <app-search-select
+        class="col-md-4"
+        placeholder="Tipo de producto"
+        [items]="productType()"
+        [initialItems]="productType()"
+        [displayField]="'nombre'"
+        [valueField]="'idTipoArt'"
+        [value]="product_form.get('idTipoArt')?.value"
+        (search)="getProductType($event)"
+        [selectedItem]="formSelections.productType()"
+        (selected)="
+          setSelection(formSelections.productType, product_form, 'idTipoArt', $event, 'idTipoArt')
+        "
+      />
+
+      <app-search-select
+        class="col-md-4"
+        placeholder="Catalogo"
+        [items]="catalog()"
+        [initialItems]="catalog()"
+        [displayField]="'nombre'"
+        [valueField]="'id'"
+        [value]="product_form.get('idCatalogo')?.value"
+        (search)="getCatalog($event)"
+        [selectedItem]="formSelections.catalog()"
+        (selected)="setSelection(formSelections.catalog, product_form, 'idCatalogo', $event, 'id')"
+      />
+
+      <div class="col-md-12 form-floating">
+        <input
+          placeholder="Descripción"
+          type="text"
+          class="form-control"
+          formControlName="descripcion"
+          id="description"
+        />
+        <label for="description">Descripción</label>
+      </div>
+
+      <app-form-actions
+        [editing]="product_form.dirty || (product_form.value.idProducto ?? 0) > 0"
+        [disabled]="!product_form.valid || loading()"
+        (clear)="clearForm()"
+      >
+      </app-form-actions>
+    </app-create-conditional-box>
+  </form>
+}
+
+@if (filteringProduct) {
+  <form [formGroup]="filter_form" (submit)="loadData(filter_form.getRawValue())" class="box mb-2">
+    <app-create-conditional-box [formName]="'Filtrar productos'">
+      <div class="col-md-4 form-floating">
+        <input
+          type="text"
+          formControlName="filter"
+          class="form-control"
+          [placeholder]="'Nombre de producto'"
+        />
+        <label for="filter">Nombre de producto</label>
+      </div>
+
+      <app-search-select
+        class="col-md-4"
+        placeholder="Tipo de producto"
+        [items]="productType()"
+        [initialItems]="productType()"
+        [displayField]="'nombre'"
+        [valueField]="'idTipoArt'"
+        [value]="filter_form.get('idTipoArticulo')?.value"
+        (search)="getProductType($event)"
+        [selectedItem]="filterSelections.productType()"
+        [showAll]="true"
+        (selected)="
+          setSelection(
+            filterSelections.productType,
+            filter_form,
+            'idTipoArticulo',
+            $event,
+            'idTipoArt'
+          )
+        "
+      />
+
+      <app-search-select
+        class="col-md-4"
+        placeholder="Catalogo"
+        [items]="catalog()"
+        [initialItems]="catalog()"
+        [displayField]="'nombre'"
+        [valueField]="'id'"
+        [value]="filter_form.get('idCatalogo')?.value"
+        (search)="getCatalog($event)"
+        [selectedItem]="filterSelections.catalog()"
+        [showAll]="true"
+        (selected)="setSelection(filterSelections.catalog, filter_form, 'idCatalogo', $event, 'id')"
+      />
+
+      <app-form-actions
+        [nameActionBoton]="'Filtrar'"
+        [iconActionBoton]="'bi bi-search'"
+        [editing]="filter_form.dirty"
+        [disabled]="!filter_form.dirty || loading()"
+        (clear)="clearForm(); loadData()"
+      >
+      </app-form-actions>
+    </app-create-conditional-box>
+  </form>
+}
+
+<div class="box">
+  <app-table-of-content
+    [showDetail]="true"
+    (showDialog)="openDialog($event)"
+    [tableTitle]="'Listado de productos'"
+    [trackByField]="'idProducto'"
+    [tableData]="data()?.data || []"
+    [tableColumns]="tableColums"
+    [totalItems]="pagination().totalItems"
+    [showPagination]="true"
+    [totalPages]="pagination().totalPages"
+    [currentPage]="pagination().currentPage"
+    [pageSize]="pagination().pageSize"
+    (pageChange)="changePage($event)"
+    (pageSizeChange)="changePageSize($event)"
+    (edit)="setProduct($event)"
+    (remove)="remove($event.idProducto)"
+  ></app-table-of-content>
+</div>
