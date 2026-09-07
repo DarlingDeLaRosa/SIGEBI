@@ -3,19 +3,18 @@
 
   <span class="d-flex gap-1">
     <button class="btn navigate" (click)="toggleFilters()">
-      {{ filteringProduct ? 'Ocultar filtros' : 'Filtrar productos' }}
+      {{ filteringProduct() ? 'Ocultar filtros' : 'Filtrar productos' }}
     </button>
 
     <button class="btn navigate" (click)="toggleCreate()">
-      {{ creatingProduct ? 'Ocultar formulario' : 'Crear producto' }}
+      {{ creatingProduct() ? 'Ocultar formulario' : 'Crear producto' }}
     </button>
   </span>
 </div>
 
-@if (creatingProduct) {
-  <form class="box mb-2" [formGroup]="product_form" (submit)="save(product_form, 'idProducto')">
+@if (creatingProduct()) {
+  <form class="box mb-2" [formGroup]="productForm" (submit)="save(productForm, 'idProducto')">
     <app-create-conditional-box [formName]="'Crear producto'">
-      
       <div class="col-md-6 form-floating">
         <input
           type="text"
@@ -24,8 +23,7 @@
           placeholder="Nombre de producto"
           id="prodName"
         />
-            <label for="prodName">Nombre de producto</label>
-
+        <label for="prodName">Nombre de producto</label>
       </div>
 
       <div class="col-md-2 form-floating">
@@ -64,17 +62,17 @@
       <app-search-select
         class="col-md-4"
         placeholder="Unidad de medida"
-        [items]="unitsOfMeasure()"
-        [initialItems]="unitsOfMeasure()"
+        [items]="facade.unitsOfMeasure()"
+        [initialItems]="facade.unitsOfMeasure()"
         [displayField]="'descripcion'"
         [valueField]="'idUnidadMe'"
-        [value]="product_form.get('idUnidadMe')?.value"
-        (search)="getUnitsOfMeasure($event)"
-        [selectedItem]="formSelections.unitOfMeasure()"
+        [value]="productForm.get('idUnidadMe')?.value"
+        (search)="facade.loadUnits($event)"
+        [selectedItem]="facade.formSelections.unitOfMeasure()"
         (selected)="
           setSelection(
-            formSelections.unitOfMeasure,
-            product_form,
+            facade.formSelections.unitOfMeasure,
+            productForm,
             'idUnidadMe',
             $event,
             'idUnidadMe'
@@ -85,29 +83,37 @@
       <app-search-select
         class="col-md-4"
         placeholder="Tipo de producto"
-        [items]="productType()"
-        [initialItems]="productType()"
+        [items]="facade.productTypes()"
+        [initialItems]="facade.productTypes()"
         [displayField]="'nombre'"
         [valueField]="'idTipoArt'"
-        [value]="product_form.get('idTipoArt')?.value"
-        (search)="getProductType($event)"
-        [selectedItem]="formSelections.productType()"
+        [value]="productForm.get('idTipoArt')?.value"
+        (search)="facade.loadProductTypes($event)"
+        [selectedItem]="facade.formSelections.productType()"
         (selected)="
-          setSelection(formSelections.productType, product_form, 'idTipoArt', $event, 'idTipoArt')
+          setSelection(
+            facade.formSelections.productType,
+            productForm,
+            'idTipoArt',
+            $event,
+            'idTipoArt'
+          )
         "
       />
 
       <app-search-select
         class="col-md-4"
         placeholder="Catalogo"
-        [items]="catalog()"
-        [initialItems]="catalog()"
+        [items]="facade.catalogs()"
+        [initialItems]="facade.catalogs()"
         [displayField]="'nombre'"
         [valueField]="'id'"
-        [value]="product_form.get('idCatalogo')?.value"
-        (search)="getCatalog($event)"
-        [selectedItem]="formSelections.catalog()"
-        (selected)="setSelection(formSelections.catalog, product_form, 'idCatalogo', $event, 'id')"
+        [value]="productForm.get('idCatalogo')?.value"
+        (search)="facade.loadCatalogs($event)"
+        [selectedItem]="facade.formSelections.catalog()"
+        (selected)="
+          setSelection(facade.formSelections.catalog, productForm, 'idCatalogo', $event, 'id')
+        "
       />
 
       <div class="col-md-12 form-floating">
@@ -122,8 +128,8 @@
       </div>
 
       <app-form-actions
-        [editing]="product_form.dirty || (product_form.value.idProducto ?? 0) > 0"
-        [disabled]="!product_form.valid || loading()"
+        [editing]="productForm.dirty || (productForm.value.idProducto ?? 0) > 0"
+        [disabled]="!productForm.valid || loading()"
         (clear)="clearForm()"
       >
       </app-form-actions>
@@ -131,9 +137,10 @@
   </form>
 }
 
-@if (filteringProduct) {
-  <form [formGroup]="filter_form" (submit)="loadData(filter_form.getRawValue())" class="box mb-2">
+@if (filteringProduct()) {
+  <form [formGroup]="filterForm" (submit)="loadData(filterForm.getRawValue())" class="box mb-2">
     <app-create-conditional-box [formName]="'Filtrar productos'">
+      
       <div class="col-md-4 form-floating">
         <input
           type="text"
@@ -147,18 +154,18 @@
       <app-search-select
         class="col-md-4"
         placeholder="Tipo de producto"
-        [items]="productType()"
-        [initialItems]="productType()"
+        [items]="facade.productTypes()"
+        [initialItems]="facade.productTypes()"
         [displayField]="'nombre'"
         [valueField]="'idTipoArt'"
-        [value]="filter_form.get('idTipoArticulo')?.value"
-        (search)="getProductType($event)"
-        [selectedItem]="filterSelections.productType()"
+        [value]="filterForm.get('idTipoArticulo')?.value"
+        (search)="facade.loadProductTypes($event)"
+        [selectedItem]="facade.filterSelections.productType()"
         [showAll]="true"
         (selected)="
           setSelection(
-            filterSelections.productType,
-            filter_form,
+            facade.filterSelections.productType,
+            filterForm,
             'idTipoArticulo',
             $event,
             'idTipoArt'
@@ -169,22 +176,24 @@
       <app-search-select
         class="col-md-4"
         placeholder="Catalogo"
-        [items]="catalog()"
-        [initialItems]="catalog()"
+        [items]="facade.catalogs()"
+        [initialItems]="facade.catalogs()"
         [displayField]="'nombre'"
         [valueField]="'id'"
-        [value]="filter_form.get('idCatalogo')?.value"
-        (search)="getCatalog($event)"
-        [selectedItem]="filterSelections.catalog()"
+        [value]="filterForm.get('idCatalogo')?.value"
+        (search)="facade.loadCatalogs($event)"
+        [selectedItem]="facade.filterSelections.catalog()"
         [showAll]="true"
-        (selected)="setSelection(filterSelections.catalog, filter_form, 'idCatalogo', $event, 'id')"
+        (selected)="
+          setSelection(facade.filterSelections.catalog, filterForm, 'idCatalogo', $event, 'id')
+        "
       />
 
       <app-form-actions
         [nameActionBoton]="'Filtrar'"
         [iconActionBoton]="'bi bi-search'"
-        [editing]="filter_form.dirty"
-        [disabled]="!filter_form.dirty || loading()"
+        [editing]="filterForm.dirty"
+        [disabled]="!filterForm.dirty || loading()"
         (clear)="clearForm(); loadData()"
       >
       </app-form-actions>
@@ -199,7 +208,7 @@
     [tableTitle]="'Listado de productos'"
     [trackByField]="'idProducto'"
     [tableData]="data()?.data || []"
-    [tableColumns]="tableColums"
+    [tableColumns]="tableColumns"
     [totalItems]="pagination().totalItems"
     [showPagination]="true"
     [totalPages]="pagination().totalPages"
@@ -207,7 +216,7 @@
     [pageSize]="pagination().pageSize"
     (pageChange)="changePage($event)"
     (pageSizeChange)="changePageSize($event)"
-    (edit)="setProduct($event)"
+    (edit)="editProduct($event.row)"
     (remove)="remove($event.idProducto)"
   ></app-table-of-content>
 </div>

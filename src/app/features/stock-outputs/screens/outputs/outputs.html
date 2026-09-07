@@ -1,0 +1,32 @@
+<div class="title">
+  <h1>Salidas</h1>
+
+  <span class="d-flex gap-1">
+    <button class="btn navigate"  (click)="this.filteringOutput = !this.filteringOutput;" >
+      {{ filteringOutput ? 'Ocultar filtros' : 'Filtrar productos' }}
+    </button>
+
+    <button class="btn navigate"  [routerLink]="['../gestionar-Salidas']"  >
+      Crear salida
+    </button>
+  </span>
+</div>
+
+<div class="box">
+    <!-- [tableColumns]="tableColumns" -->
+  <app-table-of-content
+    [showDetail]="true"
+    [tableTitle]="'Listado de salidas'"
+    [trackByField]="'idSalida'"
+    [tableData]="data()?.data || []"
+    [totalItems]="pagination().totalItems"
+    [showPagination]="true"
+    [totalPages]="pagination().totalPages"
+    [currentPage]="pagination().currentPage"
+    [pageSize]="pagination().pageSize"
+    (pageChange)="changePage($event)"
+    (pageSizeChange)="changePageSize($event)"
+    (remove)="remove($event.idSalida)"
+    ></app-table-of-content>
+    <!-- (edit)="setProduct($event)" -->
+</div>

@@ -8,147 +8,308 @@
   </span>
 </div>
 
-<form>
-  <div class="box row gx-1 gy-1">
-    <h2>Creación de orden de compra</h2>
+<form [formGroup]="purchaseContractForm" (submit)="save()">
+  <app-section-box title="Información general de orden de compra">
+    <div class="row gx-1 gy-1">
+      <div class="col-md-3 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="noExpediente"
+          formControlName="noExpediente"
+          placeholder="Número de expediente"
+        />
+        <label for="noExpediente">Número de expediente</label>
+      </div>
 
-    <div class="col-md-3 form-floating">
-      <input
-        type="text"
-        class="form-control"
-        id="noExpediente"
-        placeholder="Numero de expediente"
-      />
-      <label for="noExpediente">Numero de expediente</label>
-    </div>
+      <div class="col-md-3 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          id="noOrden"
+          formControlName="noOrden"
+          placeholder="Número de orden"
+        />
+        <label for="noOrden">Número de orden</label>
+      </div>
 
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="noOrden" placeholder="Numero de orden" />
-      <label for="noOrden">Numero de orden</label>
-    </div>
-
-    <div class="col-md-3 form-floating">
-      <input
-        type="text"
-        class="form-control"
-        id="Modalidaddecompra"
+      <app-search-select
+        class="col-md-3"
         placeholder="Modalidad de compra"
+        [items]="facadeReference.filteredPurchasesTypes()"
+        [initialItems]="facadeReference.purchasesTypes()"
+        [displayField]="'name'"
+        [valueField]="'value'"
+        [value]="purchaseContractForm.get('modalidadCompra')?.value"
+        (search)="facadeReference.filterPurchasesTypes($event)"
+        [selectedItem]="facadeReference.filterSelections.purchasesType()"
+        [showAll]="true"
+        (selected)="
+          setSelection(
+            facadeReference.filterSelections.purchasesType,
+            purchaseContractForm,
+            'modalidadCompra',
+            $event,
+            'value'
+          )
+        "
       />
-      <label for="Modalidaddecompra">Modalidad de compra</label>
-    </div>
 
-    <app-search-select class="col-md-4" placeholder="Tipo de producto" />
-
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="Anticipo" placeholder="Anticipo" />
-      <label for="Anticipo">Anticipo</label>
-    </div>
-
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="Formadepago" placeholder="Forma de pago" />
-      <label for="Formadepago">Forma de pago</label>
-    </div>
-
-    <div class="col-md-3 form-floating">
-      <input
-        type="text"
-        class="form-control"
-        id="plazoDePago"
-        placeholder="plazo de pago con recepción conforme"
+      <app-search-select
+        class="col-md-3"
+        placeholder="Forma de pago"
+        [items]="facadeReference.filteredPaymentMethods()"
+        [initialItems]="facadeReference.paymentMethods()"
+        [displayField]="'name'"
+        [valueField]="'value'"
+        [value]="purchaseContractForm.get('formaPago')?.value"
+        [selectedItem]="facadeReference.filterSelections.paymentMethod()"
+        (search)="facadeReference.filterPaymentMethods($event)"
+        [showAll]="true"
+        (selected)="
+          setSelection(
+            facadeReference.filterSelections.paymentMethod,
+            purchaseContractForm,
+            'formaPago',
+            $event,
+            'value'
+          )
+        "
       />
-      <label for="plazoDePago">Plazo de pago con recepción conforme</label>
-    </div>
 
+      <app-search-select
+        class="col-md-3"
+        placeholder="Moneda"
+        [items]="facade.filteredCurrencies()"
+        [initialItems]="facade.currencies()"
+        [displayField]="'name'"
+        [valueField]="'value'"
+        [value]="purchaseContractForm.get('moneda')?.value"
+        [selectedItem]="facade.formSelections.currency()"
+        (search)="facade.filterCurrencies($event)"
+        [showAll]="true"
+        (selected)="
+          setSelection(
+            facade.formSelections.currency,
+            purchaseContractForm,
+            'moneda',
+            $event,
+            'value'
+          )
+        "
+      />
+
+      <div class="col-md-2 form-floating">
+        <input
+          type="number"
+          class="form-control"
+          id="Anticipo"
+          formControlName="anticipo"
+          placeholder="Anticipo"
+        />
+        <label for="Anticipo">Anticipo</label>
+      </div>
+
+      <div class="col-md-2 form-floating">
+        <input
+          type="number"
+          class="form-control"
+          id="plazoDePago"
+          formControlName="plazoPago"
+          placeholder="plazo de pago con recepción conforme"
+        />
+        <label for="plazoDePago">Plazo de pago: Días</label>
+      </div>
+
+      <app-search-select
+        class="col-md-5"
+        placeholder="Proveedor"
+        [items]="facadeReference.suppliers()"
+        [initialItems]="facadeReference.suppliers()"
+        [displayField]="'razonSocial'"
+        [valueField]="'idProveedor'"
+        [value]="purchaseContractForm.get('idProveedor')?.value"
+        (search)="facadeReference.loadSupplier($event)"
+        [selectedItem]="facadeReference.filterSelections.idProveedor()"
+        [showAll]="true"
+        (selected)="
+          setSelection(
+            facadeReference.filterSelections.idProveedor,
+            purchaseContractForm,
+            'idProveedor',
+            $event,
+            'idProveedor'
+          )
+        "
+      />
+    </div>
+  </app-section-box>
+
+  <app-section-box title="Detalles de la orden de compra">
+    <form
+      [formGroup]="purchaseContractDetailForm"
+      (submit)="this.facade.addDetail(this.purchaseContractDetailForm)"
+      class="row gx-1 gy-1 mt-2"
+    >
+      <app-search-select
+        class="col-md-4"
+        placeholder="Producto"
+        [items]="facade.product()"
+        [initialItems]="facade.product()"
+        [displayField]="'nombre'"
+        [displaySubField]="'descripcion'"
+        [valueField]="'idProducto'"
+        [value]="purchaseContractDetailForm.get('idProducto')?.value"
+        (search)="facade.loadProduct($event)"
+        [selectedItem]="facade.formSelections.idProducto()"
+        (selected)="productSelection($event)"
+      />
+
+      <div class="col-md-2 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="precioUnitario"
+          id="item"
+          placeholder="Item"
+        />
+        <label for="item">Precio</label>
+      </div>
+
+      <div class="col-md-2 form-floating">
+        <input
+          type="number"
+          class="form-control"
+          formControlName="cantidad"
+          id="cantidad"
+          placeholder="Cantidad"
+        />
+        <label for="cantidad">Cantidad</label>
+      </div>
+
+      <div class="col-md-4 form-floating">
+        <input
+          type="text"
+          formControlName="catalog"
+          class="form-control"
+          id="codigo"
+          placeholder="Código"
+        />
+        <label for="codigo">Categoria de catalogo</label>
+      </div>
+
+      <!-- 
     <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="MontoTotal" placeholder="Monto Total" />
-      <label for="MontoTotal">Monto Total</label>
-    </div>
+      <input type="text" class="form-control" formControlName="moneda" id="item" placeholder="Item" />
+      <label for="item">Importe Moneda Orig</label>
+    </div> -->
 
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="descripcion" placeholder="Descripción" />
-      <label for="descripcion">Descripción</label>
-    </div>
-  </div>
+      <app-search-select
+        class="col-md-4"
+        placeholder="Unidad de medida"
+        [items]="facade.unitsOfMeasure()"
+        [initialItems]="facade.unitsOfMeasure()"
+        [displayField]="'descripcion'"
+        [valueField]="'idUnidadMe'"
+        [value]="purchaseContractDetailForm.get('idUnidadMe')?.value"
+        (search)="facade.loadUnits($event)"
+        [selectedItem]="facade.formSelections.idUnidadMe()"
+        (selected)="
+          setSelection(
+            facade.formSelections.idUnidadMe,
+            purchaseContractDetailForm,
+            'idUnidadMe',
+            $event,
+            'idUnidadMe',
+            true  
+          )
+        "
+      />
 
-  <div class="box row gx-1 gy-1 mt-2">
-    <h2>Detalles de la orden</h2>
+      <div class="col-md-2 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="itbismoneda"
+          id="itbis"
+          placeholder="ITBIS"
+        />
+        <label for="itbis">ITBIS</label>
+      </div>
 
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="item" placeholder="Item" />
-      <label for="item">Item</label>
-    </div>
+      <div class="col-md-3 form-floating">
+        <input
+          type="number"
+          class="form-control"
+          id="Descuento"
+          formControlName="descuento"
+          placeholder="Descuento"
+        />
+        <label for="Descuento">Descuento</label>
+      </div>
 
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="producto" placeholder="Producto" />
-      <label for="producto">Producto</label>
-    </div>
+      <div class="col-md-3 form-floating">
+        <input
+          type="number"
+          class="form-control"
+          id="moneda"
+          formControlName="otrosImpuestosMoneda"
+          placeholder="Moneda"
+        />
+        <label for="moneda">Otros impuestos</label>
+      </div>
 
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="unidad" placeholder="Unidad" />
-      <label for="unidad">Unidad de medida</label>
-    </div>
+      <div class="col-md-12 form-floating">
+        <textarea
+          class="form-control"
+          id="descripcion"
+          formControlName="descripcion"
+          placeholder="Descripción"
+        ></textarea>
+        <label for="descripcion">Descripción</label>
+      </div>
 
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="codigo" placeholder="Código" />
-      <label for="codigo">Código</label>
-    </div>
-
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="cantidad" placeholder="Cantidad" />
-      <label for="cantidad">Cantidad</label>
-    </div>
-
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="itbis" placeholder="ITBIS" />
-      <label for="itbis">ITBIS</label>
-    </div>
-
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="moneda" placeholder="Moneda" />
-      <label for="moneda">Moneda</label>
-    </div>
-
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="Descuento" placeholder="Descuento" />
-      <label for="Descuento">Descuento</label>
-    </div>
-
-    <div class="col-md-3 form-floating">
-      <input type="text" class="form-control" id="descripcion" placeholder="Descripción" />
-      <label for="descripcion">Descripción</label>
-    </div>
-  </div>
-
+      <app-form-actions
+        [editing]="
+          purchaseContractDetailForm.dirty || (purchaseContractDetailForm.value.idProducto ?? 0) > 0
+        "
+        [disabled]="!purchaseContractDetailForm.valid || loading()"
+        (clear)="clearDetailForm()"
+      >
+      </app-form-actions>
+    </form>
+  </app-section-box>
+  
   <div class="box mt-2">
-    <!-- (showDialog)="openDialog($event)" -->
     <app-table-of-content
-      [showDetail]="true"
       [showContent]="true"
+      [actions]="actions"
       [tableTitle]="'Listado de productos'"
       [trackByField]="'idProducto'"
-      [tableData]="data()?.data || []"
-      [tableColumns]="tableColums"
+      [tableData]="facade.details() || []"
+      [tableColumns]="tableColumns"
       [totalItems]="pagination().totalItems"
-      [showPagination]="true"
       [totalPages]="pagination().totalPages"
       [currentPage]="pagination().currentPage"
       [pageSize]="pagination().pageSize"
       (pageChange)="changePage($event)"
       (pageSizeChange)="changePageSize($event)"
-      (remove)="remove($event.idProducto)"
+      (edit)="facade.editDetail($event, purchaseContractDetailForm)"
+      (remove)="facade.clearDetail($event.index)"
     >
-      <div class="d-flex justify-content-end">
-        <div class="Total">
-          <div>Subtotal: 5200</div>
-          <div>Total: 5200</div>
-        </div>
+      <div class="summary">
+        <span>Subtotal: {{ facade.totals().subtotal | currency: 'DOP ' }}</span>
+        <span>ITBIS: {{ facade.totals().itbis | currency: 'DOP ' }}</span>
+        <span>Otros impuestos: {{ facade.totals().totalOtrosImpuestos | currency: 'DOP ' }}</span>
+        <span>Descuento: {{ facade.totals().descuento | currency: ' DOP ' }}</span>
+        <span class="summary-total"> Total: {{ facade.totals().total | currency: 'DOP ' }} </span>
       </div>
     </app-table-of-content>
-    <!-- (edit)="setProduct($event)" -->
   </div>
 
   <div class="box mt-2">
-    <app-form-actions>
-    </app-form-actions>
+    <app-form-actions
+      [disabled]="loading() || facade.details().length === 0 || !purchaseContractForm.valid"
+    ></app-form-actions>
   </div>
 </form>

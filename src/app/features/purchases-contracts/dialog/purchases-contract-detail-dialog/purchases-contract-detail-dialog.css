@@ -1,0 +1,90 @@
+.product-card{
+    background:#f8fafc;
+    border:1px solid #eef2f7;
+    border-radius:16px;
+    padding:18px;
+}
+
+.product-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:18px;
+}
+
+.product-header h5{
+    margin:0;
+    font-size:17px;
+    font-weight:600;
+}
+
+.product-header small{
+    color:#777;
+}
+
+.product-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:18px;
+}
+
+.product-grid small{
+    display:block;
+    color:#888;
+    margin-bottom:4px;
+}
+
+.product-grid strong{
+    font-size:15px;
+}
+
+.summary-card{
+    background:#f8fafc;
+    border:1px solid #eef2f7;
+    border-radius:16px;
+    padding:22px;
+}
+
+.summary-card>div{
+    display:flex;
+    justify-content:space-between;
+    padding:12px 0;
+    border-bottom:1px solid #ececec;
+}
+
+.summary-card>div:last-child{
+    border-bottom:none;
+}
+
+.summary-total{
+    font-size:18px;
+    font-weight:700;
+    color:#0d6efd;
+}
+
+.status{
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+    display:inline-block;
+}
+
+.pendiente{
+    background:#fff3cd;
+    color:#9a6700;
+}
+
+.recibida{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.cancelada{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+
+strong{
+    font-weight: 500;
+}

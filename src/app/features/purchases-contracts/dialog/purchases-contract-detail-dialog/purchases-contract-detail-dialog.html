@@ -1,0 +1,265 @@
+@if (facade.loading()) {
+  <app-skeleton [config]="{ cards: 6, columns: 2, sections: [{ height: 60 }, { height: 120 }] }" />
+} @else {
+  <div class="dialog-container">
+    <!-- Header -->
+    <div class="dialog-header">
+      <div>
+        <h2>Detalle de la Orden de Compra</h2>
+
+        <span class="dialog-subtitle"> Información completa de la orden </span>
+      </div>
+
+      <button class="btn-close" (click)="closeDialog()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <!-- =============================== -->
+      <!-- INFORMACIÓN GENERAL -->
+      <!-- =============================== -->
+
+      <div class="info-grid">
+        <div class="info-card">
+          <label>No. Expediente</label>
+          <span>{{ facade.purchaseContract().noExpediente }}</span>
+        </div>
+
+        <div class="info-card">
+          <label>No. Orden</label>
+          <span>{{ facade.purchaseContract().noOrden }}</span>
+        </div>
+
+        <div class="info-card">
+          <label>Estado</label>
+
+          <span
+            class="status"
+            [ngClass]="{
+              pendiente: facade.purchaseContract().estado == 'Pendiente',
+              recibida: facade.purchaseContract().estado == 'Recibida',
+              cancelada: facade.purchaseContract().estado == 'Cancelada',
+            }"
+          >
+            {{ facade.purchaseContract().estado }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <label>Modalidad</label>
+          <span>{{ facade.purchaseContract().modalidadCompra }}</span>
+        </div>
+
+        <div class="info-card">
+          <label>Forma de pago</label>
+          <span>{{ facade.purchaseContract().formaPago }}</span>
+        </div>
+
+        <div class="info-card">
+          <label>Plazo</label>
+          <span>{{ facade.purchaseContract().plazoPago }} días</span>
+        </div>
+
+        <div class="info-card">
+          <label>Moneda</label>
+          <span>{{ facade.purchaseContract().moneda }}</span>
+        </div>
+
+        <div class="info-card">
+          <label>Anticipo</label>
+          <span>{{
+            facade.purchaseContract().anticipo
+              | currency: facade.purchaseContract().moneda : 'symbol' : '1.2-2'
+          }}</span>
+        </div>
+      </div>
+
+      <!-- =============================== -->
+      <!-- PROVEEDOR -->
+      <!-- =============================== -->
+
+      <div class="section">
+        <label>Proveedor</label>
+
+        <div class="product-card">
+          <h5 class="mb-3">{{ facade.purchaseContract().proveedorObj.razonSocial | titlecase }}</h5>
+
+          <p>
+            <strong>RNC:</strong>
+
+            {{ facade.purchaseContract().proveedorObj.rnc }}
+          </p>
+
+          <p>
+            <strong>Nombre Comercial:</strong>
+
+            {{ facade.purchaseContract().proveedorObj.nombreComercial }}
+          </p>
+
+          <p>
+            <strong>Representante:</strong>
+
+            {{ facade.purchaseContract().proveedorObj.representante }}
+          </p>
+
+          <p>
+            <strong>Teléfono:</strong>
+
+            {{ facade.purchaseContract().proveedorObj.telRepresentante }}
+          </p>
+        </div>
+      </div>
+
+      <!-- =============================== -->
+      <!-- PRODUCTOS -->
+      <!-- =============================== -->
+
+      <div class="section">
+        <label>Productos</label>
+
+        <div class="warehouse-list">
+          @for (item of facade.purchaseContract().detalles; track item.idProducto) {
+            <div class="product-card mb-2">
+              <div class="product-header">
+                <div>
+                  <h5>
+                    {{ item.productoObj.nombre }}
+                  </h5>
+
+                  <small>
+                    {{ item.descripcion }}
+                  </small>
+                </div>
+
+                <strong>
+                  {{
+                    item.subTotalMoneda
+                      | currency: facade.purchaseContract().moneda : 'symbol' : '1.2-2'
+                  }}
+                </strong>
+              </div>
+
+              <div class="product-grid">
+                <div>
+                  <small>Cantidad</small>
+                  <strong>{{ item.cantidad }}</strong>
+                </div>
+
+                <div>
+                  <small>Unidad</small>
+                  <strong>{{ item.unidadObj.descripcion }}</strong>
+                </div>
+
+                <div>
+                  <small>Precio</small>
+                  <strong>
+                    {{
+                      item.precioUnitario
+                        | currency: facade.purchaseContract().moneda : 'symbol' : '1.2-2'
+                    }}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>Subtotal</small>
+                  <strong>
+                    {{
+                      item.importeMonedaOrig
+                        | currency: facade.purchaseContract().moneda : 'symbol' : '1.2-2'
+                    }}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>ITBIS</small>
+                  <strong>
+                    {{
+                      item.itbismoneda
+                        | currency: facade.purchaseContract().moneda : 'symbol' : '1.2-2'
+                    }}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>Descuento</small>
+                  <strong>
+                    {{
+                      item.descuento
+                        | currency: facade.purchaseContract().moneda : 'symbol' : '1.2-2'
+                    }}
+                  </strong>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- =============================== -->
+      <!-- RESUMEN -->
+      <!-- =============================== -->
+
+      <div class="section">
+        <label>Resumen Financiero</label>
+
+        <div class="summary-card">
+          <div>
+            <span>Subtotal</span>
+
+            <strong>
+              {{
+                facade.purchaseContract().subTotal
+                  | currency: facade.purchaseContract().moneda : 'symbol' : '1.2-2'
+              }}
+            </strong>
+          </div>
+
+          <div>
+            <span>ITBIS</span>
+
+            <strong>
+              {{
+                facade.purchaseContract().totalItbis
+                  | currency: facade.purchaseContract().moneda : 'symbol' : '1.2-2'
+              }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Otros impuestos</span>
+
+            <strong>
+              {{
+                facade.purchaseContract().totalOtrosImpuestos
+                  | currency: facade.purchaseContract().moneda : 'symbol' : '1.2-2'
+              }}
+            </strong>
+          </div>
+
+          <div>
+            <span>Descuento</span>
+
+            <strong>
+              {{
+                facade.purchaseContract().totalDescuento
+                  | currency: facade.purchaseContract().moneda : 'symbol' : '1.2-2'
+              }}
+            </strong>
+          </div>
+
+          <div class="summary-total">
+            <span>Total</span>
+
+            <strong>
+              {{
+                facade.purchaseContract().total
+                  | currency: facade.purchaseContract().moneda : 'symbol' : '1.2-2'
+              }}
+            </strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,12 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { NameDescriptionColumns } from '../../../../shared/table-columns';
+import { NameDescriptionColumns } from '../../../../shared/constant/table-columns';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Loading } from '../../../../core/service/loading-service/loading';
 import { DeliveryTypeService } from '../../services/deliveryType/delivery-type-service';
 import { BaseCrud } from '../../../../shared/abstracts/base-crud';
-import { TableOfContent } from '../../../../components/table-of-content/table-of-content';
-import { InputFilter } from '../../../../components/input-filter/input-filter';
-import { FormActions } from '../../../../components/form-actions/form-actions';
+import { TableOfContent } from '../../../../shared/components/table-of-content/table-of-content';
+import { InputFilter } from '../../../../shared/components/input-filter/input-filter';
+import { FormActions } from '../../../../shared/components/form-actions/form-actions';
 
 @Component({
   selector: 'app-delivery-type',
@@ -16,7 +16,7 @@ import { FormActions } from '../../../../components/form-actions/form-actions';
 })
 export class DeliveryType extends BaseCrud<any> implements OnInit{
   
-  tableColums = NameDescriptionColumns
+  tableColumns = NameDescriptionColumns
   private fb = inject(FormBuilder);
   private loadingService = inject(Loading);
   private deliveryTypeService = inject(DeliveryTypeService);

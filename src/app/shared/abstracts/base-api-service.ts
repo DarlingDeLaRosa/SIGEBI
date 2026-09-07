@@ -22,8 +22,8 @@ export class BaseApiService<T> {
     }
 
     getById(id: number | string): Observable<T> {
-    return this.http.get<T>(`${this.endpoint}/${id}`);
-}
+        return this.http.get<T>(`${this.endpoint}/${id}`);
+    }
 
     create(body: T): Observable<T> {
         return this.http.post<T>(this.endpoint, body);
@@ -39,5 +39,9 @@ export class BaseApiService<T> {
 
     protected get<R>(path: string) {
         return this.http.get<R>(`${this.endpoint}/${path}`);
+    }
+
+    protected post<R>(path: string, body: any): Observable<R> {
+        return this.http.post<R>(`${this.endpoint}/${path}`, body);
     }
 }

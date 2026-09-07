@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { StockEntryService } from './stock-entry-service';
+import { StockEntryService } from './stock-entry-type-service';
 
 describe('StockEntryService', () => {
   let service: StockEntryService;

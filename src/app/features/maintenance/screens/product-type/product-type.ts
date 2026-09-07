@@ -1,12 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { BaseCrud } from '../../../../shared/abstracts/base-crud';
-import { NameColumns } from '../../../../shared/table-columns';
+import { NameColumns } from '../../../../shared/constant/table-columns';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Loading } from '../../../../core/service/loading-service/loading';
 import { ProductTypeService } from '../../services/productType/product-type-service';
-import { TableOfContent } from '../../../../components/table-of-content/table-of-content';
-import { InputFilter } from '../../../../components/input-filter/input-filter';
-import { FormActions } from '../../../../components/form-actions/form-actions';
+import { TableOfContent } from '../../../../shared/components/table-of-content/table-of-content';
+import { InputFilter } from '../../../../shared/components/input-filter/input-filter';
+import { FormActions } from '../../../../shared/components/form-actions/form-actions';
 
 @Component({
   selector: 'app-product-type',
@@ -16,7 +16,7 @@ import { FormActions } from '../../../../components/form-actions/form-actions';
 })
 export class ProductType extends BaseCrud<any> implements OnInit{
   
-  tableColums = NameColumns
+  tableColumns = NameColumns
   private fb = inject(FormBuilder);
   private loadingService = inject(Loading);
   private productTypeService = inject(ProductTypeService);
@@ -24,7 +24,7 @@ export class ProductType extends BaseCrud<any> implements OnInit{
   
   loading = this.loadingService.loading
   product_type_form = this.fb.nonNullable.group({
-    idTipoArt: [0],
+    idTipoArt: [],
     nombre: ['', Validators.required]
   });
 

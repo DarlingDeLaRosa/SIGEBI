@@ -1,0 +1,253 @@
+<div class="title">
+  <h1>Gestionar salidas</h1>
+
+  <span class="d-flex gap-1">
+    <button class="btn navigate" [routerLink]="['../Salidas']">Listado de salidas</button>
+  </span>
+</div>
+
+<form [formGroup]="stockOutputForm" (ngSubmit)="save(stockOutputForm)">
+  <!-- ===================================== -->
+  <!-- INFORMACIÓN GENERAL -->
+  <!-- ===================================== -->
+
+  <app-section-box title="Información general de salida">
+    <div class="row gx-1 gy-1">
+      <app-search-select
+        class="col-md-4"
+        placeholder="Tipo de salida"
+        [items]="facade.outputTypes()"
+        [initialItems]="facade.outputTypes()"
+        [displayField]="'nombre'"
+        [valueField]="'idTipoSalida'"
+        [value]="stockOutputForm.get('idTipoSalida')?.value"
+        (search)="facade.loadOutputTypes($event)"
+        [selectedItem]="facade.formSelections.idTipoSalida()"
+        (selected)="
+          setSelection(
+            facade.formSelections.idTipoSalida,
+            stockOutputForm,
+            'idTipoSalida',
+            $event,
+            'idTipoSalida'
+          )
+        "
+      />
+
+      <app-search-select
+        class="col-md-4"
+        placeholder="Departamento"
+        [items]="facade.departments()"
+        [initialItems]="facade.departments()"
+        [displayField]="'nombre'"
+        [valueField]="'idDepar'"
+        [value]="stockOutputForm.get('idDepar')?.value"
+        [selectedItem]="facade.formSelections.idDepar()"
+        (selected)="
+          setSelection(facade.formSelections.idDepar, stockOutputForm, 'idDepar', $event, 'idDepar')
+        "
+      />
+
+      <app-search-select
+        class="col-md-4"
+        placeholder="Recinto"
+        [items]="facade.recintos()"
+        [initialItems]="facade.recintos()"
+        [displayField]="'nombre'"
+        [valueField]="'idRecinto'"
+        [value]="stockOutputForm.get('idRecinto')?.value"
+        [selectedItem]="facade.formSelections.idRecinto()"
+        (selected)="
+          setSelection(
+            facade.formSelections.idRecinto,
+            stockOutputForm,
+            'idRecinto',
+            $event,
+            'idRecinto'
+          )
+        "
+      />
+
+      <div class="col-md-3 form-floating">
+        <input
+          type="date"
+          class="form-control"
+          formControlName="fechaCreacion"
+          id="fechaSalida"
+          placeholder="Fecha"
+        />
+        <label for="fechaSalida">Fecha de salida</label>
+      </div>
+
+      <div class="col-md-9 form-floating">
+        <textarea
+          class="form-control"
+          id="observacion"
+          formControlName="observacion"
+          placeholder="Observación"
+        ></textarea>
+        <label for="observacion">Observación</label>
+      </div>
+    </div>
+  </app-section-box>
+
+  <!-- ===================================== -->
+  <!-- DETALLES -->
+  <!-- ===================================== -->
+
+  <app-section-box title="Detalles de la salida">
+    <!-- (ngSubmit)="facade.addDetail(stockOutputDetailForm)" -->
+    <form [formGroup]="stockOutputDetailForm" class="row gx-1 gy-1 mt-2">
+      <!-- [items]="facade.products()" -->
+      <!-- [initialItems]="facade.products()" -->
+      <!-- (search)="facade.loadProducts($event)" -->
+      <!-- [selectedItem]="facade.formSelections.idProducto()" -->
+      <!-- (selected)="productSelection($event)" -->
+      <app-search-select
+        class="col-md-4"
+        placeholder="Producto"
+        [displayField]="'nombre'"
+        [displaySubField]="'descripcion'"
+        [valueField]="'idProducto'"
+        [value]="stockOutputDetailForm.get('idProducto')?.value"
+      />
+
+      <div class="col-md-2 form-floating">
+        <input
+          type="number"
+          class="form-control"
+          formControlName="cantidad"
+          id="cantidad"
+          placeholder="Cantidad"
+        />
+        <label for="cantidad">Cantidad</label>
+      </div>
+
+      <div class="col-md-2 form-floating">
+        <input
+          type="number"
+          class="form-control"
+          formControlName="precio"
+          id="precio"
+          placeholder="Precio"
+        />
+        <label for="precio">Precio</label>
+      </div>
+
+      <app-search-select
+        class="col-md-4"
+        placeholder="Tipo de almacén"
+        [items]="facade.warehouseTypes()"
+        [initialItems]="facade.warehouseTypes()"
+        [displayField]="'nombre'"
+        [valueField]="'idTipoAlm'"
+        [value]="stockOutputDetailForm.get('idTipoAlmcacen')?.value"
+        (search)="facade.loadWarehouseTypes($event)"
+        [selectedItem]="facade.formSelections.idTipoAlmcacen()"
+        (selected)="
+          setSelection(
+            facade.formSelections.idTipoAlmcacen,
+            stockOutputDetailForm,
+            'idTipoAlmcacen',
+            $event,
+            'idTipoAlm',
+            true
+          )
+        "
+      />
+
+      <div class="col-md-3 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="marca"
+          id="marca"
+          placeholder="Marca"
+        />
+        <label for="marca">Marca</label>
+      </div>
+
+      <div class="col-md-3 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="modelo"
+          id="modelo"
+          placeholder="Modelo"
+        />
+        <label for="modelo">Modelo</label>
+      </div>
+
+      <app-search-select
+        class="col-md-3"
+        placeholder="Condición"
+        [items]="facade.filteredCondition()"
+        [initialItems]="facade.condition()"
+        [displayField]="'name'"
+        [valueField]="'value'"
+        [value]="stockOutputDetailForm.get('condicion')?.value"
+        (search)="facade.filterCondition($event)"
+        [selectedItem]="facade.formSelections.condition()"
+        [showAll]="true"
+        (selected)="
+          setSelection(
+            facade.formSelections.condition,
+            stockOutputDetailForm,
+            'condicion',
+            $event,
+            'value',
+            true
+          )
+        "
+      />
+
+      <div class="col-md-3 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="serial"
+          id="serial"
+          placeholder="Serial"
+        />
+        <label for="serial">No. Serial</label>
+      </div>
+
+      <app-form-actions
+        [editing]="stockOutputDetailForm.dirty || (stockOutputDetailForm.value.idProducto ?? 0) > 0"
+        [disabled]="!stockOutputDetailForm.valid"
+      />
+      <!-- (clear)="clearDetailForm()" -->
+    </form>
+  </app-section-box>
+
+  <!-- ===================================== -->
+  <!-- TABLA -->
+  <!-- ===================================== -->
+
+  <div class="box mt-2">
+    <!-- [actions]="actions" -->
+    <app-table-of-content
+      [showContent]="true"
+      [tableTitle]="'Productos a despachar'"
+      [trackByField]="'idProducto'"
+      [tableColumns]="tableColumns"
+      [tableData]="facade.details()"
+    >
+      <!-- (remove)="facade.clearDetail($event.index)" -->
+      <!-- (edit)="facade.editDetail($event, stockOutputDetailForm)" -->
+
+      <div class="summary">
+        <span class="summary-total"> Total: {{ 183799 | currency: 'DOP ' }} </span>
+        <!-- Total: {{ facade.totals().total | currency:'DOP ' }} -->
+      </div>
+    </app-table-of-content>
+  </div>
+
+  <!-- ===================================== -->
+  <!-- GUARDAR -->
+  <!-- ===================================== -->
+
+  <div class="box mt-2">
+    <app-form-actions [disabled]="facade.details().length === 0 || !stockOutputForm.valid" />
+  </div>
+</form>

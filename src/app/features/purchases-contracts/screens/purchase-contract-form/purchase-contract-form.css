@@ -3,10 +3,19 @@ h2{
     margin-bottom: 10px;
 }
 
-.Total{
-    display: flex;
-    gap: 20px;
-    background-color: #f8f9fa;
-    border: dashed 2px green;
-    padding: 10px;
+.summary{
+    display:flex;
+    justify-content:flex-end;
+    gap:40px;
+    margin-top:40px;
+}
+
+.summary-item{
+    font-size:15px;
+    color:#555;
+}
+
+.summary-total{
+    font-weight:500;
+    color:#222;
 }

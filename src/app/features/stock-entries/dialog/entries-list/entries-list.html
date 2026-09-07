@@ -1,0 +1,380 @@
+@if (facade.loading()) {
+  <app-skeleton
+    [config]="{
+      cards: 4,
+      columns: 1,
+      sections: [
+        { height: 180 },
+      ]
+    }"
+  />
+} @else {
+
+  <div class="dialog-container">
+
+    <!-- HEADER -->
+    <div class="dialog-header">
+
+      <div>
+        <h2>Entradas de la Orden de Compra</h2>
+
+        <span class="dialog-subtitle">
+          Historial de entradas realizadas para esta orden
+        </span>
+      </div>
+
+      <button
+        class="btn-close"
+        (click)="closeDialog()"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+    </div>
+
+
+    <div class="dialog-body">
+
+      <!-- =============================== -->
+      <!-- LISTA DE ENTRADAS -->
+      <!-- =============================== -->
+
+      <div class="section">
+
+        <label>Entradas registradas</label>
+
+        <div class="entries-list">
+
+          @for (entry of facade.stockEntry(); track entry.idEntrada) {
+
+            <div class="entry-card">
+
+              <!-- =============================== -->
+              <!-- HEADER ENTRADA -->
+              <!-- =============================== -->
+
+              <div class="entry-header">
+
+                <div>
+
+                  <div class="entry-title">
+
+                    <h4>
+                      Entrada #{{ entry.idEntrada }}
+                    </h4>
+
+                    <span class="entry-status">
+                      {{ entry.tipoEntrega?.nombre }}
+                    </span>
+
+                  </div>
+
+                  <small>
+                    Creada el
+                    {{ entry.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}
+                    por {{ entry.creadoPor }}
+                  </small>
+
+                </div>
+
+                <div class="entry-total">
+
+                  <small>Total</small>
+
+                  <strong>
+                    {{ entry.total | currency:'DOP':'symbol':'1.2-2' }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+
+              <!-- =============================== -->
+              <!-- INFORMACIÓN GENERAL -->
+              <!-- =============================== -->
+
+              <div class="entry-info-grid">
+
+                <div class="info-item">
+
+                  <small>Recinto</small>
+
+                  <strong>
+                    {{ entry.recinto?.nombre }}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-item">
+
+                  <small>Tipo de entrada</small>
+
+                  <strong>
+                    {{ entry.tipoEntrada?.nombre }}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-item">
+
+                  <small>Tipo de entrega</small>
+
+                  <strong>
+                    {{ entry.tipoEntrega?.nombre }}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-item">
+
+                  <small>Fecha de factura</small>
+
+                  <strong>
+                    {{ entry.fechaFactura | date:'dd/MM/yyyy' }}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-item">
+
+                  <small>No. factura</small>
+
+                  <strong>
+                    {{ entry.noFactura }}
+                  </strong>
+
+                </div>
+
+
+                <div class="info-item">
+
+                  <small>No. conduce</small>
+
+                  <strong>
+                    {{ entry.noConduce }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+
+              <!-- =============================== -->
+              <!-- PROVEEDOR -->
+              <!-- =============================== -->
+
+              <div class="entry-section">
+
+                <label>Proveedor</label>
+
+                <div class="supplier-card">
+
+                  <div>
+
+                    <strong>
+                      {{ entry.proveedor?.razonSocial | titlecase }}
+                    </strong>
+
+                    <small>
+                      {{ entry.proveedor?.nombreComercial }}
+                    </small>
+
+                  </div>
+
+                  <div>
+
+                    <small>RNC</small>
+
+                    <strong>
+                      {{ entry.proveedor?.rnc }}
+                    </strong>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <!-- =============================== -->
+              <!-- PRODUCTOS -->
+              <!-- =============================== -->
+
+              <div class="entry-section">
+
+                <label>Productos recibidos</label>
+
+                <div class="products-list">
+
+                  @for (
+                    detail of entry.detalles;
+                    track detail.idEntradaDet
+                  ) {
+
+                    <div class="product-item">
+
+                      <div class="product-main">
+
+                        <div>
+
+                          <h5>
+                            {{ detail.producto?.nombre }}
+                          </h5>
+
+                          <small>
+                            {{ detail.producto?.descripcion }}
+                          </small>
+
+                        </div>
+
+                        <strong class="product-subtotal">
+                          {{
+                            detail.subTotal
+                              | currency:'DOP':'symbol':'1.2-2'
+                          }}
+                        </strong>
+
+                      </div>
+
+
+                      <div class="product-info">
+
+                        <div>
+                          <small>Cantidad</small>
+                          <strong>
+                            {{ detail.cantidad }}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <small>Precio</small>
+                          <strong>
+                            {{
+                              detail.precio
+                                | currency:'DOP':'symbol':'1.2-2'
+                            }}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <small>ITBIS</small>
+                          <strong>
+                            {{ detail.itbisProducto }}%
+                          </strong>
+                        </div>
+
+                        <div>
+                          <small>Condición</small>
+
+                          <span
+                            class="condition"
+                            [ngClass]="{
+                              nuevo: detail.condicion === 'Nuevo',
+                              bueno: detail.condicion === 'Buen estado',
+                              regular: detail.condicion === 'Regular',
+                              malo: detail.condicion === 'Mal estado'
+                            }"
+                          >
+                            {{ detail.condicion }}
+                          </span>
+
+                        </div>
+
+                        @if (detail.marca) {
+
+                          <div>
+                            <small>Marca</small>
+                            <strong>
+                              {{ detail.marca }}
+                            </strong>
+                          </div>
+
+                        }
+
+                        @if (detail.modelo) {
+
+                          <div>
+                            <small>Modelo</small>
+                            <strong>
+                              {{ detail.modelo }}
+                            </strong>
+                          </div>
+
+                        }
+
+                        @if (detail.serial) {
+
+                          <div>
+                            <small>Serial</small>
+                            <strong>
+                              {{ detail.serial }}
+                            </strong>
+                          </div>
+
+                        }
+
+                      </div>
+
+                    </div>
+
+                  }
+
+                </div>
+
+              </div>
+
+
+              <!-- =============================== -->
+              <!-- PIE DE ENTRADA -->
+              <!-- =============================== -->
+
+              <div class="entry-footer">
+
+                <div>
+
+                  @if (entry.observacion) {
+
+                    <span>
+                      <i class="bi bi-chat-left-text"></i>
+
+                      {{ entry.observacion }}
+
+                    </span>
+
+                  }
+
+                </div>
+
+                <div class="entry-footer-total">
+
+                  <span>Total entrada</span>
+
+                  <strong>
+                    {{
+                      entry.total
+                        | currency:'DOP':'symbol':'1.2-2'
+                    }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}

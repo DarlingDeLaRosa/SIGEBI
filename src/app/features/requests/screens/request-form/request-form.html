@@ -1,0 +1,198 @@
+<div class="title">
+  <h1>Crear solicitud</h1>
+
+  <span class="d-flex gap-1">
+    <button class="btn navigate" [routerLink]="['../Solicitud']">Listado de solicitudes</button>
+  </span>
+</div>
+
+<form [formGroup]="requestForm" (ngSubmit)="save()">
+  <!-- ================================================= -->
+  <!-- INFORMACIÓN GENERAL -->
+  <!-- ================================================= -->
+
+  <app-section-box title="Información general de solicitud" [opened]="facade.sectionOpenGeneral()">
+    <div class="row gx-1 gy-1 mt-2">
+      <!-- RECINTO -->
+      <app-search-select
+        class="col-md-4"
+        placeholder="Recinto"
+        [items]="facade.recinto()"
+        [initialItems]="facade.recinto()"
+        [displayField]="'nombre'"
+        [valueField]="'idRecinto'"
+        [value]="requestForm.get('idRecinto')?.value"
+        [selectedItem]="facade.formSelections.idRecinto()"
+        (selected)="
+          setSelection(
+            facade.formSelections.idRecinto,
+            requestForm,
+            'idRecinto',
+            $event,
+            'idRecinto'
+          )
+        "
+      />
+
+      <!-- TIPO ARTICULO -->
+      <app-search-select
+        class="col-md-4"
+        placeholder="Tipo de artículo"
+        [items]="facade.tipoArticulo()"
+        [initialItems]="facade.tipoArticulo()"
+        [displayField]="'nombre'"
+        [valueField]="'idTipoArticulo'"
+        [value]="requestForm.get('idTipoArticulo')?.value"
+        [selectedItem]="facade.formSelections.idTipoArticulo()"
+        (selected)="
+          setSelection(
+            facade.formSelections.idTipoArticulo,
+            requestForm,
+            'idTipoArticulo',
+            $event,
+            'idTipoArticulo'
+          )
+        "
+      />
+
+      <!-- TIPO SOLICITUD -->
+      <app-search-select
+        class="col-md-4"
+        placeholder="Tipo de solicitud"
+        [items]="facade.tipoSolicitud()"
+        [initialItems]="facade.tipoSolicitud()"
+        [displayField]="'nombre'"
+        [valueField]="'idTipoSolicitud'"
+        [value]="requestForm.get('idTipoSolicitud')?.value"
+        [selectedItem]="facade.formSelections.idTipoSolicitud()"
+        (selected)="
+          setSelection(
+            facade.formSelections.idTipoSolicitud,
+            requestForm,
+            'idTipoSolicitud',
+            $event,
+            'idTipoSolicitud'
+          )
+        "
+      />
+
+      <!-- SOLICITANTE -->
+      <div class="col-md-4 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="solicitante"
+          id="solicitante"
+          placeholder="Solicitante"
+        />
+
+        <label for="solicitante"> Solicitante </label>
+      </div>
+
+      <!-- CARGO -->
+      <div class="col-md-4 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="cargoSolicitante"
+          id="cargoSolicitante"
+          placeholder="Cargo del solicitante"
+        />
+
+        <label for="cargoSolicitante"> Cargo del solicitante </label>
+      </div>
+
+      <!-- UNIDAD ORGANIZATIVA -->
+      <div class="col-md-4 form-floating">
+        <input
+          type="text"
+          class="form-control"
+          formControlName="unidadOrganizativa"
+          id="unidadOrganizativa"
+          placeholder="Unidad organizativa"
+        />
+
+        <label for="unidadOrganizativa"> Unidad organizativa </label>
+      </div>
+
+      <!-- OBSERVACIONES -->
+      <div class="col-md-12 form-floating">
+        <textarea
+          class="form-control"
+          formControlName="observaciones"
+          id="observaciones"
+          placeholder="Observaciones"
+        ></textarea>
+
+        <label for="observaciones"> Observaciones </label>
+      </div>
+    </div>
+  </app-section-box>
+
+  <!-- ================================================= -->
+  <!-- DETALLE -->
+  <!-- ================================================= -->
+
+  <div style="display: grid; grid-template-columns: calc(68% - 5px) calc(32% - 5px); gap: 10px">
+    <!-- TABLA DE PRODUCTOS -->
+    <app-section-box title="Productos solicitados" [opened]="facade.sectionOpenDetail()">
+      <app-table-of-content
+        [showContent]="true"
+        [trackByField]="'idProducto'"
+        [tableData]="facade.details()"
+        [tableColumns]="tableColumns"
+        (edit)="facade.editDetail($event, requestDetailForm)"
+        (remove)="facade.clearDetail($event.index, facade.details)"
+      />
+    </app-section-box>
+
+    <!-- FORMULARIO DETALLE -->
+    <app-section-box title="Agregar producto" [opened]="facade.sectionOpenDetail()">
+      <form
+        [formGroup]="requestDetailForm"
+        (ngSubmit)="facade.addDetail(requestDetailForm)"
+        class="row gx-1 gy-1 mt-2"
+      >
+        <!-- PRODUCTO -->
+
+        <app-search-select
+          class="col-md-8"
+          placeholder="Producto"
+          [items]="facade.products()"
+          [initialItems]="facade.products()"
+          [displayField]="'nombre'"
+          [valueField]="'idProducto'"
+          [value]="requestDetailForm.get('idProducto')?.value"
+          [selectedItem]="facade.formSelections.idProducto()"
+          (selected)="productSelection($event)"
+        />
+
+        <!-- CANTIDAD -->
+
+        <div class="col-md-4 form-floating">
+          <input
+            type="number"
+            class="form-control"
+            formControlName="cantidadSolicitada"
+            id="cantidadSolicitada"
+            placeholder="Cantidad"
+          />
+
+          <label for="cantidadSolicitada"> Cantidad </label>
+        </div>
+
+        <app-form-actions [disabled]="!requestDetailForm.valid || loading()" />
+      </form>
+    </app-section-box>
+  </div>
+
+  <!-- ================================================= -->
+  <!-- ACCIONES -->
+  <!-- ================================================= -->
+
+  <div class="box mt-2">
+    <app-form-actions
+      [disabled]="loading() || facade.details().length === 0 || !requestForm.valid"
+    />
+  </div>
+</form>

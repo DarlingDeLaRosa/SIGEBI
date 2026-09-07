@@ -30,7 +30,7 @@
   [tableTitle]="'Listado de tipos de productos'"
   [trackByField]="'idTipoArt'"
   [tableData]="data()?.data || []"
-  [tableColumns]="tableColums"
+  [tableColumns]="tableColumns"
   [showPagination]="true"
   [totalPages]="pagination().totalPages"
   [currentPage]="pagination().currentPage"
@@ -38,6 +38,6 @@
   [totalItems]="pagination().totalItems"
   (pageChange)="changePage($event)"
   (pageSizeChange)="changePageSize($event)"
-  (edit)="setEditForm(product_type_form, $event)"
+  (edit)="setEditForm(product_type_form, $event.row)"
   (remove)="remove($event.idTipoArt)"
 ></app-table-of-content>

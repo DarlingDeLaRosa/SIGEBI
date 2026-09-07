@@ -1,0 +1,42 @@
+<div class="autocomplete-container">
+  <div class="position-relative form-floating">
+    <input
+      type="text"
+      class="form-control"
+      [placeholder]="placeholder"
+      [value]="searchText()"
+      (input)="onInput($event)"
+      (focus)="dropdownOpen.set(true)"
+    />
+    <label for="searchInput">{{ placeholder }}</label>
+
+    <button type="button" class="dropdown-button" (click)="toggleDropdown()">
+      <i class="bi bi-caret-down-fill"></i>
+    </button>
+  </div>
+
+  @if (dropdownOpen()) {
+    <div class="autocomplete-dropdown shadow">
+      @if (loading()) {
+        <div class="autocomplete-message loading-message p-3">
+          <div class="spinner-border spinner-border-sm spin" role="status"></div>
+          <span>Buscando...</span>
+        </div>
+      } @else if (filteredItems().length > 0) {
+        
+        @if (showAll && selectedItem) {
+          <div class="autocomplete-item" (click)="selectItem()">Todos</div>
+        }
+        
+        @for (item of filteredItems(); track $index) {
+          <div class="autocomplete-item" (click)="selectItem(item)">
+            {{ item[displayField] }}
+            @if(item[displaySubField] && item[displaySubField].length > 0){ <h4 class="subField">{{ item[displaySubField] }}</h4> }
+          </div>
+        }
+      } @else {
+        <div class="autocomplete-message empty-message p-2">No se encontraron registros</div>
+      }
+    </div>
+  }
+</div>

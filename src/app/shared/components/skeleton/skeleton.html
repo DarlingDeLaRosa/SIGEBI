@@ -1,0 +1,40 @@
+<div class="skeleton-container">
+  <div class="skeleton-header">
+    <div class="skeleton-title"></div>
+    <div class="skeleton-subtitle"></div>
+  </div>
+
+  <!-- CARDS -->
+
+  <div class="skeleton-grid" [style.grid-template-columns]="'repeat(' + config().columns + ',1fr)'">
+    @for (card of cards; track $index) {
+      <div class="skeleton-card">
+        <div class="skeleton-label"></div>
+
+        <div class="skeleton-value"></div>
+      </div>
+    }
+  </div>
+
+  <!-- SECTIONS -->
+
+  @for (section of sections; track $index) {
+    <div class="skeleton-section">
+      <div class="skeleton-section-title"></div>
+
+      <div class="skeleton-box" [style.height.px]="section.height ?? 80"></div>
+    </div>
+  }
+
+  <!-- LIST -->
+
+  @if (config().list) {
+    <div class="skeleton-section">
+      <div class="skeleton-section-title"></div>
+
+      @for (item of listItems; track $index) {
+        <div class="skeleton-box list-item" [style.height.px]="config().list?.height ?? 100"></div>
+      }
+    </div>
+  }
+</div>

@@ -2,83 +2,141 @@
   <h1>Ordenes de compra</h1>
 
   <span class="d-flex gap-1">
-    <button class="btn navigate" (click)="this.filteringProduct = !this.filteringProduct;">
-      {{ filteringProduct ? 'Ocultar filtros' : 'Filtrar productos' }}
+    <button
+      class="btn navigate"
+      (click)="this.filteringPurchasesContracts.set(!this.filteringPurchasesContracts())"
+    >
+      {{ filteringPurchasesContracts() ? 'Ocultar filtros' : 'Filtrar ordenes de compra' }}
     </button>
 
-    <button class="btn navigate"  [routerLink]="['../gestionar-ordenes-de-compra']"> Gestionar orden de compra </button>
+    <button class="btn navigate" [routerLink]="['../gestionar-ordenes-de-compra']">
+      Crear orden de compra
+    </button>
   </span>
 </div>
 
-@if (filteringProduct) {
-  <!-- <form [formGroup]="filter_form" (submit)="loadData(filter_form.getRawValue())" class="box mb-2">
+@if (filteringPurchasesContracts()) {
+  <form [formGroup]="filterForm" (submit)="loadData(filterForm.getRawValue())" class="box mb-2">
     <app-create-conditional-box [formName]="'Filtrar productos'">
-      <div class="col-md-4 form-floating">
+      <div class="col-md-2 form-floating">
         <input
           type="text"
           formControlName="filter"
           class="form-control"
-          [placeholder]="'Nombre de producto'"
+          [placeholder]="'Número de expediente'"
         />
-        <label for="filter">Nombre de producto</label>
+        <label for="filter">Número de Exp / Orden</label>
       </div>
 
       <app-search-select
-        class="col-md-4"
-        placeholder="Tipo de producto"
-        [items]="productType()"
-        [initialItems]="productType()"
-        [displayField]="'nombre'"
-        [valueField]="'idTipoArt'"
-        [value]="filter_form.get('idTipoArticulo')?.value"
-        (search)="getProductType($event)"
-        [selectedItem]="filterSelections.productType()"
+        class="col-md-3"
+        placeholder="Modalidad de compra"
+        [items]="facadeReference.filteredPurchasesTypes()"
+        [initialItems]="facadeReference.purchasesTypes()"
+        [displayField]="'name'"
+        [valueField]="'value'"
+        [value]="filterForm.get('modalidadCompra')?.value"
+        (search)="facadeReference.filterPurchasesTypes($event)"
+        [selectedItem]="facadeReference.filterSelections.purchasesType()"
         [showAll]="true"
         (selected)="
           setSelection(
-            filterSelections.productType,
-            filter_form,
-            'idTipoArticulo',
+            facadeReference.filterSelections.purchasesType,
+            filterForm,
+            'modalidadCompra',
             $event,
-            'idTipoArt'
+            'value'
           )
         "
       />
 
       <app-search-select
-        class="col-md-4"
-        placeholder="Catalogo"
-        [items]="catalog()"
-        [initialItems]="catalog()"
-        [displayField]="'nombre'"
-        [valueField]="'id'"
-        [value]="filter_form.get('idCatalogo')?.value"
-        (search)="getCatalog($event)"
-        [selectedItem]="filterSelections.catalog()"
+        class="col-md-2"
+        placeholder="Forma de pago"
+        [items]="facadeReference.filteredPaymentMethods()"
+        [initialItems]="facadeReference.paymentMethods()"
+        [displayField]="'name'"
+        [valueField]="'value'"
+        [value]="filterForm.get('formaPago')?.value"
+        [selectedItem]="facadeReference.filterSelections.paymentMethod()"
+        (search)="facadeReference.filterPaymentMethods($event)"
         [showAll]="true"
-        (selected)="setSelection(filterSelections.catalog, filter_form, 'idCatalogo', $event, 'id')"
+        (selected)="
+          setSelection(
+            facadeReference.filterSelections.paymentMethod,
+            filterForm,
+            'formaPago',
+            $event,
+            'value'
+          )
+        "
+      />
+
+      <app-search-select
+        class="col-md-2"
+        placeholder="Estado de orden"
+        [items]="facade.filteredStatus()"
+        [initialItems]="facade.status()"
+        [displayField]="'name'"
+        [valueField]="'value'"
+        [value]="filterForm.get('estado')?.value"
+        [selectedItem]="facade.filterSelections.status()"
+        (search)="facade.filterStatus($event)"
+        [showAll]="true"
+        (selected)="
+          setSelection(
+            facade.filterSelections.status,
+            filterForm,
+            'estado',
+            $event,
+            'value'
+          )
+        "
+      />
+
+      <app-search-select
+        class="col-md-3"
+        placeholder="Proveedor"
+        [items]="facadeReference.suppliers()"
+        [initialItems]="facadeReference.suppliers()"
+        [displayField]="'razonSocial'"
+        [valueField]="'idProveedor'"
+        [value]="filterForm.get('idProveedor')?.value"
+        (search)="facadeReference.loadSupplier($event)"
+        [selectedItem]="facadeReference.filterSelections.idProveedor()"
+        [showAll]="true"
+        (selected)="
+          setSelection(
+            facadeReference.filterSelections.idProveedor,
+            filterForm,
+            'idProveedor',
+            $event,
+            'idProveedor'
+          )
+        "
       />
 
       <app-form-actions
         [nameActionBoton]="'Filtrar'"
         [iconActionBoton]="'bi bi-search'"
-        [editing]="filter_form.dirty"
-        [disabled]="!filter_form.dirty || loading()"
+        [editing]="filterForm.dirty"
+        [disabled]="!filterForm.dirty || loading()"
         (clear)="clearForm(); loadData()"
       >
       </app-form-actions>
     </app-create-conditional-box>
-  </form> -->
+  </form>
 }
 
 <div class="box">
-    <!-- (showDialog)="openDialog($event)" -->
   <app-table-of-content
+    (showDialog)="openDialog($event.id)"
     [showDetail]="true"
+    [actions]="facade.actions"
     [tableTitle]="'Listado de ordenes de compra'"
-    [trackByField]="'idOrden'"
+    [trackByField]="'id'"
     [tableData]="data()?.data || []"
-    [tableColumns]="tableColums"
+    [tableColumns]="tableColumns"
     [totalItems]="pagination().totalItems"
     [showPagination]="true"
     [totalPages]="pagination().totalPages"
@@ -86,7 +144,7 @@
     [pageSize]="pagination().pageSize"
     (pageChange)="changePage($event)"
     (pageSizeChange)="changePageSize($event)"
-    (remove)="remove($event.idOrden)"
-    ></app-table-of-content>
-    <!-- (edit)="setProduct($event)" -->
+    (remove)="remove($event.row.id)"
+    (edit)="facade.editPurchaseContract($event.row.id)"
+  ></app-table-of-content>
 </div>

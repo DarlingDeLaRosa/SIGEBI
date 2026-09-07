@@ -3,13 +3,13 @@ import { BaseCrud } from '../../../../shared/abstracts/base-crud';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Loading } from '../../../../core/service/loading-service/loading';
 import { CatalogService } from '../../services/catalog/catalog-service';
-import { CatalogColumns } from '../../../../shared/table-columns';
-import { TableOfContent } from '../../../../components/table-of-content/table-of-content';
-import { FormActions } from '../../../../components/form-actions/form-actions';
-import { InputFilter } from '../../../../components/input-filter/input-filter';
+import { CatalogColumns } from '../../../../shared/constant/table-columns';
+import { TableOfContent } from '../../../../shared/components/table-of-content/table-of-content';
+import { FormActions } from '../../../../shared/components/form-actions/form-actions';
+import { InputFilter } from '../../../../shared/components/input-filter/input-filter';
 import { DialogService } from '../../../../core/service/dialog-service/dialog';
 import { CatalogDialog } from '../../dialog/catalog-dialog/catalog-dialog';
-import { SearchSelect } from '../../../../components/search-select/search-select';
+import { SearchSelect } from '../../../../shared/components/search-select/search-select';
 
 @Component({
   selector: 'app-catalog',
@@ -19,7 +19,7 @@ import { SearchSelect } from '../../../../components/search-select/search-select
 })
 export class Catalog extends BaseCrud<any> implements OnInit {
 
-  tableColums = CatalogColumns
+  tableColumns = CatalogColumns
 
   auxiliar = signal<any[]>([]);
   auxiliarSelected = signal<any | null>(null);

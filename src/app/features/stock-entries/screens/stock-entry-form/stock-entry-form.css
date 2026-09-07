@@ -1,0 +1,16 @@
+h2{
+    font-size: 17px;
+    margin-bottom: 10px;
+}
+
+.summary{
+    display:flex;
+    justify-content:flex-end;
+    gap:40px;
+    margin-top:40px;
+}
+
+.summary-total{
+    font-weight:500;
+    color:#222;
+}

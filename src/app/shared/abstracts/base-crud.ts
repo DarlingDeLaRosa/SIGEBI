@@ -2,7 +2,7 @@ import { inject, signal, WritableSignal } from "@angular/core";
 import { Alert } from "../../core/service/alert-service/alert";
 import { FormGroup } from "@angular/forms";
 import { ApiResponse } from "../interface/abstracts-class";
-import { debounceTime, distinctUntilChanged, skip } from "rxjs";
+import { debounceTime, distinctUntilChanged, Observable, skip } from "rxjs";
 import { toObservable } from "@angular/core/rxjs-interop";
 
 export abstract class BaseCrud<T> {
@@ -10,6 +10,7 @@ export abstract class BaseCrud<T> {
     alert = inject(Alert)
     search = signal('');
     data = signal<ApiResponse<T[]> | null>(null);
+    dataById = signal<ApiResponse<T> | null>(null);
     abstract getService(): any;
 
     pagination = signal({
@@ -44,6 +45,41 @@ export abstract class BaseCrud<T> {
         });
     }
 
+    loadDataPost(request: (body: any) => Observable<any>, body: any = {}) {
+
+        const requestBody = {
+            page: this.pagination().currentPage,
+            CantItems: this.pagination().pageSize,
+            ...body
+        };
+
+        request(requestBody).subscribe({
+            next: (response: any) => {
+
+                this.data.set(response);
+
+                this.pagination.set({
+                    currentPage: response.currentPage,
+                    pageSize: response.cantItem,
+                    totalPages: response.cantPage,
+                    totalItems: response.totalItems,
+                });
+            },
+
+            error: console.error
+        });
+    }
+
+    loadById(id: number, callback?: (data: T) => void) {
+        this.getService().getById(id).subscribe({
+            next: (response: any) => {
+                this.dataById.set(response);
+                callback?.(response);
+            },
+            error: console.error
+        });
+    }
+
     loadSelect(request: () => any, target: any) {
         request()
             .subscribe({
@@ -72,13 +108,12 @@ export abstract class BaseCrud<T> {
         afterEdit?.(data);
     }
 
-    save(form: FormGroup, trackField: string = 'id', callback?: () => void) {
+    save(form: FormGroup, trackField: string = 'id', callback?: () => void, body?: any,) {
+        const data = body ?? form.getRawValue();
 
-        const body = form.getRawValue();
-
-        const method = body[trackField] > 0
-            ? this.getService().update(body)
-            : this.getService().create(body);
+        const method = data[trackField] > 0
+            ? this.getService().update(data)
+            : this.getService().create(data);
 
         method.subscribe({
             next: () => {
@@ -114,14 +149,21 @@ export abstract class BaseCrud<T> {
         form: FormGroup,
         controlName: string,
         item: any,
-        valueField: string
+        valueField: string,
+        objectOrID: boolean = false,
     ) {
-
         selectedSignal.set(item);
 
-        form.patchValue({
-            [controlName]: item[valueField]
-        });
+        if (objectOrID == false) {
+            form.patchValue({
+                [controlName]: item[valueField]
+            });
+
+        } else {
+            form.patchValue({
+                [controlName]: item
+            });
+        }
 
         form.markAsDirty();
     }

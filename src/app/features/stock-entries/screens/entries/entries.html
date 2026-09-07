@@ -2,19 +2,140 @@
   <h1>Entradas</h1>
 
   <span class="d-flex gap-1">
-    <button class="btn navigate"  (click)="this.filteringProduct = !this.filteringProduct;" >
-      {{ filteringProduct ? 'Ocultar filtros' : 'Filtrar productos' }}
+    <button class="btn navigate" (click)="this.filteringentries.set(!this.filteringentries())">
+      {{ filteringentries() ? 'Ocultar filtros' : 'Filtrar entradas' }}
     </button>
 
-    <button class="btn navigate"  [routerLink]="['../gestionar-Entradas']"  >
-      Crear producto
-    </button>
+    <button class="btn navigate" [routerLink]="['../gestionar-Entradas']">Crear entrada</button>
   </span>
 </div>
 
+@if (filteringentries()) {
+  <form [formGroup]="filterForm" (submit)="loadData(filterForm.getRawValue())" class="box mb-2">
+    <app-create-conditional-box [formName]="'Filtrar productos'">
+      <div class="col-md-2 form-floating">
+        <input
+          type="text"
+          formControlName="noFactura"
+          class="form-control"
+          [placeholder]="'Número de factura'"
+        />
+        <label for="filter">Número de factura</label>
+      </div>
+
+      <app-search-select
+        class="col-md-3"
+        placeholder="Tipo de entrada"
+        [items]="facade.entryType()"
+        [initialItems]="facade.entryType()"
+        [displayField]="'nombre'"
+        [valueField]="'idTipoEntrada'"
+        [value]="filterForm.get('idTipoEntrada')?.value"
+        (search)="facade.loadEntryTypes($event)"
+        [selectedItem]="facade.formSelections.idTipoEntrada()"
+        (selected)="
+          setSelection(
+            facade.formSelections.idTipoEntrada,
+            filterForm,
+            'idTipoEntrada',
+            $event,
+            'idTipoEntrada'
+          )
+        "
+      />
+
+      <app-search-select
+        class="col-md-3"
+        placeholder="Tipo de entrega"
+        [items]="facade.deliveryType()"
+        [initialItems]="facade.deliveryType()"
+        [displayField]="'nombre'"
+        [valueField]="'idTipoEntrega'"
+        [value]="filterForm.get('idTipoEntrega')?.value"
+        (search)="facade.loadDeliveryTypes($event)"
+        [selectedItem]="facade.formSelections.idTipoEntrega()"
+        (selected)="
+          setSelection(
+            facade.formSelections.idTipoEntrega,
+            filterForm,
+            'idTipoEntrega',
+            $event,
+            'idTipoEntrega'
+          )
+        "
+      />
+
+      <app-search-select
+        class="col-md-4"
+        placeholder="Proveedor"
+        [items]="facade.suppliers()"
+        [initialItems]="facade.suppliers()"
+        [displayField]="'razonSocial'"
+        [valueField]="'idProveedor'"
+        [value]="filterForm.get('idProveedor')?.value"
+        (search)="facade.loadSupplier($event)"
+        [selectedItem]="facade.formSelections.idProveedor()"
+        [showAll]="true"
+        (selected)="
+          setSelection(
+            facade.formSelections.idProveedor,
+            filterForm,
+            'idProveedor',
+            $event,
+            'idProveedor'
+          )
+        "
+      />
+
+      <app-search-select
+        class="col-md-3"
+        placeholder="Recinto"
+        [items]="facade.recintos()"
+        [initialItems]="facade.recintos()"
+        [displayField]="'nombre'"
+        [valueField]="'idRecinto'"
+        [value]="filterForm.get('idRecinto')?.value"
+        [selectedItem]="facade.formSelections.idRecinto()"
+        (selected)="
+          setSelection(
+            facade.formSelections.idRecinto,
+            filterForm,
+            'idRecinto',
+            $event,
+            'idRecinto'
+          )
+        "
+      />
+
+      <div class="col-md-2 form-floating">
+        <input
+          type="date"
+          class="form-control"
+          formControlName="desde"
+          id="fechadesde"
+          placeholder="Fecha de inicio"
+        />
+        <label for="fechadesde">Fecha de inicio</label>
+      </div>
+
+      <div class="col-md-2 form-floating">
+        <input
+          type="date"
+          class="form-control"
+          formControlName="hasta"
+          id="fechafinal"
+          placeholder="Fecha final"
+        />
+        <label for="fechafinal">Fecha final</label>
+      </div>
+    </app-create-conditional-box>
+  </form>
+}
+
 <div class="box">
-    <!-- [tableColumns]="tableColums" -->
   <app-table-of-content
+    (showDialog)="openDialog($event.idEntrada)"
+    [tableColumns]="tableColumns"
     [showDetail]="true"
     [tableTitle]="'Listado de entradas'"
     [trackByField]="'idEntrada'"
@@ -27,6 +148,6 @@
     (pageChange)="changePage($event)"
     (pageSizeChange)="changePageSize($event)"
     (remove)="remove($event.idEntrada)"
-    ></app-table-of-content>
-    <!-- (edit)="setProduct($event)" -->
+  ></app-table-of-content>
+  <!-- (edit)="setProduct($event)" -->
 </div>

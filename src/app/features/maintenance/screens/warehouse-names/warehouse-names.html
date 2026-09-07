@@ -30,7 +30,7 @@
   [tableTitle]="'Listado de almacenes'"
   [trackByField]="'idTipoAlm'"
   [tableData]="data()?.data || []"
-  [tableColumns]="tableColums"
+  [tableColumns]="tableColumns"
   [totalItems]="pagination().totalItems"
   [showPagination]="true"
   [totalPages]="pagination().totalPages"
@@ -38,6 +38,6 @@
   [pageSize]="pagination().pageSize"
   (pageChange)="changePage($event)"
   (pageSizeChange)="changePageSize($event)"
-  (edit)="setEditForm(warehouse_names_form, $event)"
+  (edit)="setEditForm(warehouse_names_form, $event.row)"
   (remove)="remove($event.idTipoAlm)"
 ></app-table-of-content>

@@ -1,0 +1,29 @@
+.box {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+    margin-bottom: 8px;
+}
+
+.box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.box-header h2 {
+    margin: 0;
+    font-size: 17px;
+}
+
+.box-header i {
+    font-size: 16px;
+    transition: .25s;
+}
+
+.box-content {
+    margin-top: 20px;
+}

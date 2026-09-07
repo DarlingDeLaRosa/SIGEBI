@@ -1,0 +1,352 @@
+@if (facade.loading()) {
+  <app-skeleton
+    [config]="{
+      cards: 6,
+      columns: 2,
+      sections: [{ height: 60 }, { height: 120 }],
+    }"
+  />
+} @else {
+  <div class="dialog-container">
+    <!-- ================================= -->
+    <!-- HEADER -->
+    <!-- ================================= -->
+
+    <div class="dialog-header">
+      <div>
+        <h2>Detalle de la Entrada</h2>
+
+        <span class="dialog-subtitle"> Información completa de la recepción de mercancía </span>
+      </div>
+
+      <button class="btn-close" (click)="closeDialog()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="dialog-body">
+      <!-- ================================= -->
+      <!-- INFORMACIÓN GENERAL -->
+      <!-- ================================= -->
+
+      <div class="info-grid">
+        <div class="info-card">
+          <label>No. Entrada</label>
+
+          <span>
+            {{ facade.entry().idEntrada }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <label>Recinto</label>
+
+          <span>
+            {{ facade.entry().recinto?.nombre }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <label>Tipo de entrada</label>
+
+          <span>
+            {{ facade.entry().tipoEntrada?.nombre }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <label>Tipo de entrega</label>
+
+          <span>
+            {{ facade.entry().tipoEntrega?.nombre }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <label>No. Orden</label>
+
+          <span>
+            {{ facade.entry().numOrden || 'N/A' }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <label>No. Conduce</label>
+
+          <span>
+            {{ facade.entry().noConduce || 'N/A' }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <label>Creado por</label>
+
+          <span>
+            {{ facade.entry().creadoPor || 'N/A' }}
+          </span>
+        </div>
+
+        <div class="info-card">
+          <label>Fecha de creación</label>
+
+          <span>
+            {{ facade.entry().fechaCreacion | date: 'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- ================================= -->
+      <!-- FACTURA -->
+      <!-- ================================= -->
+
+      <div class="section">
+        <label>Información de Factura</label>
+
+        <div class="info-grid">
+          <div class="info-card">
+            <label>No. Factura</label>
+
+            <span>
+              {{ facade.entry().noFactura || 'N/A' }}
+            </span>
+          </div>
+
+          <div class="info-card">
+            <label>Fecha de factura</label>
+
+            <span>
+              {{ facade.entry().fechaFactura | date: 'dd/MM/yyyy' }}
+            </span>
+          </div>
+
+          <div class="info-card">
+            <label>ITBIS general</label>
+
+            <span>
+              {{ facade.entry().itbisGeneral | currency: 'DOP' : 'symbol' : '1.2-2' }}
+            </span>
+          </div>
+
+          <div class="info-card">
+            <label>ITBIS aplicado</label>
+
+            <span
+              class="status"
+              [ngClass]="{
+                recibida: facade.entry().itbisGeneralEstado,
+                cancelada: !facade.entry().itbisGeneralEstado,
+              }"
+            >
+              {{ facade.entry().itbisGeneralEstado ? 'Sí' : 'No' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================= -->
+      <!-- PROVEEDOR -->
+      <!-- ================================= -->
+
+      <div class="section">
+        <label>Proveedor</label>
+
+        <div class="product-card">
+          <h5 class="mb-3">
+            {{ facade.entry().proveedor?.razonSocial | titlecase }}
+          </h5>
+
+          <p>
+            <strong>RNC:</strong>
+
+            {{ facade.entry().proveedor?.rnc }}
+          </p>
+
+          <p>
+            <strong>Nombre Comercial:</strong>
+
+            {{ facade.entry().proveedor?.nombreComercial || 'N/A' }}
+          </p>
+
+          <p>
+            <strong>Representante:</strong>
+
+            {{ facade.entry().proveedor?.representante || 'N/A' }}
+          </p>
+
+          <p>
+            <strong>Teléfono:</strong>
+
+            {{ facade.entry().proveedor?.telRepresentante || 'N/A' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- ================================= -->
+      <!-- PRODUCTOS -->
+      <!-- ================================= -->
+
+      <div class="section">
+        <label>Productos Recibidos</label>
+
+        <div class="warehouse-list">
+          @for (item of facade.entry().detalles; track item.idEntradaDet) {
+            <div class="product-card mb-2">
+              <!-- PRODUCT HEADER -->
+
+              <div class="product-header">
+                <div>
+                  <h5>
+                    {{ item.producto?.nombre }}
+                  </h5>
+
+                  <small>
+                    {{ item.producto?.descripcion }}
+                  </small>
+                </div>
+
+                <strong>
+                  {{ item.subTotal | currency: 'DOP' : 'symbol' : '1.2-2' }}
+                </strong>
+              </div>
+
+              <!-- PRODUCT INFORMATION -->
+
+              <div class="product-grid">
+                <div>
+                  <small>Cantidad</small>
+
+                  <strong>
+                    {{ item.cantidad }}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>Marca</small>
+
+                  <strong>
+                    {{ item.marca || 'N/A' }}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>Modelo</small>
+
+                  <strong>
+                    {{ item.modelo || 'N/A' }}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>Condición</small>
+
+                  <strong>
+                    {{ item.condicion || 'N/A' }}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>Serial</small>
+
+                  <strong>
+                    {{ item.serial || 'N/A' }}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>Precio unitario</small>
+
+                  <strong>
+                    {{ item.precio | currency: 'DOP' : 'symbol' : '1.2-2' }}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>Subtotal</small>
+
+                  <strong>
+                    {{ item.precio * item.cantidad | currency: 'DOP' : 'symbol' : '1.2-2' }}
+                  </strong>
+                </div>
+
+                <div>
+                  <small>ITBIS</small>
+
+                  <strong>
+                    {{ item.itbisProducto | currency: 'DOP' : 'symbol' : '1.2-2' }}
+                  </strong>
+                </div>
+              </div>
+
+              <!-- OBSERVACIÓN DEL PRODUCTO -->
+
+              @if (item.observacion) {
+                <div class="product-observation">
+                  <small>Observación</small>
+
+                  <span>
+                    {{ item.observacion }}
+                  </span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- ================================= -->
+      <!-- RESUMEN FINANCIERO -->
+      <!-- ================================= -->
+
+      <div class="section">
+        <label>Resumen Financiero</label>
+
+        <div class="summary-card">
+          <div>
+            <span>Subtotal</span>
+
+            <strong>
+              {{
+                facade.entry().total - facade.entry().itbisGeneral
+                  | currency: 'DOP' : 'symbol' : '1.2-2'
+              }}
+            </strong>
+          </div>
+
+          <div>
+            <span>ITBIS</span>
+
+            <strong>
+              {{ facade.entry().itbisGeneral | currency: 'DOP' : 'symbol' : '1.2-2' }}
+            </strong>
+          </div>
+
+          <div class="summary-total">
+            <span>Total</span>
+
+            <strong>
+              {{ facade.entry().total | currency: 'DOP' : 'symbol' : '1.2-2' }}
+            </strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================================= -->
+      <!-- OBSERVACIÓN GENERAL -->
+      <!-- ================================= -->
+
+      @if (facade.entry().observacion) {
+        <div class="section">
+          <label>Observación</label>
+
+          <div class="observation-card">
+            <i class="bi bi-info-circle"></i>
+
+            <span>
+              {{ facade.entry().observacion }}
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

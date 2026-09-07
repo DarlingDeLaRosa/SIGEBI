@@ -18,8 +18,12 @@
     <a class="item-menu" [routerLink]="['/layout/salidas']" routerLinkActive="active">
       <i class="bi bi-box-arrow-up"></i>Salidas
     </a>
+    
+    <a class="item-menu" [routerLink]="['/layout/transferencia']" routerLinkActive="active">
+      <i class="bi bi-truck"></i>Transferencias
+    </a>
 
-    <a class="item-menu" [routerLink]="['/layout/consiliaciones']" routerLinkActive="active">
+    <a class="item-menu" [routerLink]="['/layout/conciliaciones']" routerLinkActive="active">
       <i class="bi bi-arrow-left-right"></i>Conciliaciones
     </a>
 
@@ -52,8 +56,8 @@
 
       <div class="logout">
         <h3 class="nombre">
-          <span style="color: #004b8d; font-weight: 600">{{ 'user.role' }}</span
-          >, {{ 'user.Firstname' }} {{ 'user.Lastname' }}
+          <span style="color: #004b8d; font-weight: 600">{{ 'Administrador' }}</span
+          >, {{ 'Darling' }} {{ 'De la Rosa' }}
         </h3>
 
         <div class="dropdown">

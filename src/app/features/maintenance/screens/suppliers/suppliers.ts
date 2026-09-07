@@ -1,13 +1,13 @@
 import { Component, inject, OnInit, signal, viewChild } from '@angular/core';
-import { FormActions } from '../../../../components/form-actions/form-actions';
-import { InputFilter } from '../../../../components/input-filter/input-filter';
+import { FormActions } from '../../../../shared/components/form-actions/form-actions';
+import { InputFilter } from '../../../../shared/components/input-filter/input-filter';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TableOfContent } from '../../../../components/table-of-content/table-of-content';
+import { TableOfContent } from '../../../../shared/components/table-of-content/table-of-content';
 import { Loading } from '../../../../core/service/loading-service/loading';
 import { BaseCrud } from '../../../../shared/abstracts/base-crud';
-import { SupplierColumns } from '../../../../shared/table-columns';
+import { SupplierColumns } from '../../../../shared/constant/table-columns';
 import { SuppliersService } from '../../services/supplier/suppliers-service';
-import { SearchSelect } from '../../../../components/search-select/search-select';
+import { SearchSelect } from '../../../../shared/components/search-select/search-select';
 import { debounceTime, distinctUntilChanged, filter, map, switchMap } from 'rxjs';
 
 @Component({
@@ -18,7 +18,7 @@ import { debounceTime, distinctUntilChanged, filter, map, switchMap } from 'rxjs
 })
 export class Suppliers extends BaseCrud<any> implements OnInit {
 
-  tableColums = SupplierColumns
+  tableColumns = SupplierColumns
   private fb = inject(FormBuilder);
   private loadingService = inject(Loading);
   private supplierService = inject(SuppliersService);

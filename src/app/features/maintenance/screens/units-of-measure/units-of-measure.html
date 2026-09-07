@@ -30,7 +30,7 @@
   [tableTitle]="'Listado de unidades de medida'"
   [trackByField]="'idUnidadMe'"
   [tableData]="data()?.data || []"
-  [tableColumns]="tableColums"
+  [tableColumns]="tableColumns"
   [totalItems]="pagination().totalItems"
   [showPagination]="true"
   [totalPages]="pagination().totalPages"
@@ -38,6 +38,6 @@
   [pageSize]="pagination().pageSize"
   (pageChange)="changePage($event)"
   (pageSizeChange)="changePageSize($event)"
-  (edit)="setEditForm(units_measure_form, $event)"
+  (edit)="setEditForm(units_measure_form, $event.row)"
   (remove)="remove($event.idUnidadMe)"
 ></app-table-of-content>

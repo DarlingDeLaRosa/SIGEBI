@@ -1,0 +1,89 @@
+.skeleton-container {
+    padding: 20px;
+}
+
+.skeleton-header {
+    margin-bottom: 25px;
+}
+
+.skeleton-title {
+    width: 260px;
+    height: 28px;
+    border-radius: 8px;
+}
+
+.skeleton-subtitle {
+    margin-top: 10px;
+    width: 180px;
+    height: 14px;
+    border-radius: 6px;
+}
+
+.skeleton-grid {
+    display: grid;
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.skeleton-card {
+    height: 85px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 16px;
+}
+
+.skeleton-label {
+    height: 12px;
+    width: 90px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.skeleton-value {
+    height: 18px;
+    width: 120px;
+    border-radius: 6px;
+}
+
+.skeleton-section {
+    margin-top: 25px;
+}
+
+.skeleton-section-title {
+    width: 130px;
+    height: 16px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+.skeleton-box {
+    border-radius: 15px;
+}
+
+.list-item {
+    margin-bottom: 12px;
+}
+
+.skeleton-title,
+.skeleton-subtitle,
+.skeleton-card,
+.skeleton-label,
+.skeleton-value,
+.skeleton-section-title,
+.skeleton-box {
+
+    background:
+        linear-gradient(90deg,
+            #eef2f7 25%,
+            #f8fafc 50%,
+            #eef2f7 75%);
+
+    background-size: 200% 100%;
+    animation:
+        loading 1.5s infinite;
+}
+
+@keyframes loading {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0;}
+}

@@ -1,0 +1,84 @@
+<div class="title">
+  <h1>Solicitudes</h1>
+
+  <span class="d-flex gap-1">
+    <button
+      class="btn navigate"
+      (click)="this.filteringRequests.set(!this.filteringRequests())"
+    >
+      {{ filteringRequests() ? 'Ocultar filtros' : 'Filtrar solicitudes' }}
+    </button>
+
+    <button class="btn navigate" [routerLink]="['../gestionar-solicitudes']">
+      Crear solicitud
+    </button>
+  </span>
+</div>
+
+@if (filteringRequests()) {
+  <form [formGroup]="filterForm" (submit)="loadData(filterForm.getRawValue())" class="box mb-2">
+    <app-create-conditional-box [formName]="'Filtrar productos'">
+      <div class="col-md-2 form-floating">
+        <input
+          type="text"
+          formControlName="filter"
+          class="form-control"
+          [placeholder]="'Número de expediente'"
+        />
+        <label for="filter">Número de Exp / Orden</label>
+      </div>
+
+      <app-search-select
+        class="col-md-2"
+        placeholder="Estado de orden"
+        [items]="facade.filteredStatus()"
+        [initialItems]="facade.status()"
+        [displayField]="'name'"
+        [valueField]="'value'"
+        [value]="filterForm.get('estado')?.value"
+        [selectedItem]="facade.filterSelections.status()"
+        (search)="facade.filterStatus($event)"
+        [showAll]="true"
+        (selected)="
+          setSelection(
+            facade.filterSelections.status,
+            filterForm,
+            'estado',
+            $event,
+            'value'
+          )
+        "
+      />
+
+      <app-form-actions
+        [nameActionBoton]="'Filtrar'"
+        [iconActionBoton]="'bi bi-search'"
+        [editing]="filterForm.dirty"
+        [disabled]="!filterForm.dirty || loading()"
+        (clear)="clearForm(); loadData()"
+      >
+      </app-form-actions>
+    </app-create-conditional-box>
+  </form>
+}
+
+<div class="box">
+    <!-- (showDialog)="openDialog($event.id)" -->
+  <app-table-of-content
+    [showDetail]="true"
+    [actions]="facade.actions"
+    [tableTitle]="'Listado de ordenes de compra'"
+    [trackByField]="'id'"
+    [tableData]="data()?.data || []"
+    [tableColumns]="tableColumns"
+    [totalItems]="pagination().totalItems"
+    [showPagination]="true"
+    [totalPages]="pagination().totalPages"
+    [currentPage]="pagination().currentPage"
+    [pageSize]="pagination().pageSize"
+    (pageChange)="changePage($event)"
+    (pageSizeChange)="changePageSize($event)"
+    (remove)="remove($event.row.id)"
+  ></app-table-of-content>
+    <!-- (edit)="facade.editPurchaseContract($event.row.id)" -->
+</div>

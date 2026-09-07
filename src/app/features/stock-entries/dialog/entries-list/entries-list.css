@@ -1,0 +1,327 @@
+.entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+
+/* ================================= */
+/* ENTRADA */
+/* ================================= */
+
+.entry-card {
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+
+/* ================================= */
+/* HEADER */
+/* ================================= */
+
+.entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #eceff3;
+}
+
+.entry-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.entry-title h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.entry-header small {
+  color: #888;
+  font-size: 13px;
+}
+
+
+/* ================================= */
+/* STATUS */
+/* ================================= */
+
+.entry-status {
+  padding: 5px 12px;
+  border-radius: 20px;
+
+  background: #e8f1ff;
+  color: #0d6efd;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+/* ================================= */
+/* TOTAL */
+/* ================================= */
+
+.entry-total {
+  text-align: right;
+}
+
+.entry-total small {
+  display: block;
+  margin-bottom: 3px;
+}
+
+.entry-total strong {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+
+/* ================================= */
+/* INFORMACIÓN */
+/* ================================= */
+
+.entry-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 18px;
+
+  padding: 20px 0;
+}
+
+.info-item small {
+  display: block;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.info-item strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+/* ================================= */
+/* SECCIONES */
+/* ================================= */
+
+.entry-section {
+  margin-top: 18px;
+}
+
+.entry-section > label {
+  display: block;
+  margin-bottom: 10px;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+
+/* ================================= */
+/* PROVEEDOR */
+/* ================================= */
+
+.supplier-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: white;
+  border: 1px solid #eef2f7;
+
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.supplier-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.supplier-card strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.supplier-card small {
+  color: #888;
+}
+
+
+/* ================================= */
+/* PRODUCTOS */
+/* ================================= */
+
+.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.product-item {
+  background: white;
+  border: 1px solid #eef2f7;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.product-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  margin-bottom: 16px;
+}
+
+.product-main h5 {
+  margin: 0 0 3px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.product-main small {
+  color: #888;
+}
+
+.product-subtotal {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+
+/* ================================= */
+/* PRODUCT INFO */
+/* ================================= */
+
+.product-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 15px;
+}
+
+.product-info small {
+  display: block;
+  color: #888;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.product-info strong {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+/* ================================= */
+/* CONDICIÓN */
+/* ================================= */
+
+.condition {
+  display: inline-block;
+
+  padding: 4px 10px;
+  border-radius: 15px;
+
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.condition.nuevo {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.condition.bueno {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.condition.regular {
+  background: #fff3cd;
+  color: #9a6700;
+}
+
+.condition.malo {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+
+/* ================================= */
+/* FOOTER */
+/* ================================= */
+
+.entry-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 18px;
+  padding-top: 16px;
+
+  border-top: 1px solid #eceff3;
+}
+
+.entry-footer > div:first-child {
+  color: #777;
+  font-size: 13px;
+}
+
+.entry-footer i {
+  margin-right: 5px;
+}
+
+.entry-footer-total {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.entry-footer-total span {
+  color: #777;
+  font-size: 13px;
+}
+
+.entry-footer-total strong {
+  color: #0d6efd;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+
+/* ================================= */
+/* RESPONSIVE */
+/* ================================= */
+
+@media (max-width: 768px) {
+
+  .entry-header {
+    flex-direction: column;
+  }
+
+  .entry-total {
+    text-align: left;
+  }
+
+  .supplier-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .entry-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+}
