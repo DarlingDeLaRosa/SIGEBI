@@ -1,0 +1,133 @@
+<div class="title">
+  <h1>Conciliaciones de inventario</h1>
+  <div class="d-flex gap-2 flex-wrap">
+    <button type="button" class="btn navigate" (click)="toggleFilters()">
+      {{ showFilters() ? 'Ocultar filtros' : 'Filtrar conciliaciones' }}
+    </button>
+    <a class="btn navigate" routerLink="../gestionar-ajuste-de-inventario">Crear conciliación</a>
+  </div>
+</div>
+
+@if (facade.error() || references.error()) {
+  <div class="alert alert-danger" role="alert">{{ facade.error() || references.error() }}</div>
+}
+
+@if (showFilters()) {
+  <form class="box mb-2" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+    <h2 class="h5 mb-3">Filtrar conciliaciones</h2>
+    <div class="row g-2">
+      <div class="col-md-3">
+        <label for="filter-campus" class="form-label">Recinto</label>
+        <select id="filter-campus" class="form-select" formControlName="campusId">
+          <option [ngValue]="null">Todos</option>
+          @for (campus of references.campuses(); track campus.idRecinto) {
+            <option [ngValue]="campus.idRecinto">{{ campus.nombre }}</option>
+          }
+        </select>
+      </div>
+      <app-search-select
+        class="col-md-3"
+        placeholder="Almacén"
+        [items]="references.warehouses()"
+        displayField="nombre"
+        valueField="idTipoAlm"
+        [showAll]="true"
+        [value]="filterForm.controls.warehouseId.value"
+        [selectedItem]="selectedWarehouse()"
+        (search)="references.loadWarehouses($event)"
+        (selected)="selectWarehouse($event)"
+      />
+      <div class="col-md-3">
+        <label for="filter-count-number" class="form-label">Número de toma física</label>
+        <input id="filter-count-number" class="form-control" formControlName="countNumber" />
+      </div>
+      <app-search-select
+        class="col-md-3"
+        placeholder="Producto"
+        [items]="references.products()"
+        displayField="nombre"
+        valueField="idProducto"
+        [showAll]="true"
+        [value]="filterForm.controls.productId.value"
+        [selectedItem]="selectedProduct()"
+        (search)="references.loadProducts($event)"
+        (selected)="selectProduct($event)"
+      />
+    </div>
+    <app-form-actions
+      nameActionBoton="Filtrar"
+      iconActionBoton="bi bi-search"
+      [editing]="true"
+      [disabled]="facade.loading()"
+      (clear)="clearFilters()"
+    />
+  </form>
+}
+
+<div class="box" [attr.aria-busy]="facade.loading()">
+  @if (facade.loading()) {
+    <p role="status">Cargando conciliaciones…</p>
+  }
+  <app-table-of-content
+    tableTitle="Listado de conciliaciones"
+    [tableData]="rows()"
+    [tableColumns]="tableColumns"
+    trackByField="id"
+    [showDetail]="true"
+    [showPagination]="false"
+    [totalItems]="facade.pagination().totalItems"
+    [totalPages]="facade.pagination().totalPages"
+    [currentPage]="facade.pagination().currentPage"
+    [pageSize]="facade.pagination().pageSize"
+    (pageChange)="facade.changePage($event)"
+    (pageSizeChange)="facade.changePageSize($event)"
+    (edit)="facade.edit($event.row.id)"
+    (remove)="facade.remove($event.row.id)"
+    (showDialog)="openDetail($event.id)"
+  />
+  <nav
+    class="d-flex justify-content-between align-items-center gap-2 flex-wrap mt-3"
+    aria-label="Paginación de conciliaciones"
+  >
+    <div>
+      @if (facade.totalItems() !== null) {
+        <span>Total: {{ facade.totalItems() }} · </span>
+      }
+      <span
+        >Página {{ facade.pagination().currentPage }} de {{ facade.pagination().totalPages }}</span
+      >
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <label for="adjustment-page-size">Por página</label>
+      <select
+        id="adjustment-page-size"
+        class="form-select w-auto"
+        [value]="facade.pagination().pageSize"
+        [disabled]="facade.loading()"
+        (change)="changePageSize($event)"
+      >
+        <option [value]="5">5</option>
+        <option [value]="10">10</option>
+        <option [value]="20">20</option>
+      </select>
+      <button
+        type="button"
+        class="btn save"
+        [disabled]="facade.loading() || facade.pagination().currentPage <= 1"
+        (click)="facade.changePage(facade.pagination().currentPage - 1)"
+      >
+        Anterior
+      </button>
+      <button
+        type="button"
+        class="btn save"
+        [disabled]="
+          facade.loading() || facade.pagination().currentPage >= facade.pagination().totalPages
+        "
+        (click)="facade.changePage(facade.pagination().currentPage + 1)"
+      >
+        Siguiente
+      </button>
+    </div>
+  </nav>
+</div>

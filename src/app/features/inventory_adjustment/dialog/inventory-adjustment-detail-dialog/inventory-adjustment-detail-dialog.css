@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+td,
+th {
+  white-space: normal;
+  min-width: 100px;
+}
+dd {
+  margin-bottom: 0;
+}

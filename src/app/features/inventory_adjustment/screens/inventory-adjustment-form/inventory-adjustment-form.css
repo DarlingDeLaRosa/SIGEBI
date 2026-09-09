@@ -1,0 +1,28 @@
+:host {
+  display: block;
+}
+.title {
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+app-section-box {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+app-form-actions {
+  display: block;
+  margin: 1rem 0;
+}
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 1.5rem;
+}
+fieldset {
+  min-width: 0;
+}
+fieldset:disabled {
+  opacity: 0.7;
+  pointer-events: none;
+}

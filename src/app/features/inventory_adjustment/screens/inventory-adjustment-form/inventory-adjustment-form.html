@@ -1,0 +1,278 @@
+<div class="title">
+  <h1>
+    {{ facade.form.controls.id.value ? 'Editar conciliación' : 'Gestionar ajuste de inventario' }}
+  </h1>
+  <a class="btn navigate" routerLink="/layout/conciliaciones/Ajuste-de-inventario"
+    >Listado de conciliaciones</a
+  >
+</div>
+
+@if (facade.error() || references.error()) {
+  <div class="alert alert-danger" role="alert">{{ facade.error() || references.error() }}</div>
+}
+@if (facade.loading()) {
+  <p role="status">Cargando conciliación…</p>
+}
+
+<fieldset [disabled]="facade.loading() || facade.saving() || facade.loadFailed()">
+  <app-section-box title="Información general de la toma física">
+    <form [formGroup]="facade.form" (ngSubmit)="facade.save()" class="row g-2">
+      <div class="col-md-3">
+        <label for="count-number" class="form-label">Número de toma física *</label>
+        <input id="count-number" class="form-control" formControlName="countNumber" />
+        @if (facade.form.controls.countNumber.touched && facade.form.controls.countNumber.invalid) {
+          <small class="text-danger">Escribe el número de toma física.</small>
+        }
+      </div>
+      <div class="col-md-3">
+        <label for="count-date" class="form-label">Fecha *</label>
+        <input id="count-date" type="date" class="form-control" formControlName="date" />
+        @if (facade.form.controls.date.touched && facade.form.controls.date.invalid) {
+          <small class="text-danger">Selecciona la fecha.</small>
+        }
+      </div>
+      <div class="col-md-3">
+        <label for="count-campus" class="form-label">Recinto *</label>
+        @if (facade.details().length) {
+          <input id="count-campus" class="form-control" [value]="campusName()" readonly />
+        } @else {
+          <select
+            id="count-campus"
+            class="form-select"
+            formControlName="campusId"
+            (change)="facade.changeCampus()"
+          >
+            <option [ngValue]="0">Seleccionar recinto</option>
+            @for (campus of references.campuses(); track campus.idRecinto) {
+              <option [ngValue]="campus.idRecinto">{{ campus.nombre }}</option>
+            }
+          </select>
+        }
+        @if (facade.form.controls.campusId.touched && facade.form.controls.campusId.invalid) {
+          <small class="text-danger">Selecciona un recinto.</small>
+        }
+      </div>
+      <div class="col-md-3">
+        @if (facade.details().length) {
+          <label for="count-warehouse" class="form-label">Almacén *</label>
+          <input
+            id="count-warehouse"
+            class="form-control"
+            [value]="facade.selectedWarehouse()?.nombre || facade.form.controls.warehouseId.value"
+            readonly
+          />
+        } @else {
+          <app-search-select
+            placeholder="Almacén *"
+            [items]="references.warehouses()"
+            displayField="nombre"
+            valueField="idTipoAlm"
+            [value]="facade.form.controls.warehouseId.value"
+            [selectedItem]="facade.selectedWarehouse()"
+            (search)="references.loadWarehouses($event)"
+            (selected)="facade.selectWarehouse($event)"
+          />
+        }
+        @if (facade.form.controls.warehouseId.touched && facade.form.controls.warehouseId.invalid) {
+          <small class="text-danger">Selecciona un almacén.</small>
+        }
+      </div>
+      <div class="col-md-3">
+        <label for="start-time" class="form-label">Hora de inicio</label>
+        <input
+          id="start-time"
+          type="time"
+          step="1"
+          class="form-control"
+          formControlName="startTime"
+        />
+      </div>
+      <div class="col-md-3">
+        <label for="end-time" class="form-label">Hora de término</label>
+        <input id="end-time" type="time" step="1" class="form-control" formControlName="endTime" />
+      </div>
+      @if (facade.form.hasError('timePair') || facade.form.hasError('timeOrder')) {
+        <small class="text-danger"
+          >Indica ambas horas; la hora de término debe ser igual o posterior a la de inicio.</small
+        >
+      }
+      @if (facade.details().length) {
+        <small class="text-muted"
+          >Para cambiar el recinto o el almacén, elimina primero los detalles del conteo.</small
+        >
+      }
+    </form>
+  </app-section-box>
+
+  <app-section-box title="Participantes">
+    <form [formGroup]="facade.participantForm" (ngSubmit)="facade.addParticipant()" class="row g-2">
+      <div class="col-md-6">
+        <label for="participant-name" class="form-label">Nombre *</label>
+        <input id="participant-name" class="form-control" formControlName="name" />
+      </div>
+      <div class="col-md-6">
+        <label for="participant-position" class="form-label">Cargo *</label>
+        <input id="participant-position" class="form-control" formControlName="position" />
+      </div>
+      @if (facade.participantForm.touched && facade.participantForm.invalid) {
+        <small class="text-danger">Completa el nombre y el cargo del participante.</small>
+      }
+      <app-form-actions
+        [nameActionBoton]="
+          facade.editingParticipantIndex() === null
+            ? 'Agregar participante'
+            : 'Actualizar participante'
+        "
+        [editing]="true"
+        [disabled]="facade.participantForm.invalid"
+        (clear)="facade.clearParticipant()"
+      />
+    </form>
+    <app-table-of-content
+      tableTitle="Participantes de la toma física"
+      [tableData]="facade.participantRows()"
+      [tableColumns]="participantColumns"
+      trackByField="rowKey"
+      (edit)="facade.editParticipant($event.index)"
+      (remove)="facade.removeParticipant($event.index)"
+    />
+  </app-section-box>
+
+  <app-section-box title="Detalles del conteo físico">
+    @if (!facade.form.controls.warehouseId.value) {
+      <p class="text-muted">
+        Selecciona el recinto y el almacén para consultar los productos y sus entradas.
+      </p>
+    } @else {
+      <form [formGroup]="facade.detailForm" (ngSubmit)="facade.addDetail()" class="row g-2">
+        @if (facade.editingDetailIndex() === null) {
+          <app-search-select
+            class="col-md-4"
+            placeholder="Producto *"
+            [items]="references.products()"
+            displayField="nombre"
+            valueField="idProducto"
+            [value]="facade.detailForm.controls.productId.value"
+            [selectedItem]="facade.selectedProduct()"
+            (search)="references.loadProducts($event)"
+            (selected)="facade.selectProduct($event)"
+          />
+        } @else {
+          <div class="col-md-4">
+            <label for="editing-product" class="form-label">Producto</label>
+            <input
+              id="editing-product"
+              class="form-control"
+              [value]="facade.selectedProduct()?.nombre"
+              readonly
+            />
+          </div>
+        }
+        <div class="col-md-4">
+          <label for="entry-detail" class="form-label">Detalle de entrada *</label>
+          @if (facade.editingDetailIndex() === null) {
+            <select
+              id="entry-detail"
+              class="form-select"
+              formControlName="entryDetailId"
+              (change)="facade.selectEntry()"
+            >
+              <option [ngValue]="0">Seleccionar entrada</option>
+              @for (entry of facade.entryDetails(); track entry.idEntradaDet) {
+                <option [ngValue]="entry.idEntradaDet">
+                  Detalle {{ entry.idEntradaDet }} · Entrada {{ entry.idEntrada }}
+                  {{ entry.serial ? '· ' + entry.serial : '' }}
+                </option>
+              }
+            </select>
+          } @else {
+            <input
+              id="entry-detail"
+              class="form-control"
+              [value]="facade.detailForm.controls.entryDetailId.value"
+              readonly
+            />
+          }
+        </div>
+        <div class="col-md-2">
+          <label for="inventory-quantity" class="form-label">Existencia</label>
+          <input
+            id="inventory-quantity"
+            type="number"
+            class="form-control"
+            formControlName="inventoryQuantity"
+            readonly
+          />
+        </div>
+        <div class="col-md-2">
+          <label for="counted-quantity" class="form-label">Conteo físico *</label>
+          <input
+            id="counted-quantity"
+            type="number"
+            min="0"
+            step="1"
+            class="form-control"
+            formControlName="countedQuantity"
+          />
+          @if (
+            facade.detailForm.controls.countedQuantity.touched &&
+            facade.detailForm.controls.countedQuantity.invalid
+          ) {
+            <small class="text-danger">Ingresa una cantidad entera mayor o igual a cero.</small>
+          }
+        </div>
+        <div class="col-12">
+          <label for="detail-observations" class="form-label">Observaciones</label>
+          <textarea
+            id="detail-observations"
+            class="form-control"
+            formControlName="observations"
+            rows="2"
+          ></textarea>
+        </div>
+        @if (facade.loadingEntries()) {
+          <p role="status">Cargando entradas…</p>
+        }
+        @if (facade.detailError()) {
+          <p class="text-danger" role="alert">{{ facade.detailError() }}</p>
+        }
+        <app-form-actions
+          [nameActionBoton]="
+            facade.editingDetailIndex() === null ? 'Agregar detalle' : 'Actualizar detalle'
+          "
+          [editing]="true"
+          [disabled]="facade.detailForm.invalid || facade.loadingEntries()"
+          (clear)="facade.clearDetail()"
+        />
+      </form>
+    }
+  </app-section-box>
+
+  <div class="box mt-2">
+    <app-table-of-content
+      tableTitle="Listado del conteo"
+      [tableData]="facade.details()"
+      [tableColumns]="detailColumns"
+      trackByField="entryDetailId"
+      [showContent]="true"
+      (edit)="facade.editDetail($event.index)"
+      (remove)="facade.removeDetail($event.index)"
+    >
+      <div class="summary">
+        <span>Existencia: {{ facade.totals().inventory }}</span>
+        <span>Conteo físico: {{ facade.totals().counted }}</span>
+        <strong>Diferencia: {{ facade.totals().difference }}</strong>
+      </div>
+    </app-table-of-content>
+  </div>
+  <div class="box mt-2 d-flex justify-content-end">
+    <button
+      type="button"
+      class="btn save"
+      [disabled]="facade.form.invalid || !facade.details().length || facade.saving()"
+      (click)="facade.save()"
+    >
+      <i class="bi bi-send"></i>{{ facade.saving() ? 'Guardando…' : 'Guardar conciliación' }}
+    </button>
+  </div>
+</fieldset>

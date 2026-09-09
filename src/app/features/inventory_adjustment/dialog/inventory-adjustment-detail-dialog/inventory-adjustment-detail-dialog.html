@@ -1,0 +1,86 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2>Detalle de conciliación</h2>
+    <button type="button" class="btn-close" aria-label="Cerrar" (click)="close()"></button>
+  </div>
+  <div class="dialog-body">
+    @if (facade.loading()) {
+      <p role="status">Cargando conciliación…</p>
+    }
+    @if (facade.error()) {
+      <p class="alert alert-danger" role="alert">{{ facade.error() }}</p>
+    }
+    @if (facade.adjustment(); as adjustment) {
+      <dl class="info-grid">
+        <div>
+          <dt>Toma física</dt>
+          <dd>{{ adjustment.countNumber }}</dd>
+        </div>
+        <div>
+          <dt>Fecha</dt>
+          <dd>{{ adjustment.date | date: 'dd/MM/yyyy' }}</dd>
+        </div>
+        <div>
+          <dt>Recinto</dt>
+          <dd>{{ campusName(adjustment.campusId) }}</dd>
+        </div>
+        <div>
+          <dt>Almacén</dt>
+          <dd>{{ adjustment.warehouseName || adjustment.warehouseId }}</dd>
+        </div>
+        <div>
+          <dt>Hora de inicio</dt>
+          <dd>{{ adjustment.startTime || 'Sin registrar' }}</dd>
+        </div>
+        <div>
+          <dt>Hora de término</dt>
+          <dd>{{ adjustment.endTime || 'Sin registrar' }}</dd>
+        </div>
+      </dl>
+      <h3 class="h5">Participantes</h3>
+      <ul>
+        @for (participant of adjustment.participants; track $index) {
+          <li>{{ participant.name }} — {{ participant.position }}</li>
+        } @empty {
+          <li>No hay participantes registrados.</li>
+        }
+      </ul>
+      <h3 class="h5">Detalles del conteo</h3>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Detalle de entrada</th>
+              <th>Almacén</th>
+              <th>Existencia</th>
+              <th>Conteo físico</th>
+              <th>Diferencia</th>
+              <th>Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (detail of adjustment.details; track $index) {
+              <tr>
+                <td>{{ detail.productName || detail.productId }}</td>
+                <td>{{ detail.entryDetailId }}</td>
+                <td>{{ detail.warehouseName || detail.warehouseId }}</td>
+                <td>{{ detail.inventoryQuantity }}</td>
+                <td>{{ detail.countedQuantity }}</td>
+                <td>{{ detail.difference }}</td>
+                <td>{{ detail.observations }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7">No hay detalles registrados.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+  <div class="dialog-footer">
+    <button type="button" class="btn save" (click)="close()">Cerrar</button>
+  </div>
+</div>

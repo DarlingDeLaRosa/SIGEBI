@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+.title {
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+app-form-actions {
+  display: block;
+  margin-top: 1rem;
+}

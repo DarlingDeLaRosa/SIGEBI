@@ -1,5 +1,32 @@
 import { tableColumnsInterface } from "../../interfaces/table-content-interface"
 
+export const InventoryAdjustmentColumns: tableColumnsInterface[] = [
+    { key: 'countNumber', label: 'Número de toma física' },
+    { key: 'date', label: 'Fecha', format: 'date' },
+    { key: 'campusName', label: 'Recinto' },
+    { key: 'warehouseName', label: 'Almacén' },
+    { key: 'startTime', label: 'Hora de inicio' },
+    { key: 'endTime', label: 'Hora de término' },
+    { key: 'acciones', label: 'Acciones', align: 'center' },
+];
+
+export const InventoryAdjustmentDetailColumns: tableColumnsInterface[] = [
+    { key: 'productName', label: 'Producto' },
+    { key: 'entryDetailId', label: 'Detalle de entrada' },
+    { key: 'warehouseName', label: 'Almacén' },
+    { key: 'inventoryQuantity', label: 'Existencia', format: 'number' },
+    { key: 'countedQuantity', label: 'Conteo físico', format: 'number' },
+    { key: 'difference', label: 'Diferencia', format: 'number' },
+    { key: 'observations', label: 'Observaciones' },
+    { key: 'acciones', label: 'Acciones', align: 'center' },
+];
+
+export const InventoryAdjustmentParticipantColumns: tableColumnsInterface[] = [
+    { key: 'name', label: 'Nombre' },
+    { key: 'position', label: 'Cargo' },
+    { key: 'acciones', label: 'Acciones', align: 'center' },
+];
+
 export const NameColumns: tableColumnsInterface[] = [
     { key: 'nombre', label: 'Nombre' },
     { key: 'acciones', label: 'Acciones', align: 'center' }
