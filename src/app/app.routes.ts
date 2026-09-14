@@ -41,10 +41,10 @@ export const routes: Routes = [
                 path: 'solicitudes',
                 loadChildren: () => import('./features/requests/routes/request.route').then(m => m.RequestRoutes),
             },
-        //     {
-        //         path: 'reportes',
-        //         // loadChildren: () => import('./features/news/routes/news.routes').then(m => m.newsRoutes),
-        //     },
+            {
+                path: 'reportes',
+                loadChildren: () => import('./features/reports/routes/reports.routes').then(m => m.ReportsRoutes),
+            },
             {
                 path: 'mantenimientos',
                 loadChildren: () => import('./features/maintenance/routes/maintenance.route').then(m => m.MaintenanceRoutes),

@@ -1,0 +1,37 @@
+h3 {
+  color: #18344d;
+  font-size: 19px;
+  margin-bottom: 12px;
+}
+p {
+  color: #657486;
+  line-height: 1.6;
+  font-size: 14px;
+}
+dl {
+  display: grid;
+  gap: 14px;
+  background: #f7f9fb;
+  border-radius: 12px;
+  padding: 16px;
+}
+dt {
+  color: #69798a;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+dd {
+  color: #243d54;
+  margin: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.availability {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 0;
+  color: #82632f;
+}
+mat-dialog-actions {
+  padding: 16px 24px;
+}

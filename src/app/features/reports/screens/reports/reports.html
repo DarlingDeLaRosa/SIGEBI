@@ -1,0 +1,140 @@
+ <header class="reports-header">
+  <div>
+    <p class="eyebrow">INVENTARIO Y ALMACENES</p>
+    <h1>Reportes</h1>
+    <p class="intro">
+      Selecciona el informe que necesitas consultar y define el alcance de la información.
+    </p>
+  </div>
+  <span class="header-icon" aria-hidden="true"><i class="bi bi-file-earmark-bar-graph"></i></span>
+</header>
+
+<section class="report-filters" aria-labelledby="filters-title">
+  <div class="filters-heading">
+    <i class="bi bi-sliders" aria-hidden="true"></i>
+    <h2 id="filters-title">Opciones del informe</h2>
+  </div>
+  <form [formGroup]="filterForm" class="filters-grid">
+    <div class="filter-field">
+      <label for="report-scope">Alcance</label>
+      <select id="report-scope" class="form-select" formControlName="scope">
+        <option value="rectorate">Rectoría</option>
+        <option value="campus">Por recinto</option>
+        <option value="consolidated">Consolidado desde Rectoría</option>
+      </select>
+    </div>
+    @if (filterForm.controls.scope.value === 'campus') {
+      <div class="filter-field">
+        <label for="report-campus">Recinto</label>
+        <input
+          id="report-campus"
+          class="form-control"
+          formControlName="campus"
+          placeholder="Nombre del recinto"
+        />
+      </div>
+    }
+    <fieldset class="date-mode">
+      <legend>Período de consulta</legend>
+      <div class="date-options">
+        <label [class.selected]="filterForm.controls.dateMode.value === 'cutoff'">
+          <input type="radio" formControlName="dateMode" value="cutoff" />Fecha de corte
+        </label>
+        <label [class.selected]="filterForm.controls.dateMode.value === 'range'">
+          <input type="radio" formControlName="dateMode" value="range" />Rango de fechas
+        </label>
+      </div>
+    </fieldset>
+    @if (filterForm.controls.dateMode.value === 'cutoff') {
+      <div class="filter-field">
+        <label for="report-cutoff">Fecha de corte</label>
+        <input id="report-cutoff" class="form-control" type="date" formControlName="cutoffDate" />
+      </div>
+    } @else {
+      <div class="filter-field">
+        <label for="report-start">Desde</label>
+        <input
+          id="report-start"
+          class="form-control"
+          type="date"
+          formControlName="startDate"
+          [max]="filterForm.controls.endDate.value"
+        />
+      </div>
+      <div class="filter-field">
+        <label for="report-end">Hasta</label>
+        <input
+          id="report-end"
+          class="form-control"
+          type="date"
+          formControlName="endDate"
+          [min]="filterForm.controls.startDate.value"
+        />
+      </div>
+    }
+  </form>
+  @if (filterForm.hasError('campusRequired')) {
+    <p class="filter-error" role="status">Indica el recinto para continuar.</p>
+  }
+  @if (filterForm.hasError('datesRequired')) {
+    <p class="filter-error" role="status">Completa las fechas de consulta.</p>
+  }
+  @if (filterForm.hasError('dateOrder')) {
+    <p class="filter-error" role="status">
+      La fecha final debe ser igual o posterior a la inicial.
+    </p>
+  }
+  <p class="filters-note">
+    <i class="bi bi-info-circle" aria-hidden="true"></i>Estas opciones se aplican a todos los
+    informes. La consulta consolidada corresponde a Rectoría.
+  </p>
+</section>
+
+<section aria-labelledby="inventory-reports-title">
+  <div class="section-heading">
+    <h2 id="inventory-reports-title">Informes de inventario</h2>
+    <span>7 reportes</span>
+  </div>
+  <div class="reports-grid">
+    @for (report of reports; track report.id) {
+      <app-report-card
+        [report]="report"
+        [disabled]="filterForm.invalid"
+        (view)="selectReport($event, 'view')"
+        (download)="selectReport($event, 'download')"
+      />
+    }
+  </div>
+</section>
+
+<aside class="receipt-note">
+  <i class="bi bi-calendar2-check" aria-hidden="true"></i>
+  <div>
+    <h2>La fecha de recepción física es la referencia</h2>
+    <p>
+      Los informes de recepción deben mostrar cuándo se recibió físicamente el insumo, además de su
+      registro en el sistema.
+    </p>
+  </div>
+</aside>
+
+<section aria-labelledby="official-forms-title">
+  <div class="section-heading">
+    <h2 id="official-forms-title">Formularios oficiales</h2>
+    <span>Entrada y salida</span>
+  </div>
+  <p class="section-description">
+    Documentos de respaldo para la recepción y el despacho de insumos.
+  </p>
+  <div class="reports-grid forms-grid">
+    @for (report of officialForms; track report.id) {
+      <app-report-card
+        [report]="report"
+        [disabled]="filterForm.invalid"
+        (view)="selectReport($event, 'view')"
+        (download)="selectReport($event, 'download')"
+        (print)="selectReport($event, 'print')"
+      />
+    }
+  </div>
+</section>
