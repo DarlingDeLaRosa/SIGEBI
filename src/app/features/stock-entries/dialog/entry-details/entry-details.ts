@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { EntryDetailFacade } from '../../facades/entry-detail-facade';
 import { CommonModule } from '@angular/common';
 import { Skeleton } from '../../../../shared/components/skeleton/skeleton';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-entry-details',
@@ -14,11 +14,13 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 export class EntryDetails implements OnInit {
   id = inject(MAT_DIALOG_DATA);
   facade = inject(EntryDetailFacade);
+  private readonly dialogRef = inject(MatDialogRef<EntryDetails>);
 
   ngOnInit(): void {
     this.facade.load(this.id);
   }
 
-  closeDialog(): void { // cerrar modal
+  closeDialog(): void {
+    this.dialogRef.close();
   }
 } 
