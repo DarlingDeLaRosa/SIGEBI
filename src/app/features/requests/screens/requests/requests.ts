@@ -22,7 +22,7 @@ import { CreateConditionalBox } from '../../../../shared/components/create-condi
   styleUrl: './requests.css',
 })
 export class Requests extends BaseCrud<any> implements OnInit {
-  
+
   tableColumns = RequestList
   filteringRequests = signal(false);
 
@@ -40,8 +40,8 @@ export class Requests extends BaseCrud<any> implements OnInit {
   override getService() { }
 
   constructor() { super(); }
-  ngOnInit(): void {
-    this.loadData()
+
+  ngOnInit(): void { // this.loadData()
   }
 
   // openDialog(id: number) { this.dialogService.open(PurchasesContractDetailDialog, id) }
