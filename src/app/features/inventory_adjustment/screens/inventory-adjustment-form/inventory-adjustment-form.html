@@ -17,41 +17,46 @@
 <fieldset [disabled]="facade.loading() || facade.saving() || facade.loadFailed()">
   <app-section-box title="Información general de la toma física">
     <form [formGroup]="facade.form" (ngSubmit)="facade.save()" class="row g-2">
-      <div class="col-md-3">
+
+      <div class="col-md-3 form-floating">
+
         <label for="count-number" class="form-label">Número de toma física *</label>
         <input id="count-number" class="form-control" formControlName="countNumber" />
-        @if (facade.form.controls.countNumber.touched && facade.form.controls.countNumber.invalid) {
+        <!-- @if (facade.form.controls.countNumber.touched && facade.form.controls.countNumber.invalid) {
           <small class="text-danger">Escribe el número de toma física.</small>
-        }
+        } -->
       </div>
-      <div class="col-md-3">
-        <label for="count-date" class="form-label">Fecha *</label>
+
+      <div class="col-md-3 form-floating">
         <input id="count-date" type="date" class="form-control" formControlName="date" />
-        @if (facade.form.controls.date.touched && facade.form.controls.date.invalid) {
+        <label for="count-date" class="form-label">Fecha</label>
+        <!-- @if (facade.form.controls.date.touched && facade.form.controls.date.invalid) {
           <small class="text-danger">Selecciona la fecha.</small>
-        }
+        } -->
       </div>
-      <div class="col-md-3">
-        <label for="count-campus" class="form-label">Recinto *</label>
-        @if (facade.details().length) {
+
+      <div class="col-md-3 form-floating">
+        <label for="count-campus" class="form-label">Recinto</label>
+        <!-- @if (facade.details().length) {
           <input id="count-campus" class="form-control" [value]="campusName()" readonly />
-        } @else {
+        } @else { -->
           <select
             id="count-campus"
             class="form-select"
             formControlName="campusId"
             (change)="facade.changeCampus()"
           >
-            <option [ngValue]="0">Seleccionar recinto</option>
+            <!-- <option [ngValue]="0">Seleccionar recinto</option> -->
             @for (campus of references.campuses(); track campus.idRecinto) {
               <option [ngValue]="campus.idRecinto">{{ campus.nombre }}</option>
             }
           </select>
-        }
-        @if (facade.form.controls.campusId.touched && facade.form.controls.campusId.invalid) {
+        <!-- } -->
+        <!-- @if (facade.form.controls.campusId.touched && facade.form.controls.campusId.invalid) {
           <small class="text-danger">Selecciona un recinto.</small>
-        }
+        } -->
       </div>
+
       <div class="col-md-3">
         @if (facade.details().length) {
           <label for="count-warehouse" class="form-label">Almacén *</label>
@@ -77,8 +82,8 @@
           <small class="text-danger">Selecciona un almacén.</small>
         }
       </div>
-      <div class="col-md-3">
-        <label for="start-time" class="form-label">Hora de inicio</label>
+
+      <div class="col-md-3  form-floating">
         <input
           id="start-time"
           type="time"
@@ -86,10 +91,11 @@
           class="form-control"
           formControlName="startTime"
         />
+        <label for="start-time" class="form-label">Hora de inicio</label>
       </div>
-      <div class="col-md-3">
-        <label for="end-time" class="form-label">Hora de término</label>
+      <div class="col-md-3  form-floating">
         <input id="end-time" type="time" step="1" class="form-control" formControlName="endTime" />
+        <label for="end-time" class="form-label">Hora de término</label>
       </div>
       @if (facade.form.hasError('timePair') || facade.form.hasError('timeOrder')) {
         <small class="text-danger"
@@ -106,13 +112,13 @@
 
   <app-section-box title="Participantes">
     <form [formGroup]="facade.participantForm" (ngSubmit)="facade.addParticipant()" class="row g-2">
-      <div class="col-md-6">
-        <label for="participant-name" class="form-label">Nombre *</label>
+      <div class="col-md-6  form-floating" >
         <input id="participant-name" class="form-control" formControlName="name" />
+        <label for="participant-name" >Nombre</label>
       </div>
-      <div class="col-md-6">
-        <label for="participant-position" class="form-label">Cargo *</label>
+      <div class="col-md-6 form-floating" >
         <input id="participant-position" class="form-control" formControlName="position" />
+        <label for="participant-position">Cargo</label>
       </div>
       @if (facade.participantForm.touched && facade.participantForm.invalid) {
         <small class="text-danger">Completa el nombre y el cargo del participante.</small>
@@ -168,7 +174,8 @@
             />
           </div>
         }
-        <div class="col-md-4">
+
+        <div class="col-md-4 form-floating">
           <label for="entry-detail" class="form-label">Detalle de entrada *</label>
           @if (facade.editingDetailIndex() === null) {
             <select
@@ -177,7 +184,7 @@
               formControlName="entryDetailId"
               (change)="facade.selectEntry()"
             >
-              <option [ngValue]="0">Seleccionar entrada</option>
+              <!-- <option [ngValue]="0">Seleccionar entrada</option> -->
               @for (entry of facade.entryDetails(); track entry.idEntradaDet) {
                 <option [ngValue]="entry.idEntradaDet">
                   Detalle {{ entry.idEntradaDet }} · Entrada {{ entry.idEntrada }}
@@ -194,7 +201,7 @@
             />
           }
         </div>
-        <div class="col-md-2">
+        <div class="col-md-2 form-floating">
           <label for="inventory-quantity" class="form-label">Existencia</label>
           <input
             id="inventory-quantity"
@@ -204,7 +211,7 @@
             readonly
           />
         </div>
-        <div class="col-md-2">
+        <div class="col-md-2 form-floating">
           <label for="counted-quantity" class="form-label">Conteo físico *</label>
           <input
             id="counted-quantity"
@@ -221,7 +228,7 @@
             <small class="text-danger">Ingresa una cantidad entera mayor o igual a cero.</small>
           }
         </div>
-        <div class="col-12">
+        <div class="col-12 form-floating">
           <label for="detail-observations" class="form-label">Observaciones</label>
           <textarea
             id="detail-observations"

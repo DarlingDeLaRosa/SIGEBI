@@ -16,31 +16,6 @@
   <form class="box mb-2" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
     <h2 class="h5 mb-3">Filtrar conciliaciones</h2>
     <div class="row g-2">
-      <div class="col-md-3">
-        <label for="filter-campus" class="form-label">Recinto</label>
-        <select id="filter-campus" class="form-select" formControlName="campusId">
-          <option [ngValue]="null">Todos</option>
-          @for (campus of references.campuses(); track campus.idRecinto) {
-            <option [ngValue]="campus.idRecinto">{{ campus.nombre }}</option>
-          }
-        </select>
-      </div>
-      <app-search-select
-        class="col-md-3"
-        placeholder="Almacén"
-        [items]="references.warehouses()"
-        displayField="nombre"
-        valueField="idTipoAlm"
-        [showAll]="true"
-        [value]="filterForm.controls.warehouseId.value"
-        [selectedItem]="selectedWarehouse()"
-        (search)="references.loadWarehouses($event)"
-        (selected)="selectWarehouse($event)"
-      />
-      <div class="col-md-3">
-        <label for="filter-count-number" class="form-label">Número de toma física</label>
-        <input id="filter-count-number" class="form-control" formControlName="countNumber" />
-      </div>
       <app-search-select
         class="col-md-3"
         placeholder="Producto"
@@ -53,7 +28,63 @@
         (search)="references.loadProducts($event)"
         (selected)="selectProduct($event)"
       />
+
+      <app-search-select
+        class="col-md-3"
+        placeholder="Recinto"
+        [items]="references.recintos()"
+        [initialItems]="references.recintos()"
+        [displayField]="'nombre'"
+        [valueField]="'idRecinto'"
+        [value]="filterForm.get('idRecinto')?.value"
+        [selectedItem]="references.formSelections.idRecinto()"
+      />
+        <!-- (selected)="
+          setSelection(
+            references.formSelections.idRecinto,
+            filterForm,
+            'idRecinto',
+            $event,
+            'idRecinto'
+          )
+        " -->
+
+      <app-search-select
+        class="col-md-3"
+        placeholder="Almacén"
+        [items]="references.warehouses()"
+        displayField="nombre"
+        valueField="idTipoAlm"
+        [showAll]="true"
+        [value]="filterForm.controls.warehouseId.value"
+        [selectedItem]="selectedWarehouse()"
+        (search)="references.loadWarehouses($event)"
+        (selected)="selectWarehouse($event)"
+      />
+
+      <div class="col-md-3 form-floating">
+        <input
+          id="filter-count-number"
+          type="text"
+          [placeholder]="'Número de toma física'"
+          class="form-control"
+          formControlName="countNumber"
+        />
+        <label for="filter-count-number" class="form-label">Número de toma física</label>
+      </div>
+
+      
+      <!-- <div class="col-md-2 form-floating">
+        <input
+          type="text"
+          formControlName="filter"
+          class="form-control"
+          [placeholder]="'Número de expediente'"
+        />
+        <label for="filter">Número de Exp / Orden</label>
+      </div> -->
     </div>
+
     <app-form-actions
       nameActionBoton="Filtrar"
       iconActionBoton="bi bi-search"
