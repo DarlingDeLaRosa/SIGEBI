@@ -1,0 +1,66 @@
+<div class="title">
+  <h1>Transferencias</h1>
+  <button type="button" class="btn navigate" (click)="facade.toggleFilters()">
+    {{ facade.filtering() ? 'Ocultar filtros' : 'Filtrar transferencias' }}
+  </button>
+</div>
+
+@if (facade.filtering()) {
+  <form class="box mb-2" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+    <app-create-conditional-box formName="Filtrar transferencias">
+      <div class="col-12 form-floating">
+        <input
+          id="transfer-filter"
+          type="search"
+          class="form-control"
+          formControlName="filter"
+          placeholder="Buscar transferencias"
+        />
+        <label for="transfer-filter">Buscar transferencias</label>
+      </div>
+      <app-form-actions
+        nameActionBoton="Filtrar"
+        iconActionBoton="bi bi-search"
+        [editing]="true"
+        [disabled]="facade.loading()"
+        (clear)="clearForm()"
+      />
+    </app-create-conditional-box>
+  </form>
+}
+
+@if (facade.error()) {
+  <div
+    class="alert alert-danger d-flex align-items-center justify-content-between gap-2"
+    role="alert"
+  >
+    <span>{{ facade.error() }}</span>
+    <button type="button" class="btn save" (click)="loadData()">Reintentar</button>
+  </div>
+}
+<div class="box" [attr.aria-busy]="facade.loading()">
+  @if (facade.loading()) {
+    <p role="status">Cargando transferencias…</p>
+  }
+  @if (!facade.error()) {
+    <div class="table-scroll">
+      <app-table-of-content
+        tableTitle="Listado de transferencias"
+        [tableData]="data()?.data || []"
+        [tableColumns]="tableColumns"
+        trackByField="id"
+        [showbasicActions]="false"
+        [showDetail]="true"
+        [showPagination]="true"
+        [showTotal]="facade.hasKnownTotal()"
+        [currentPage]="pagination().currentPage"
+        [pageSize]="pagination().pageSize"
+        [totalPages]="pagination().totalPages"
+        [totalItems]="pagination().totalItems"
+        (pageChange)="changePage($event)"
+        (pageSizeChange)="changePageSize($event)"
+        (showDialog)="openDetail($event)"
+      />
+    </div>
+  }
+</div>

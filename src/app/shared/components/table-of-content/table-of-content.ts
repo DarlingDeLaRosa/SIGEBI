@@ -29,6 +29,7 @@ export class TableOfContent {
   tableData = input<any[]>([]);
   showDetail = input<boolean>(false);
   showPagination = input<boolean>(false);
+  showTotal = input<boolean>(true);
   showContent = input<boolean>(false);
   tableTitle = input<string>('');
   trackByField = input<string>('id');

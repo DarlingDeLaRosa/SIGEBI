@@ -1,5 +1,17 @@
 import { tableColumnsInterface } from "../../interfaces/table-content-interface"
 
+export const TransferColumns: tableColumnsInterface[] = [
+    { key: 'id', label: 'No. transferencia' },
+    { key: 'date', label: 'Fecha', format: 'date' },
+    { key: 'createdBy', label: 'Creado por' },
+    { key: 'creatorCampus', label: 'Recinto del creador' },
+    { key: 'outputCampus', label: 'Recinto de salida' },
+    { key: 'department', label: 'Departamento de salida' },
+    { key: 'transferCampus', label: 'Recinto de transferencia' },
+    { key: 'status', label: 'Estado', render: 'app-badge', align: 'center' },
+    { key: 'acciones', label: 'Acciones', align: 'center' },
+];
+
 export const InventoryAdjustmentColumns: tableColumnsInterface[] = [
     { key: 'countNumber', label: 'Número de toma física' },
     { key: 'date', label: 'Fecha', format: 'date' },

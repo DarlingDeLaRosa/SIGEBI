@@ -107,13 +107,17 @@
     @if (showPagination()) {
       <div class="pagination-container">
         <div class="pagination-info">
+          @if (showTotal()) {
           <span>
             Total:
             {{ totalItems() | number }}
           </span>
+          } @else {
+            <span>Página {{ currentPage() }} de {{ totalPages() }}</span>
+          }
         </div>
 
-        @if (totalItems() > pageSize()) {
+        @if (totalPages() > 1 || totalItems() > pageSize()) {
           <div class="pagination-buttons">
             <select class="form-select page-size-select" (change)="changePageSize($event)">
               <option [selected]="pageSize() === 5" value="5">5</option>

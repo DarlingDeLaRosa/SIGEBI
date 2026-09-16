@@ -1,0 +1,13 @@
+:host {
+  display: block;
+}
+dd,
+.observations {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+@media (max-width: 600px) {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}
