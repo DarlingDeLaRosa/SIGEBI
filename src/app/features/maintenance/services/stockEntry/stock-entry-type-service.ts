@@ -5,7 +5,7 @@ import { environment } from '../../../../../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class StockEntryService  extends BaseApiService<any>{
+export class StockEntryTypeService extends BaseApiService<any>{
   constructor(){
     super(`${environment.apiUrl}/TipoEntrada`)
   }

@@ -3,6 +3,7 @@ import { StockEntryService } from "../services/stock-entry-service";
 import { DeliveryTypeService } from "../../maintenance/services/deliveryType/delivery-type-service";
 import { SuppliersService } from "../../maintenance/services/supplier/suppliers-service";
 import { IntranetService } from "../../../shared/service/general.service";
+import { StockEntryTypeService } from "../../maintenance/services/stockEntry/stock-entry-type-service";
 
 @Injectable() export class EntriesFacade {
 
@@ -10,7 +11,7 @@ import { IntranetService } from "../../../shared/service/general.service";
     // private warehouseTypeService = inject(WarehouseNameService);
     private intranetService = inject(IntranetService);
     private supplierService = inject(SuppliersService);
-    private entryTypeService = inject(StockEntryService);
+    private entryTypeService = inject(StockEntryTypeService);
     private deliveryTypeService = inject(DeliveryTypeService);
 
     entryType = signal<any[]>([]);

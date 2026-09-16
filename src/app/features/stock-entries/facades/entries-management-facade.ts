@@ -7,7 +7,7 @@ import { filterByProperty } from "../../../shared/helpers/filter.helper";
 import { WarehouseNameService } from "../../maintenance/services/warehouseName/warehouse-name-service";
 import { purchaseDetailContractModel } from "../../purchases-contracts/model/detail-contract-model";
 import { FormGroup } from "@angular/forms";
-import { StockEntryService } from "../../maintenance/services/stockEntry/stock-entry-type-service";
+import { StockEntryTypeService } from "../../maintenance/services/stockEntry/stock-entry-type-service";
 import { DeliveryTypeService } from "../../maintenance/services/deliveryType/delivery-type-service";
 import { StockEntryMapper } from "../mappers/stock-entry-mapper";
 import { DialogService } from "../../../core/service/dialog-service/dialog";
@@ -28,7 +28,7 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
 
     private purchaseContractService = inject(PurchaseContractService);
     private warehouseTypeService = inject(WarehouseNameService);
-    private entryTypeService = inject(StockEntryService);
+    private entryTypeService = inject(StockEntryTypeService);
     private deliveryTypeService = inject(DeliveryTypeService);
     private dialogService = inject(DialogService);
 
