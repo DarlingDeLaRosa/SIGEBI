@@ -23,6 +23,8 @@ import { InputFilter } from '../../../../shared/components/input-filter/input-fi
 })
 export class StockEntryForm extends BaseCrud<any> implements OnInit {
 
+  purchaseContract: any;  
+
   noOrden: string = ''
   tableColumns = EntryDetailsColumns
   tableColumsPurchases = PurchaseContractListSummary
@@ -56,7 +58,7 @@ export class StockEntryForm extends BaseCrud<any> implements OnInit {
 
     effect(() => {
       const detail = this.facade.selectedDetail();
-
+      
       if (!detail) return;
 
       this.stockEntryDetailForm.patchValue({
@@ -70,7 +72,14 @@ export class StockEntryForm extends BaseCrud<any> implements OnInit {
     });
   }
 
-  ngOnInit(): void { this.facade.loadData() }
+  ngOnInit(): void {
+    this.purchaseContract = history.state.purchaseContract;
+    if (this.purchaseContract) {
+      this.facade.loadPurchaseContractById(this.purchaseContract.row.id)
+    }
+
+    this.facade.loadData()
+  }
 
   override save(): void {
 

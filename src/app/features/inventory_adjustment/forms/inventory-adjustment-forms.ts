@@ -32,8 +32,10 @@ export class InventoryAdjustmentForms {
         countNumber: ['', [Validators.required, nonBlank]],
         warehouseId: [0, [Validators.required, Validators.min(1)]],
         date: ['', Validators.required],
-        startTime: ['', Validators.pattern(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/)],
-        endTime: ['', Validators.pattern(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/)],
+        startTime: ['', Validators.required],
+        endTime: ['', Validators.required],
+        // endTime: ['', Validators.pattern(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/)],
+        // startTime: ['', Validators.pattern(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/)],
       },
       {
         validators: (control) => {

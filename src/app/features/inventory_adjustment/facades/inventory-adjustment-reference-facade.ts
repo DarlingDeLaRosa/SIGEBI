@@ -5,6 +5,7 @@ import { WarehouseNameService } from '../../maintenance/services/warehouseName/w
 import { ProductService } from '../../products/services/product/product-service';
 import { CampusDto, ProductOptionDto, WarehouseDto } from '../DTOs/inventory-adjustment-dto';
 import { InventoryAdjustmentReferenceService } from '../services/inventory-adjustment-reference-service';
+import { IntranetService } from '../../../shared/service/general.service';
 
 @Injectable()
 export class InventoryAdjustmentReferenceFacade {
@@ -12,24 +13,32 @@ export class InventoryAdjustmentReferenceFacade {
   private readonly referenceService = inject(InventoryAdjustmentReferenceService);
   private readonly warehouseService = inject(WarehouseNameService);
   private readonly productService = inject(ProductService);
+  private intranetService = inject(IntranetService);
   private warehouseRequest?: Subscription;
   private productRequest?: Subscription;
 
   readonly campuses = signal<CampusDto[]>([]);
   readonly warehouses = signal<WarehouseDto[]>([]);
   readonly products = signal<ProductOptionDto[]>([]);
+  recintos = signal<any[]>([]);
   readonly error = signal('');
 
+  formSelections = {
+    idRecinto: signal<any | null>(null),
+  }
+
   load() {
-    this.referenceService
-      .getCampuses()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (campuses) => this.campuses.set(campuses),
-        error: () => this.error.set('No se pudieron cargar los recintos.'),
-      });
+    this.loadRecintos()
     this.loadWarehouses();
     this.loadProducts();
+  }
+
+  loadRecintos() {
+    this.intranetService
+      .getAllRecinto()
+      .subscribe(response => {
+        this.recintos.set(response.data);
+      });
   }
 
   loadWarehouses(filter = '') {

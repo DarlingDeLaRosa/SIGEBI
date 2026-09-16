@@ -13,6 +13,7 @@ import { InventoryAdjustmentMapper } from '../mappers/inventory-adjustment-mappe
 
 @Injectable()
 export class InventoryAdjustmentFacade extends BaseCrud<InventoryAdjustmentModel> {
+  
   private readonly service = inject(InventoryAdjustmentService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);

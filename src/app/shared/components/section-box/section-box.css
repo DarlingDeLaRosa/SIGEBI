@@ -1,9 +1,15 @@
 .box {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+    /* background: white; */
+    /* border-radius: 16px; */
+    /* padding: 20px; */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
     margin-bottom: 8px;
+
+    padding: 22px 24px;
+    background: #fff;
+    border: 1px solid #e2e8ef;
+    border-radius: 16px;
+    /* margin-bottom: 30px; */
 }
 
 .box-header {

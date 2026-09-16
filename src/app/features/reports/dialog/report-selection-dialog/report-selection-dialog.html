@@ -1,0 +1,21 @@
+<h2 mat-dialog-title>{{ actionTitle[selection.action] }}</h2>
+<mat-dialog-content>
+  <h3>{{ selection.report.title }}</h3>
+  <p>{{ selection.report.description }}</p>
+  <dl>
+    <div>
+      <dt>Alcance</dt>
+      <dd>{{ selection.scope }}</dd>
+    </div>
+    <div>
+      <dt>Período</dt>
+      <dd>{{ selection.period }}</dd>
+    </div>
+  </dl>
+  <p class="availability" role="status">
+    <i class="bi bi-info-circle" aria-hidden="true"></i>{{ availability[selection.action] }}
+  </p>
+</mat-dialog-content>
+<mat-dialog-actions align="end"
+  ><button type="button" class="btn save" mat-dialog-close>Cerrar</button></mat-dialog-actions
+>

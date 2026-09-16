@@ -12,6 +12,7 @@ import { InventoryAdjustmentMapper } from '../../mappers/inventory-adjustment-ma
 import { ProductOptionDto, WarehouseDto } from '../../DTOs/inventory-adjustment-dto';
 import { DialogService } from '../../../../core/service/dialog-service/dialog';
 import { InventoryAdjustmentDetailDialog } from '../../dialog/inventory-adjustment-detail-dialog/inventory-adjustment-detail-dialog';
+import { BaseCrud } from '../../../../shared/abstracts/base-crud';
 
 @Component({
   selector: 'app-inventory-adjustment',
@@ -20,7 +21,8 @@ import { InventoryAdjustmentDetailDialog } from '../../dialog/inventory-adjustme
   templateUrl: './inventory-adjustment.html',
   styleUrl: './inventory-adjustment.css',
 })
-export class InventoryAdjustment implements OnInit {
+export class InventoryAdjustment implements OnInit  {
+
   readonly facade = inject(InventoryAdjustmentFacade);
   readonly references = inject(InventoryAdjustmentReferenceFacade);
   private readonly dialog = inject(DialogService);
@@ -29,6 +31,7 @@ export class InventoryAdjustment implements OnInit {
   readonly showFilters = signal(false);
   readonly selectedWarehouse = signal<WarehouseDto | null>(null);
   readonly selectedProduct = signal<ProductOptionDto | null>(null);
+
   readonly rows = computed(() =>
     (this.facade.data()?.data ?? []).map((row) => ({
       ...row,
