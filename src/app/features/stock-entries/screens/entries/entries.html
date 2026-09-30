@@ -11,7 +11,7 @@
 </div>
 
 @if (filteringentries()) {
-  <form [formGroup]="filterForm" (submit)="loadData(filterForm.getRawValue())" class="box mb-2">
+  <form [formGroup]="filterForm" (submit)="getDataFromPost(filterForm.getRawValue())" class="box mb-2">
     <app-create-conditional-box [formName]="'Filtrar productos'">
       <div class="col-md-2 form-floating">
         <input
@@ -128,6 +128,15 @@
         />
         <label for="fechafinal">Fecha final</label>
       </div>
+
+      <app-form-actions
+        [nameActionBoton]="'Filtrar'"
+        [iconActionBoton]="'bi bi-search'"
+        [editing]="filterForm.dirty"
+        [disabled]="!filterForm.dirty || loading()"
+        (clear)="clearForm(); "
+      >
+      </app-form-actions>
     </app-create-conditional-box>
   </form>
 }
@@ -148,6 +157,6 @@
     (pageChange)="changePage($event)"
     (pageSizeChange)="changePageSize($event)"
     (remove)="remove($event.idEntrada)"
+    (edit)="facade.editEntries($event.row)"
   ></app-table-of-content>
-  <!-- (edit)="setProduct($event)" -->
 </div>

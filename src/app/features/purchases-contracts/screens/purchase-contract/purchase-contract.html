@@ -16,6 +16,7 @@
 </div>
 
 @if (filteringPurchasesContracts()) {
+  
   <form [formGroup]="filterForm" (submit)="loadData(filterForm.getRawValue())" class="box mb-2">
     <app-create-conditional-box [formName]="'Filtrar productos'">
       <div class="col-md-2 form-floating">

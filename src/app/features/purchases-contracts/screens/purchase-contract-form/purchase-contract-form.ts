@@ -66,9 +66,7 @@ export class PurchaseContractForm extends BaseCrud<any> implements OnInit {
   ngOnInit(): void {
     const purchaseContractId = history.state.purchaseContract;
 
-    if (purchaseContractId) {
-      this.loadById(purchaseContractId);
-    }
+    if (purchaseContractId) { this.loadById(purchaseContractId); }
 
     this.facade.loadSelections();
     this.facadeReference.loadSelections();

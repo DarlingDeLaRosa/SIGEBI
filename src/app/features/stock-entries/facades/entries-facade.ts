@@ -4,11 +4,14 @@ import { DeliveryTypeService } from "../../maintenance/services/deliveryType/del
 import { SuppliersService } from "../../maintenance/services/supplier/suppliers-service";
 import { IntranetService } from "../../../shared/service/general.service";
 import { StockEntryTypeService } from "../../maintenance/services/stockEntry/stock-entry-type-service";
+import { Router } from "@angular/router";
+import { StockEntryModel } from "../model/entry-model";
 
 @Injectable() export class EntriesFacade {
 
     // private purchaseContractService = inject(PurchaseContractService);
     // private warehouseTypeService = inject(WarehouseNameService);
+    router = inject(Router);
     private intranetService = inject(IntranetService);
     private supplierService = inject(SuppliersService);
     private entryTypeService = inject(StockEntryTypeService);
@@ -67,11 +70,19 @@ import { StockEntryTypeService } from "../../maintenance/services/stockEntry/sto
             });
     }
 
+    editEntries(stockEntryModel: StockEntryModel) {
+        console.log(stockEntryModel);
+        
+        this.router.navigate(
+            ['/layout/entradas/gestionar-Entradas'],
+            { state: { purchaseContract: stockEntryModel } }
+        );
+    }
+
     loadData() {
         this.loadEntryTypes()
         this.loadDeliveryTypes()
         this.loadSupplier()
         this.loadRecintos()
     }
-
 }

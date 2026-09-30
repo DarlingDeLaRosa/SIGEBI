@@ -74,8 +74,9 @@ export class StockEntryForm extends BaseCrud<any> implements OnInit {
 
   ngOnInit(): void {
     this.purchaseContract = history.state.purchaseContract;
+    
     if (this.purchaseContract) {
-      this.facade.loadPurchaseContractById(this.purchaseContract.row.id)
+      // this.facade.loadPurchaseContractById(this.purchaseContract.row.id)
     }
 
     this.facade.loadData()
