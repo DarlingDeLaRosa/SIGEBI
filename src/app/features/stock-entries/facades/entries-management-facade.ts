@@ -102,6 +102,7 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
     });
 
     editDetail(product: any, form: FormGroup) {
+        this.sectionOpenDetail.set(true)
         this.loadDetail(form, product.row);
         this.clearDetail(product.index, this.details);
     }
@@ -212,5 +213,41 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
             form.getRawValue(),
             this.details()
         );
+    }
+
+    loadStockEntryHead(entry: any, form: FormGroup) {
+        // Cabecera
+        console.log(entry);
+
+        form.patchValue({
+            fechaFactura: entry.data.fechaFactura,
+            itbisGeneral: entry.data.itbisGeneral,
+            total: entry.data.total,
+            observacion: entry.data.observacion,
+            itbisGeneralEstado: entry.data.itbisGeneralEstado,
+            noConduce: entry.data.noConduce,
+            noFactura: entry.data.noFactura,
+        });
+
+        this.details.set(
+            entry.data.detalles.map((detail: any) =>
+                StockEntryMapper.fromApiDetail(detail, entry.idOrdenCompra)
+            )
+        );
+
+        console.log(this.details());
+        
+        // SearchSelect
+
+        // this.formSelections.currency.set({
+        //     name: purchase.moneda,
+        //     value: purchase.moneda
+        // });
+
+        // this.details.set(
+        //     purchase.detalles.map((detail: any) =>
+        //         PurchaseContractMapper.fromApiDetail(detail)
+        //     )
+        // );
     }
 }

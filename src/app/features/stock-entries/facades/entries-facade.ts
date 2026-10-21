@@ -24,7 +24,6 @@ import { StockEntryModel } from "../model/entry-model";
 
     // condition = signal<any[]>(CONDITION);
     // warehouseType = signal<any[]>([]);
-
     // filteredcondition = signal(this.condition());
 
     formSelections = {
@@ -32,7 +31,6 @@ import { StockEntryModel } from "../model/entry-model";
         idTipoEntrega: signal<any | null>(null),
         idProveedor: signal<any | null>(null),
         idRecinto: signal<any | null>(null),
-
 
         condition: signal<any | null>(null),
         idTipoAlmcacen: signal<any | null>(null),
@@ -70,12 +68,10 @@ import { StockEntryModel } from "../model/entry-model";
             });
     }
 
-    editEntries(stockEntryModel: StockEntryModel) {
-        console.log(stockEntryModel);
-        
+    editEntries(idEntrada: number) {
         this.router.navigate(
             ['/layout/entradas/gestionar-Entradas'],
-            { state: { purchaseContract: stockEntryModel } }
+            { state: { idEntrada: idEntrada } }
         );
     }
 

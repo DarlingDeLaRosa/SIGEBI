@@ -8,10 +8,12 @@ export class StockOutputsForms {
             idTipoSalida: [0, Validators.required],
             idDepar: [0, Validators.required],
             idRecinto: [0, Validators.required],
-
+            noRequerimiento: ['', Validators.required],
+            solicitante: ['', Validators.required],
+            solicitanteCargo: ['', Validators.required],
+            fechaCreacion: [new Date().toISOString().substring(0, 10)],
             observacion: [''],
             total: [0],
-            fechaCreacion: [new Date().toISOString().substring(0, 10)]
         });
     }
 

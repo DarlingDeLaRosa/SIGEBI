@@ -16,8 +16,6 @@ export class EntryDetailFacade {
             .subscribe({
 
                 next: (response) => {
-                    console.log(response);
-                    
                     this.entry.set(response.data);
                     this.loading.set(false);
                 },

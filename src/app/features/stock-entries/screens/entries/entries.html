@@ -157,6 +157,6 @@
     (pageChange)="changePage($event)"
     (pageSizeChange)="changePageSize($event)"
     (remove)="remove($event.idEntrada)"
-    (edit)="facade.editEntries($event.row)"
+    (edit)="facade.editEntries($event.row.idEntrada)"
   ></app-table-of-content>
 </div>

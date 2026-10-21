@@ -14,3 +14,13 @@ h2{
     font-weight:500;
     color:#222;
 }
+
+.detail-container {
+  display: grid;
+  grid-template-columns: calc(32% - 8px) calc(68% - 2px);
+  gap: 10px;
+}
+
+.detail-container > :only-child {
+  grid-column: 1 / -1;
+}

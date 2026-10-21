@@ -153,10 +153,7 @@ import { CreatePurchaseContractDto } from "../DTOs/purchaseContractDTO";
         );
     }
 
-    loadPurchaseContract(
-        purchase: any,
-        form: FormGroup
-    ) {
+    loadPurchaseContract( purchase: any, form: FormGroup ) {
         // Cabecera
 
         form.patchValue({

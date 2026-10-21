@@ -40,6 +40,19 @@ export class OutputsForm extends BaseCrud<any> implements OnInit {
 
   ngOnInit(): void { this.facade.loadData() }
 
+  productSelection($event: any) {
+    // this.facade.selectProduct($event, this.purchaseContractDetailForm);
+
+    // this.setSelection(
+    //   this.facade.formSelections.idUnidadMe,
+    //   this.purchaseContractDetailForm, 'idUnidadMe', $event.unidadMedidaObj, 'idUnidadMe', true
+    // )
+
+    // this.setSelection(
+    //   this.facade.formSelections.idProducto,
+    //   this.purchaseContractDetailForm, 'idProducto', $event, 'idProducto', true
+    // )
+  }
   // override save(): void {
 
   //   if (this.stockOutputForm.invalid || this.facade.details().length == 0) {

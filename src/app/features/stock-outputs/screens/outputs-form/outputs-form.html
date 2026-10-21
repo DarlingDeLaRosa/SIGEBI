@@ -14,7 +14,7 @@
   <app-section-box title="Información general de salida">
     <div class="row gx-1 gy-1">
       <app-search-select
-        class="col-md-4"
+        class="col-md-2"
         placeholder="Tipo de salida"
         [items]="facade.outputTypes()"
         [initialItems]="facade.outputTypes()"
@@ -49,7 +49,7 @@
       />
 
       <app-search-select
-        class="col-md-4"
+        class="col-md-3"
         placeholder="Recinto"
         [items]="facade.recintos()"
         [initialItems]="facade.recintos()"
@@ -70,6 +70,16 @@
 
       <div class="col-md-3 form-floating">
         <input
+          class="form-control"
+          id="noreq"
+          formControlName="Noquerimiento"
+          placeholder="No. Requerimiento"
+        />
+        <label for="noreq">No. Requerimiento</label>
+      </div>
+
+      <div class="col-md-3 form-floating">
+        <input
           type="date"
           class="form-control"
           formControlName="fechaCreacion"
@@ -78,7 +88,7 @@
         />
         <label for="fechaSalida">Fecha de salida</label>
       </div>
-
+      
       <div class="col-md-9 form-floating">
         <textarea
           class="form-control"
@@ -98,18 +108,19 @@
   <app-section-box title="Detalles de la salida">
     <!-- (ngSubmit)="facade.addDetail(stockOutputDetailForm)" -->
     <form [formGroup]="stockOutputDetailForm" class="row gx-1 gy-1 mt-2">
-      <!-- [items]="facade.products()" -->
-      <!-- [initialItems]="facade.products()" -->
-      <!-- (search)="facade.loadProducts($event)" -->
-      <!-- [selectedItem]="facade.formSelections.idProducto()" -->
-      <!-- (selected)="productSelection($event)" -->
+
       <app-search-select
         class="col-md-4"
         placeholder="Producto"
+        [items]="facade.product()"
+        [initialItems]="facade.product()"
         [displayField]="'nombre'"
         [displaySubField]="'descripcion'"
         [valueField]="'idProducto'"
         [value]="stockOutputDetailForm.get('idProducto')?.value"
+        (search)="facade.loadProduct($event)"
+        [selectedItem]="facade.formSelections.idProducto()"
+        (selected)="productSelection($event)"
       />
 
       <div class="col-md-2 form-floating">
@@ -250,4 +261,5 @@
   <div class="box mt-2">
     <app-form-actions [disabled]="facade.details().length === 0 || !stockOutputForm.valid" />
   </div>
+  
 </form>

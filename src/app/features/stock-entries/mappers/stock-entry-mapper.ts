@@ -75,4 +75,28 @@ export class StockEntryMapper {
 
     return new Date(`${date}T00:00:00`).toISOString();
   }
+
+  static fromApiDetail(detail: any, idOrden: number) {
+    console.log(detail);
+    
+    return {
+
+      idEntradaDet: detail.idEntradaDet,
+      nombre:  detail.producto.nombre,
+      idProducto: detail.producto.idProducto,
+      marca: detail.marca ,
+      modelo: detail.modelo ,
+      condicion: detail.condicion,
+      serial: detail.serial ,
+      precio: detail.precio ,
+      cantidad: detail.cantidad ,
+      itbisProducto: detail.itbisProducto,
+      subTotal: detail.subTotal ,
+      idEntrada: detail.idEntrada ,
+      // idTipoAlmcacen: detail,
+      observacion: detail.observacion ,
+      idDetalleOrden: idOrden,
+    };
+
+  }
 }

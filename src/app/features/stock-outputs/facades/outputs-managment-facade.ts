@@ -4,6 +4,7 @@ import { CONDITION } from "../../../shared/constant/select-options";
 import { StockOutputService } from "../../maintenance/services/stockOutput/stock-output-service";
 import { filterByProperty } from "../../../shared/helpers/filter.helper";
 import { IntranetService } from "../../../shared/service/general.service";
+import { ProductService } from "../../products/services/product/product-service";
 
 @Injectable() export class OutputsManagementFacade {
 
@@ -13,11 +14,13 @@ import { IntranetService } from "../../../shared/service/general.service";
     sectionOpenGeneral = signal(false);
     details = signal<any[]>([]);
 
+    private productService = inject(ProductService);
     private intranetService = inject(IntranetService);
     private warehouseTypeService = inject(WarehouseNameService);
     private outputTypeService = inject(StockOutputService);
     // private deliveryTypeService = inject(DeliveryTypeService);
 
+    product = signal<any[]>([]);
     condition = signal<any[]>(CONDITION);
     outputTypes = signal<any[]>([]);
     recintos = signal<any[]>([]);
@@ -27,6 +30,7 @@ import { IntranetService } from "../../../shared/service/general.service";
     filteredCondition = signal(this.condition());
 
     formSelections = {
+        idProducto: signal<any | null>(null),
         condition: signal<any | null>(null),
         idRecinto: signal<any | null>(null),
         idDepar: signal<any | null>(null),
@@ -92,6 +96,13 @@ import { IntranetService } from "../../../shared/service/general.service";
     //         items.filter((_, i) => i !== index)
     //     );
     // }
+    loadProduct(filter: string = '') {
+        this.productService
+            .getAll({ filter, page: 1, CantItems: 10 })
+            .subscribe(response => {
+                this.product.set(response.data);
+            });
+    }
 
     loadWarehouseTypes(filter: string = '') {
         this.warehouseTypeService
@@ -154,6 +165,7 @@ import { IntranetService } from "../../../shared/service/general.service";
     // }
 
     loadData() {
+        this.loadProduct()
         this.loadWarehouseTypes()
         this.loadOutputTypes()
         this.loadRecintos()

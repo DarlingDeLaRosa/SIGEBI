@@ -6,5 +6,5 @@ import { BaseApiService } from '../../../shared/abstracts/base-api-service';
   providedIn: 'root',
 })
 export class OutputService extends BaseApiService<any>{
-   constructor() { super(`${environment.apiUrl}/Salidas`) }
+   constructor() { super(`${environment.apiUrl}/Salida`) }
 }
