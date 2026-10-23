@@ -1,13 +1,15 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
-import { StockEntryService } from './stock-entry-type-service';
+import { StockEntryTypeService } from './stock-entry-type-service';
 
-describe('StockEntryService', () => {
-  let service: StockEntryService;
+describe('StockEntryTypeService', () => {
+  let service: StockEntryTypeService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(StockEntryService);
+    TestBed.configureTestingModule({ providers: [provideHttpClient(), provideHttpClientTesting()] });
+    service = TestBed.inject(StockEntryTypeService);
   });
 
   it('should be created', () => {

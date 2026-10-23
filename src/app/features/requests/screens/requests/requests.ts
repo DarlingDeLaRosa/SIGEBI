@@ -13,6 +13,7 @@ import { BaseCrud } from '../../../../shared/abstracts/base-crud';
 import { RequestFacade } from '../../facades/request-facade';
 import { RequestFiltersForms } from '../../forms/request-filter-form';
 import { CreateConditionalBox } from '../../../../shared/components/create-conditional-box/create-conditional-box';
+import { RequestsService } from '../../services/requests-service';
 
 @Component({
   selector: 'app-requests',
@@ -31,18 +32,16 @@ export class Requests extends BaseCrud<any> implements OnInit {
 
   private fb = inject(FormBuilder);
   private loadingService = inject(Loading);
-  private dialogService = inject(DialogService);
-  // private purchaseContract = inject(PurchaseContractService);
+  private dialogService = inject(DialogService); 
+  private request = inject(RequestsService);
 
   loading = this.loadingService.loading
   filterForm = RequestFiltersForms.filters(this.fb);
 
-  override getService() { }
+  override getService() { return this.request }
 
   constructor() { super(); }
-
-  ngOnInit(): void { // this.loadData()
-  }
+  ngOnInit(): void { this.loadData({cantItem: 10})}
 
   // openDialog(id: number) { this.dialogService.open(PurchasesContractDetailDialog, id) }
   clearForm() { this.filterForm.reset(); this.loadData() }

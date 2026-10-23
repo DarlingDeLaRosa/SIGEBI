@@ -16,4 +16,8 @@ export class IntranetService extends BaseApiService<any> {
     getAllAreas() {
         return this.get<ApiResponse<any[]>>(`GenericService/get_areas`);
     }
+
+    filterPeople(filter: string) {
+        return this.get<{ status: boolean; data: any[] }>(`Persona/filter/${encodeURIComponent(filter)}`);
+    }
 }

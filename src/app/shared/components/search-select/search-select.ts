@@ -24,9 +24,11 @@ export class SearchSelect implements OnInit {
   @Input() value: any = '';
   @Input() valueField: string = 'id';
   @Input() selectedItem: any = null;
+  @Input() keepSearchOnClear = false;
 
   @Output() search = new EventEmitter<string>();
   @Output() selected = new EventEmitter<any>();
+  @Output() searchChange = new EventEmitter<string>();
 
   searchText = signal('');
   dropdownOpen = signal(false);
@@ -48,6 +50,7 @@ export class SearchSelect implements OnInit {
 
     this.searchText.set(value);
     this.dropdownOpen.set(true);
+    this.searchChange.emit(value);
 
     clearTimeout(this.debounceTimer);
 
@@ -57,13 +60,17 @@ export class SearchSelect implements OnInit {
   }
 
   selectItem(item: any = '') {
+    clearTimeout(this.debounceTimer);
     this.isSelecting = true;
 
     this.searchText.set(item ? item[this.displayField] : 'Todos');
     this.selected.emit(item);
     this.dropdownOpen.set(false);
 
-    setTimeout(() => { this.isSelecting = false; });
+    setTimeout(() => {
+      this.isSelecting = false;
+      if (this.keepSearchOnClear && !this.selectedItem) this.clear();
+    });
   }
 
   toggleDropdown() {
@@ -77,6 +84,7 @@ export class SearchSelect implements OnInit {
   }
 
   clear() {
+    clearTimeout(this.debounceTimer);
     this.searchText.set('');
     this.filteredItems.set([]);
   }
@@ -113,7 +121,8 @@ export class SearchSelect implements OnInit {
       const previous = changes['value'].previousValue;
       const current = changes['value'].currentValue;
 
-      if (previous != null && (current == null || current === '' || current === 0)) { this.clear() }
+      if (previous != null && (current == null || current === '' || current === 0)
+        && !(this.keepSearchOnClear && this.dropdownOpen())) { this.clear() }
     }
 
     if (changes['selectedItem']) {
@@ -121,7 +130,8 @@ export class SearchSelect implements OnInit {
       const currentPV = changes['selectedItem'].previousValue;
       const currentSI = changes['selectedItem'].currentValue;
 
-      if ( currentSI == null && currentPV != null) { this.clear() }
+      if (currentSI == null && currentPV != null
+        && !(this.keepSearchOnClear && this.dropdownOpen())) { this.clear() }
     }
 
     // SI RECIBE OBJETO COMPLETO

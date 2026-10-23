@@ -6,7 +6,7 @@
   </span>
 </div>
 
-<form [formGroup]="requestForm" (ngSubmit)="save()">
+<form id="request-general" [formGroup]="requestForm" (ngSubmit)="save()">
   <!-- ================================================= -->
   <!-- INFORMACIÓN GENERAL -->
   <!-- ================================================= -->
@@ -17,7 +17,8 @@
       <app-search-select
         class="col-md-4"
         placeholder="Recinto"
-        [items]="facade.recinto()"
+        [items]="facade.filteredRecintos()"
+        (search)="facade.recintoSearch.set($event)"
         [initialItems]="facade.recinto()"
         [displayField]="'nombre'"
         [valueField]="'idRecinto'"
@@ -41,7 +42,8 @@
         [items]="facade.tipoArticulo()"
         [initialItems]="facade.tipoArticulo()"
         [displayField]="'nombre'"
-        [valueField]="'idTipoArticulo'"
+        [valueField]="'idTipoArt'"
+        (search)="facade.loadArticleTypes($event)"
         [value]="requestForm.get('idTipoArticulo')?.value"
         [selectedItem]="facade.formSelections.idTipoArticulo()"
         (selected)="
@@ -50,7 +52,7 @@
             requestForm,
             'idTipoArticulo',
             $event,
-            'idTipoArticulo'
+            'idTipoArt'
           )
         "
       />
@@ -59,10 +61,11 @@
       <app-search-select
         class="col-md-4"
         placeholder="Tipo de solicitud"
-        [items]="facade.tipoSolicitud()"
+        [items]="facade.filteredRequestTypes()"
+        (search)="facade.requestTypeSearch.set($event)"
         [initialItems]="facade.tipoSolicitud()"
         [displayField]="'nombre'"
-        [valueField]="'idTipoSolicitud'"
+        [valueField]="'id'"
         [value]="requestForm.get('idTipoSolicitud')?.value"
         [selectedItem]="facade.formSelections.idTipoSolicitud()"
         (selected)="
@@ -71,23 +74,24 @@
             requestForm,
             'idTipoSolicitud',
             $event,
-            'idTipoSolicitud'
+            'id'
           )
         "
       />
 
       <!-- SOLICITANTE -->
-      <div class="col-md-4 form-floating">
-        <input
-          type="text"
-          class="form-control"
-          formControlName="solicitante"
-          id="solicitante"
-          placeholder="Solicitante"
-        />
-
-        <label for="solicitante"> Solicitante </label>
-      </div>
+      <app-search-select
+        class="col-md-4"
+        placeholder="Solicitante"
+        [items]="facade.people()"
+        [displayField]="'nombreCompleto'"
+        [keepSearchOnClear]="true"
+        [valueField]="'idPersona'"
+        [selectedItem]="facade.formSelections.solicitante()"
+        (searchChange)="facade.personSearchChanged(requestForm)"
+        (search)="facade.loadPeople($event)"
+        (selected)="facade.selectPerson($event, requestForm)"
+      />
 
       <!-- CARGO -->
       <div class="col-md-4 form-floating">
@@ -95,6 +99,7 @@
           type="text"
           class="form-control"
           formControlName="cargoSolicitante"
+          readonly
           id="cargoSolicitante"
           placeholder="Cargo del solicitante"
         />
@@ -108,6 +113,7 @@
           type="text"
           class="form-control"
           formControlName="unidadOrganizativa"
+          readonly
           id="unidadOrganizativa"
           placeholder="Unidad organizativa"
         />
@@ -133,20 +139,10 @@
   <!-- DETALLE -->
   <!-- ================================================= -->
 
-  <div style="display: grid; grid-template-columns: calc(68% - 5px) calc(32% - 5px); gap: 10px">
-    <!-- TABLA DE PRODUCTOS -->
-    <app-section-box title="Productos solicitados" [opened]="facade.sectionOpenDetail()">
-      <app-table-of-content
-        [showContent]="true"
-        [trackByField]="'idProducto'"
-        [tableData]="facade.details()"
-        [tableColumns]="tableColumns"
-        (edit)="facade.editDetail($event, requestDetailForm)"
-        (remove)="facade.clearDetail($event.index, facade.details)"
-      />
-    </app-section-box>
+  </form>
 
-    <!-- FORMULARIO DETALLE -->
+  <div style="display: grid; grid-template-columns: calc(40% - 2.5px) calc(60% - 2.5px); gap: 5px">
+    <!-- TABLA DE PRODUCTOS -->
     <app-section-box title="Agregar producto" [opened]="facade.sectionOpenDetail()">
       <form
         [formGroup]="requestDetailForm"
@@ -156,6 +152,7 @@
         <!-- PRODUCTO -->
 
         <app-search-select
+          #productSelect
           class="col-md-8"
           placeholder="Producto"
           [items]="facade.products()"
@@ -164,6 +161,10 @@
           [valueField]="'idProducto'"
           [value]="requestDetailForm.get('idProducto')?.value"
           [selectedItem]="facade.formSelections.idProducto()"
+          (searchChange)="facade.productSearchChanged(requestDetailForm)"
+          (search)="facade.loadProducts($event)"
+          [displaySubField]="'descripcion'"
+          [keepSearchOnClear]="true"
           (selected)="productSelection($event)"
         />
 
@@ -181,18 +182,35 @@
           <label for="cantidadSolicitada"> Cantidad </label>
         </div>
 
-        <app-form-actions [disabled]="!requestDetailForm.valid || loading()" />
+        <app-form-actions
+          [editing]="requestDetailForm.dirty || facade.editingIndex() !== null"
+          [disabled]="loading() || facade.loadingProducts() || facade.checkingProduct()"
+          (clear)="facade.clearDetailForm(requestDetailForm); productSelect.clear()"
+        />
       </form>
     </app-section-box>
+
+    <app-section-box title="Productos solicitados" [opened]="facade.sectionOpenDetail()">
+      <app-table-of-content
+        [showContent]="true"
+        [trackByField]="'idProducto'"
+        [tableData]="facade.details()"
+        [tableColumns]="tableColumns"
+        (edit)="facade.editDetail($event, requestDetailForm)"
+        (remove)="facade.clearDetail($event.index, facade.details)"
+      />
+    </app-section-box>
+
+    <!-- FORMULARIO DETALLE -->
+
   </div>
 
   <!-- ================================================= -->
   <!-- ACCIONES -->
   <!-- ================================================= -->
 
-  <div class="box mt-2">
+  <form [formGroup]="requestForm" (ngSubmit)="save()" class="box mt-2">
     <app-form-actions
       [disabled]="loading() || facade.details().length === 0 || !requestForm.valid"
     />
-  </div>
-</form>
+  </form>

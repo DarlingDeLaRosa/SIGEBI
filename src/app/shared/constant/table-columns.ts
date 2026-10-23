@@ -79,8 +79,8 @@ export const RequestList: tableColumnsInterface[] = [
     { key: 'tipoArtiucloObj.nombre', label: 'Tipo de Artículo' },
     { key: 'tipoSolicitudObj.nombre', label: 'Tipo de Solicitud' },
     { key: 'solicitante', label: 'Unidad Responsable' },
-    { key: 'fecha', label: 'Fecha de Creación' },
-    { key: 'estadoObj.nombre', label: 'Estado' },
+    { key: 'fecha', label: 'Fecha de Creación', format: 'date', align: 'center' },
+    { key: 'estadoObj.nombre', label: 'Estado', align: 'center' },
     { key: 'acciones', label: 'Acciones', align: 'center' }
 ]
 
