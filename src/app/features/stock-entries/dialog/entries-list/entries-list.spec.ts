@@ -1,17 +1,25 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EntriesList } from './entries-list';
+import { EntriesListDialog } from './entries-list';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { of } from 'rxjs';
+import { StockEntryService } from '../../services/stock-entry-service';
 
-describe('EntriesList', () => {
-  let component: EntriesList;
-  let fixture: ComponentFixture<EntriesList>;
+describe('EntriesListDialog', () => {
+  let component: EntriesListDialog;
+  let fixture: ComponentFixture<EntriesListDialog>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EntriesList],
+      imports: [EntriesListDialog],
+      providers: [
+        { provide: MAT_DIALOG_DATA, useValue: 1 },
+        { provide: MatDialogRef, useValue: { close: () => {} } },
+        { provide: StockEntryService, useValue: { getEntryByIdOrden: () => of({ data: [] }) } },
+      ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(EntriesList);
+    fixture = TestBed.createComponent(EntriesListDialog);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

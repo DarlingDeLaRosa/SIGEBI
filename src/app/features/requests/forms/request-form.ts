@@ -4,9 +4,9 @@ export class RequestForms {
 
   static createForm(fb: FormBuilder) {
     return fb.nonNullable.group({
-      idRecinto: [0, Validators.required],
-      idTipoArticulo: [0, Validators.required],
-      idTipoSolicitud: [0, Validators.required],
+      idRecinto: [0, [Validators.required, Validators.min(1)]],
+      idTipoArticulo: [0, [Validators.required, Validators.min(1)]],
+      idTipoSolicitud: [0, [Validators.required, Validators.min(1)]],
 
       solicitante: ['', Validators.required],
       cargoSolicitante: ['', Validators.required],
@@ -18,11 +18,11 @@ export class RequestForms {
 
   static createDetailForm(fb: FormBuilder) {
     return fb.nonNullable.group({
-      idProducto: [0, Validators.required],
+      idProducto: [0, [Validators.required, Validators.min(1)]],
       nombreProducto: ['', Validators.required],
       cantidadSolicitada: [0, [
         Validators.required,
-        Validators.min(1)
+        Validators.min(Number.MIN_VALUE)
       ]]
     });
   }

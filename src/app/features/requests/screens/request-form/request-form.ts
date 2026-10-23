@@ -1,10 +1,9 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RequestFormFacade } from '../../facades/request-management-facade';
 import { RequestForms } from '../../forms/request-form';
 import { SectionBox } from '../../../../shared/components/section-box/section-box';
 import { TableOfContent } from '../../../../shared/components/table-of-content/table-of-content';
-import { InputFilter } from '../../../../shared/components/input-filter/input-filter';
 import { FormActions } from '../../../../shared/components/form-actions/form-actions';
 import { SearchSelect } from '../../../../shared/components/search-select/search-select';
 import { RouterLink } from '@angular/router';
@@ -12,12 +11,12 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-request-form',
-  imports: [CommonModule, RouterLink, FormsModule, SearchSelect, FormActions, InputFilter, TableOfContent, ReactiveFormsModule, SectionBox],
+  imports: [CommonModule, RouterLink, FormsModule, SearchSelect, FormActions, TableOfContent, ReactiveFormsModule, SectionBox],
   templateUrl: './request-form.html',
   providers: [RequestFormFacade],
   styleUrl: './request-form.css',
 })
-export class RequestForm {
+export class RequestForm implements OnInit {
 
 
   private fb = inject(FormBuilder);
@@ -39,11 +38,8 @@ export class RequestForm {
     }
   ];
 
-  constructor() {
-    effect(() => {
-      const product = this.facade.formSelections.idProducto();
-      if (!product) return;
-    });
+  ngOnInit() {
+    this.facade.loadSelections();
   }
 
   setSelection(
@@ -84,18 +80,10 @@ export class RequestForm {
   }
 
   save() {
-
     this.facade.create(
       this.requestForm,
-      () => {
-
-        console.log(
-          'Solicitud creada correctamente'
-        );
-
-      }
+      () => this.facade.clearDetailForm(this.requestDetailForm),
+      this.requestDetailForm
     );
-
   }
-
 }
