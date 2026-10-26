@@ -93,4 +93,27 @@ describe('RequestForm', () => {
     vi.advanceTimersByTime(500);
     http.expectOne(environment.apiUrlIntranet + '/Persona/filter/Mar').flush({ status: true, data: [] });
   });
+
+  it('sends Guardar to create_solicitud once, without list or pagination parameters', () => {
+    const component = fixture.componentInstance;
+    component.requestForm.patchValue({ idRecinto: 1, idTipoArticulo: 2, idTipoSolicitud: 3 });
+    component.facade.selectPerson({ nombreCompleto: 'Ana Pérez', cargo: { nombre: 'Analista' },
+      unidadOrganizativa: 'Compras' }, component.requestForm);
+    component.facade.selectProduct({ idProducto: 1, nombre: 'Papel', stock: 2 }, component.requestDetailForm);
+    component.requestDetailForm.patchValue({ cantidadSolicitada: 4 });
+    component.facade.addDetail(component.requestDetailForm);
+    fixture.detectChanges();
+    const forms = fixture.nativeElement.querySelectorAll('form');
+    forms[forms.length - 1].querySelector('button[type="submit"]').click();
+    const req = http.expectOne(environment.apiUrl + '/Solicitudes/create_solicitud');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.params.keys()).toEqual([]);
+    expect(req.request.body).toMatchObject({ idRecinto: 1, solicitante: 'Ana Pérez',
+      detalles: [{ idProducto: 1, cantidadSolicitada: 4 }] });
+    expect(req.request.body).not.toHaveProperty('CantItems');
+    expect(req.request.body).not.toHaveProperty('cantItems');
+    req.flush({ success: true });
+    http.expectNone(request => request.url === environment.apiUrl + '/Solicitudes');
+    expect(alert.success).toHaveBeenCalled();
+  });
 });

@@ -63,11 +63,10 @@
 }
 
 <div class="box">
-    <!-- (showDialog)="openDialog($event.id)" -->
   <app-table-of-content
     [showDetail]="true"
     [actions]="facade.actions"
-    [tableTitle]="'Listado de ordenes de compra'"
+    [tableTitle]="'Listado de solicitudes'"
     [trackByField]="'id'"
     [tableData]="data()?.data || []"
     [tableColumns]="tableColumns"
@@ -78,6 +77,7 @@
     [pageSize]="pagination().pageSize"
     (pageChange)="changePage($event)"
     (pageSizeChange)="changePageSize($event)"
+    (showDialog)="openDialog($event.id)"
     (remove)="remove($event.row.id)"
   ></app-table-of-content>
     <!-- (edit)="facade.editPurchaseContract($event.row.id)" -->

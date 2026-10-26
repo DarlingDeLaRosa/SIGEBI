@@ -1,28 +1,28 @@
 export interface RequestModel {
   id: number;
-  noRequerimiento: string;
+  noRequerimiento: string | null;
 
-  idRecinto: number;
-  recintoObj: RequestRecinto;
+  idRecinto: number | null;
+  recintoObj: RequestRecinto | null;
 
-  idTipoArticulo: number;
-  tipoArtiucloObj: RequestTipoArticulo;
+  idTipoArticulo: number | null;
+  tipoArtiucloObj: RequestTipoArticulo | null;
 
-  idTipoSolicitud: number;
-  tipoSolicitudObj: RequestTipoSolicitud;
+  idTipoSolicitud: number | null;
+  tipoSolicitudObj: RequestTipoSolicitud | null;
 
-  fecha: string;
+  fecha: string | null;
 
-  solicitante: string;
-  cargoSolicitante: string;
-  unidadOrganizativa: string;
+  solicitante: string | null;
+  cargoSolicitante: string | null;
+  unidadOrganizativa: string | null;
 
-  observaciones: string;
+  observaciones: string | null;
 
-  idEstado: number;
-  estadoObj: RequestEstado;
+  idEstado: number | null;
+  estadoObj: RequestEstado | null;
 
-  detallesSolicitud: RequestDetail[];
+  detallesSolicitud: RequestDetail[] | null;
 }
 
 export interface RequestRecinto {
@@ -52,7 +52,7 @@ export interface RequestEstado {
 
 export interface RequestDetail {
   id: number;
-  idProducto: number;
+  idProducto: number | null;
 
   productoObj: {
     idProducto: number;
@@ -60,7 +60,7 @@ export interface RequestDetail {
     descripcion: string;
     precio: number;
     itbis: number;
-  };
+  } | null;
 
-  cantidadSolicitada: number;
+  cantidadSolicitada: number | null;
 }

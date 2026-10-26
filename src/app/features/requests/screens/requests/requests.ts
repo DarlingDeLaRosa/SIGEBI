@@ -13,7 +13,8 @@ import { BaseCrud } from '../../../../shared/abstracts/base-crud';
 import { RequestFacade } from '../../facades/request-facade';
 import { RequestFiltersForms } from '../../forms/request-filter-form';
 import { CreateConditionalBox } from '../../../../shared/components/create-conditional-box/create-conditional-box';
-import { RequestsService } from '../../services/requests-service';
+import { RequestQuery, RequestsService } from '../../services/requests-service';
+import { RequestDetail } from '../../dialog/request-detail/request-detail';
 
 @Component({
   selector: 'app-requests',
@@ -41,8 +42,12 @@ export class Requests extends BaseCrud<any> implements OnInit {
   override getService() { return this.request }
 
   constructor() { super(); }
-  ngOnInit(): void { this.loadData({cantItem: 10})}
+  ngOnInit(): void { this.loadData() }
 
-  // openDialog(id: number) { this.dialogService.open(PurchasesContractDetailDialog, id) }
+  override loadData(params: RequestQuery = {}) {
+    super.loadData({ ...this.filterForm.getRawValue(), ...params });
+  }
+
+  openDialog(id: number) { this.dialogService.open(RequestDetail, id) }
   clearForm() { this.filterForm.reset(); this.loadData() }
 }
