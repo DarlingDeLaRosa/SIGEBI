@@ -1,1 +1,99 @@
-<p>request-detail works!</p>
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div>
+      <h2>Detalle de la solicitud</h2>
+      <span class="dialog-subtitle">Información completa de la solicitud</span>
+    </div>
+    <button type="button" class="btn-close" aria-label="Cerrar detalle de solicitud" (click)="closeDialog()">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    @if (facade.loading()) {
+      <app-skeleton [config]="{ cards: 6, columns: 2, sections: [{ height: 60 }, { height: 120 }] }" />
+    } @else if (facade.error()) {
+      <p role="alert" class="text-danger">{{ facade.error() }}</p>
+      <button type="button" class="btn btn-outline-primary align-self-start" (click)="facade.load(id)">
+        Reintentar
+      </button>
+    } @else if (facade.request(); as request) {
+      <div class="info-grid">
+        <div class="info-card">
+          <label>No. Requerimiento</label>
+          <span>{{ request.noRequerimiento || 'No disponible' }}</span>
+        </div>
+        <div class="info-card">
+          <label>Fecha de creación</label>
+          <span>{{ request.fecha ? (request.fecha | date: 'dd/MM/yyyy') : 'No disponible' }}</span>
+        </div>
+        <div class="info-card">
+          <label>Estado</label>
+          <span class="status">{{ request.estadoObj?.nombre || 'No disponible' }}</span>
+        </div>
+        <div class="info-card">
+          <label>Recinto</label>
+          <span>{{ request.recintoObj?.nombre || 'No disponible' }}</span>
+        </div>
+        <div class="info-card">
+          <label>Tipo de artículo</label>
+          <span>{{ request.tipoArtiucloObj?.nombre || 'No disponible' }}</span>
+        </div>
+        <div class="info-card">
+          <label>Tipo de solicitud</label>
+          <span>{{ request.tipoSolicitudObj?.nombre || 'No disponible' }}</span>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Solicitante</label>
+        <div class="product-card">
+          <h5>{{ request.solicitante || 'No disponible' }}</h5>
+          <p><strong>Cargo:</strong> {{ request.cargoSolicitante || 'No disponible' }}</p>
+          <p><strong>Unidad organizativa:</strong> {{ request.unidadOrganizativa || 'No disponible' }}</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Observaciones</label>
+        <div class="product-card observations">{{ request.observaciones || 'Sin observaciones' }}</div>
+      </div>
+
+      <div class="section">
+        <label>Productos solicitados</label>
+        <div class="warehouse-list">
+          @for (item of request.detallesSolicitud; track item.id) {
+            <div class="product-card mb-2">
+              <div class="product-header">
+                <div>
+                  <h5>{{ item.productoObj?.nombre || ('Producto #' + item.idProducto) }}</h5>
+                  @if (item.productoObj?.descripcion) {
+                    <small>{{ item.productoObj?.descripcion }}</small>
+                  }
+                </div>
+              </div>
+              <div class="product-grid">
+                <div>
+                  <small>Cantidad solicitada</small>
+                  <strong>{{ item.cantidadSolicitada ?? 'No disponible' }}</strong>
+                </div>
+                @if (item.productoObj; as product) {
+                  <div>
+                    <small>Precio unitario</small>
+                    <strong>{{ product.precio | number: '1.2-2' }}</strong>
+                  </div>
+                  <div>
+                    <small>ITBIS (%)</small>
+                    <strong>{{ product.itbis | number: '1.0-2' }}</strong>
+                  </div>
+                }
+              </div>
+            </div>
+          } @empty {
+            <p class="text-muted">Esta solicitud no tiene productos registrados.</p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
