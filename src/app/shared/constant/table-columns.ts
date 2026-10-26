@@ -175,3 +175,12 @@ export const DescriptionColumns: tableColumnsInterface[] = [
     { key: 'descripcion', label: 'Nombre' },
     { key: 'acciones', label: 'Acciones', align: 'center' }
 ]
+
+export const UsersColumns: tableColumnsInterface[] = [
+    { key: ['persona.nombre', 'persona.apellidos'], label: 'Nombre completo' },
+    { key: 'usuario', label: 'Usuario' },
+    { key: 'persona.cargo.nombre', label: 'Cargo' },
+    { key: 'persona.recinto.nombre', label: 'Recinto' },
+    { key: 'rol.nombre', label: 'Rol' },
+    { key: 'acciones', label: 'Acciones', align: 'center' },
+];

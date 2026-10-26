@@ -80,10 +80,6 @@ export class RequestForm implements OnInit {
   }
 
   save() {
-    this.facade.create(
-      this.requestForm,
-      () => this.facade.clearDetailForm(this.requestDetailForm),
-      this.requestDetailForm
-    );
+    this.facade.create( this.requestForm, () => this.facade.clearDetailForm(this.requestDetailForm), this.requestDetailForm);
   }
 }

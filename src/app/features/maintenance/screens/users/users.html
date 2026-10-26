@@ -1,1 +1,76 @@
-<p>users works!</p>
+<h2>Usuarios</h2>
+
+<form [formGroup]="userForm" (ngSubmit)="save()" class="row g-2">
+  <app-search-select
+    #personSelect
+    class="col-md-8"
+    placeholder="Persona"
+    [items]="people()"
+    [displayField]="'nombreCompleto'"
+    [displaySubField]="'unidadOrganizativa'"
+    [valueField]="'idPersona'"
+    [selectedItem]="selectedPerson()"
+    [keepSearchOnClear]="true"
+    (searchChange)="personSearchChanged()"
+    (search)="loadPeople($event)"
+    (selected)="selectPerson($event)"
+  />
+
+  <app-search-select
+    #roleSelect
+    class="col-md-4"
+    placeholder="Rol"
+    [items]="filteredRoles()"
+    [initialItems]="roles()"
+    [displayField]="'nombre'"
+    [valueField]="'idRol'"
+    [value]="userForm.controls.idRol.value"
+    [selectedItem]="selectedRole()"
+    [keepSearchOnClear]="true"
+    (searchChange)="selectRole(null)"
+    (search)="roleSearch.set($event)"
+    (selected)="selectRole($event)"
+  />
+
+  @if (loadingRoles()) {
+    <p class="text-muted" role="status">Cargando roles...</p>
+  } @else if (rolesError()) {
+    <p class="text-danger" role="alert">{{ rolesError() }}
+      <button type="button" class="btn btn-link" (click)="loadRoles()">Reintentar</button>
+    </p>
+  } @else if (roles().length === 0) {
+    <p class="text-muted" role="status">No hay roles disponibles para SIGEBI. Debe existir un rol para agregar personas.</p>
+  }
+
+  <app-form-actions
+    [editing]="userForm.dirty"
+    [disabled]="userForm.invalid || saving() || loadingRoles() || roles().length === 0"
+    (clear)="clearForm()"
+  />
+</form>
+
+<app-input-filter [(filter)]="search" [placeholder]="'Buscar usuario de SIGEBI'" />
+
+@if (listError()) {
+  <p class="text-danger" role="alert">{{ listError() }}
+    <button type="button" class="btn btn-link" (click)="loadData()">Reintentar</button>
+  </p>
+}
+@if (loading()) {
+  <p class="text-muted" role="status">Cargando usuarios...</p>
+}
+
+<app-table-of-content
+  [tableTitle]="'Listado de usuarios de SIGEBI'"
+  [trackByField]="'rowKey'"
+  [tableData]="data()?.data || []"
+  [tableColumns]="tableColumns"
+  [actions]="actions"
+  [showPagination]="true"
+  [totalPages]="pagination().totalPages"
+  [currentPage]="pagination().currentPage"
+  [pageSize]="pagination().pageSize"
+  [totalItems]="pagination().totalItems"
+  (pageChange)="changePage($event)"
+  (pageSizeChange)="changePageSize($event)"
+/>
