@@ -233,6 +233,7 @@ export class RequestFormFacade {
   }
 
   create(form: FormGroup, onSuccess?: () => void, detailForm?: FormGroup) {
+
     if (this.loading() || this.checkingProduct()) return;
     if (form.invalid || !this.formSelections.solicitante() || !this.details().length) {
       form.markAllAsTouched(); return;
@@ -240,6 +241,7 @@ export class RequestFormFacade {
     if (detailForm?.dirty || this.editingIndex() !== null || this.formSelections.idProducto()) {
       this.alert.error('Agrega o limpia el producto pendiente antes de guardar'); return;
     }
+
     this.loading.set(true);
     this.requestService.create(this.buildCreateDto(form))
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.loading.set(false)))
