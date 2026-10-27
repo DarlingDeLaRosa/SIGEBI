@@ -61,20 +61,24 @@ export class InventoryAdjustmentFacade extends BaseCrud<InventoryAdjustmentModel
             success: response.success,
             message: response.message,
             dateNow: '',
-            currentPage: response.currentPage ?? currentPage,
-            cantItem: response.cantItem ?? pageSize,
+            currentPage,
+            cantItem: pageSize,
             cantPage: response.cantPage ?? 1,
           });
           this.pagination.set({
-            currentPage: response.currentPage || currentPage,
-            pageSize: response.cantItem || pageSize,
+            currentPage,
+            pageSize,
             totalPages: Math.max(1, response.cantPage ?? 1),
             totalItems: response.totalItems ?? 0,
           });
         },
-        error: () =>
-          this.error.set('No se pudieron cargar las conciliaciones. Intenta nuevamente.'),
+        error: () => this.reportError('No se pudieron cargar las conciliaciones. Intenta nuevamente.'),
       });
+  }
+
+  private reportError(message: string) {
+    this.error.set(message);
+    this.alert.error(message);
   }
 
   edit(id: number) {
@@ -97,7 +101,7 @@ export class InventoryAdjustmentFacade extends BaseCrud<InventoryAdjustmentModel
             try {
               unwrapAdjustmentResponse(response);
             } catch {
-              this.error.set('No se pudo eliminar la conciliación.');
+              this.reportError('No se pudo eliminar la conciliación.');
               return;
             }
             if (this.data()?.data.length === 1 && this.pagination().currentPage > 1) {
@@ -106,7 +110,7 @@ export class InventoryAdjustmentFacade extends BaseCrud<InventoryAdjustmentModel
             this.loadData();
             this.alert.success('Conciliación eliminada');
           },
-          error: () => this.error.set('No se pudo eliminar la conciliación.'),
+          error: () => this.reportError('No se pudo eliminar la conciliación.'),
         });
     });
   }
