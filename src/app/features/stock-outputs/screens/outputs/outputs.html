@@ -13,20 +13,22 @@
 </div>
 
 <div class="box">
-    <!-- [tableColumns]="tableColumns" -->
   <app-table-of-content
     [showDetail]="true"
     [tableTitle]="'Listado de salidas'"
     [trackByField]="'idSalida'"
     [tableData]="data()?.data || []"
+    [tableColumns]="tableColumns"
     [totalItems]="pagination().totalItems"
     [showPagination]="true"
+    [showTotal]="false"
     [totalPages]="pagination().totalPages"
     [currentPage]="pagination().currentPage"
     [pageSize]="pagination().pageSize"
     (pageChange)="changePage($event)"
     (pageSizeChange)="changePageSize($event)"
-    (remove)="remove($event.idSalida)"
+    (showDialog)="openDetail($event.idSalida)"
+    (remove)="remove($event.row.idSalida)"
     ></app-table-of-content>
     <!-- (edit)="setProduct($event)" -->
 </div>

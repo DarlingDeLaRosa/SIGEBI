@@ -1,1 +1,118 @@
-<p>output-detail works!</p>
+<div class="dialog-container">
+  <div class="dialog-header">
+    <div>
+      <h2>Detalle de la salida</h2>
+      <span class="dialog-subtitle">Información completa de la salida</span>
+    </div>
+    <button type="button" class="btn-close" aria-label="Cerrar detalle de salida" (click)="closeDialog()">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="dialog-body">
+    @if (facade.loading()) {
+      <app-skeleton [config]="{ cards: 6, columns: 2, sections: [{ height: 60 }, { height: 120 }] }" />
+    } @else if (facade.error()) {
+      <p role="alert" class="text-danger">{{ facade.error() }}</p>
+      <button type="button" class="btn btn-outline-primary align-self-start" (click)="facade.load(id)">Reintentar</button>
+    } @else if (facade.output(); as output) {
+      <div class="info-grid">
+        <div class="info-card">
+          <label>No. Requerimiento</label>
+          <span>{{ output.noRequerimiento || 'No disponible' }}</span>
+        </div>
+        <div class="info-card">
+          <label>Fecha de creación</label>
+          <span>{{ output.fechaCreacion ? (output.fechaCreacion | date: 'dd/MM/yyyy') : 'No disponible' }}</span>
+        </div>
+        <div class="info-card">
+          <label>Recinto</label>
+          <span>{{ output.recinto?.nombre || 'No disponible' }}</span>
+        </div>
+        <div class="info-card">
+          <label>Tipo de salida</label>
+          <span>{{ output.tipoSalida?.nombre || 'No disponible' }}</span>
+        </div>
+        <div class="info-card">
+          <label>Departamento</label>
+          <span>{{ output.departamento?.nombre || 'No disponible' }}</span>
+        </div>
+        <div class="info-card">
+          <label>Creado por</label>
+          <span>{{ ((output.creadoPorU?.nombre || '') + ' ' + (output.creadoPorU?.apellido || '')).trim() || 'No disponible' }}</span>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Solicitante</label>
+        <div class="product-card">
+          <h5>{{ output.solicitante || 'No disponible' }}</h5>
+          <p class="mb-0"><strong>Cargo:</strong> {{ output.solicitanteCargo || 'No disponible' }}</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Observaciones</label>
+        <div class="product-card observations">{{ output.observacion || 'Sin observaciones' }}</div>
+      </div>
+
+      <div class="section">
+        <label>Productos despachados</label>
+        <div class="product-list">
+          @for (item of output.detalles; track item.idSalidaDet) {
+            <div class="product-card">
+              <div class="product-header">
+                <div>
+                  <h5>{{ item.producto?.nombre || 'Producto no disponible' }}</h5>
+                  @if (item.producto?.descripcion) {
+                    <small>{{ item.producto?.descripcion }}</small>
+                  }
+                </div>
+                <strong>{{ item.totalGeneral != null ? (item.totalGeneral | currency: 'DOP ' : 'symbol' : '1.2-2') : 'No disponible' }}</strong>
+              </div>
+              <div class="product-grid">
+                <div><small>Cantidad</small><strong>{{ item.cantidad ?? 'No disponible' }}</strong></div>
+                <div><small>Marca</small><strong>{{ item.marca || 'Sin registrar' }}</strong></div>
+                <div><small>Modelo</small><strong>{{ item.modelo || 'Sin registrar' }}</strong></div>
+                <div><small>Condición</small><strong>{{ item.condicion || 'Sin registrar' }}</strong></div>
+                <div><small>Serial</small><strong>{{ item.serial || 'Sin registrar' }}</strong></div>
+                <div>
+                  <small>Precio unitario</small>
+                  <strong>{{ item.precio != null ? (item.precio | currency: 'DOP ' : 'symbol' : '1.2-2') : 'No disponible' }}</strong>
+                </div>
+                <div>
+                  <small>Subtotal</small>
+                  <strong>{{ item.subTotal != null ? (item.subTotal | currency: 'DOP ' : 'symbol' : '1.2-2') : 'No disponible' }}</strong>
+                </div>
+                <div>
+                  <small>ITBIS</small>
+                  <strong>{{ item.itbis != null ? (item.itbis | currency: 'DOP ' : 'symbol' : '1.2-2') : 'No disponible' }}</strong>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <p class="text-muted">Esta salida no tiene productos registrados.</p>
+          }
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Resumen financiero</label>
+        <div class="summary-card">
+          <div>
+            <span>Total</span>
+            <strong>{{ output.total != null ? (output.total | currency: 'DOP ' : 'symbol' : '1.2-2') : 'No disponible' }}</strong>
+          </div>
+          <div>
+            <span>ITBIS</span>
+            <strong>{{ output.itbis != null ? (output.itbis | currency: 'DOP ' : 'symbol' : '1.2-2') : 'No disponible' }}</strong>
+          </div>
+          <div class="summary-total">
+            <span>Total general</span>
+            <strong>{{ output.totalGeneral != null ? (output.totalGeneral | currency: 'DOP ' : 'symbol' : '1.2-2') : 'No disponible' }}</strong>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

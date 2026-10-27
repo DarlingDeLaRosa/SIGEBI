@@ -7,7 +7,7 @@ import { FormActions } from '../../../../shared/components/form-actions/form-act
 import { SearchSelect } from '../../../../shared/components/search-select/search-select';
 import { CommonModule } from '@angular/common';
 import { BaseCrud } from '../../../../shared/abstracts/base-crud';
-import { OutputColumns } from '../../../../shared/constant/table-columns';
+import { OutputProductColumns, PurchaseContractProductsColumnsSummary, RequestList } from '../../../../shared/constant/table-columns';
 import { Loading } from '../../../../core/service/loading-service/loading';
 import { StockOutputsForms } from '../../forms/stock-outputs-forms';
 import { OutputService } from '../../services/output-service';
@@ -23,7 +23,11 @@ import { OutputsManagementFacade } from '../../facades/outputs-managment-facade'
 export class OutputsForm extends BaseCrud<any> implements OnInit {
 
   noOrden: string = ''
-  tableColumns = OutputColumns
+  tableColumns = OutputProductColumns
+  showRequest: boolean = true
+  showListRequestDetails: boolean = true
+  tableRequestColumns = RequestList
+  tableColumsRequestProducts = PurchaseContractProductsColumnsSummary
 
   private fb = inject(FormBuilder);
   private loadingService = inject(Loading);

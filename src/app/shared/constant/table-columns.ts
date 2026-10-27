@@ -69,6 +69,17 @@ export const EntryDetailsColumns: tableColumnsInterface[] = [
 ]
 
 export const OutputColumns : tableColumnsInterface[] = [
+    { key: 'noRequerimiento', label: 'Número de requerimiento' },
+    { key: 'recinto.nombre', label: 'Recinto' },
+    { key: 'tipoSalida.nombre', label: 'Tipo de salida' },
+    { key: 'departamento.nombre', label: 'Departamento' },
+    { key: 'solicitante', label: 'Solicitante' },
+    { key: 'fechaCreacion', label: 'Fecha de creación', format: 'date', align: 'center' },
+    { key: 'totalGeneral', label: 'Total', format: 'currency', align: 'right' },
+    { key: 'acciones', label: 'Acciones', align: 'center' }
+]
+
+export const OutputProductColumns: tableColumnsInterface[] = [
     { key: 'codInstitucional', label: 'Código Institucional' },
     { key: 'nombre', label: 'Nombre' },
     { key: 'acciones', label: 'Acciones', align: 'center' }

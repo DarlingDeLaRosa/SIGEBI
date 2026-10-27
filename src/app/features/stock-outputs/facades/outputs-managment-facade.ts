@@ -5,6 +5,11 @@ import { StockOutputService } from "../../maintenance/services/stockOutput/stock
 import { filterByProperty } from "../../../shared/helpers/filter.helper";
 import { IntranetService } from "../../../shared/service/general.service";
 import { ProductService } from "../../products/services/product/product-service";
+import { DialogService } from "../../../core/service/dialog-service/dialog";
+import { RequestDetail } from "../../requests/dialog/request-detail/request-detail";
+import { TableAction } from "../../../interfaces/table-content-interface";
+import { RequestsService } from "../../requests/services/requests-service";
+import { ProductDetailDialog } from "../../products/dialog/product-detail-dialog/product-detail-dialog";
 
 @Injectable() export class OutputsManagementFacade {
 
@@ -15,11 +20,15 @@ import { ProductService } from "../../products/services/product/product-service"
     details = signal<any[]>([]);
 
     private productService = inject(ProductService);
+    private requestService = inject(RequestsService);
     private intranetService = inject(IntranetService);
     private warehouseTypeService = inject(WarehouseNameService);
     private outputTypeService = inject(StockOutputService);
+    private dialogService = inject(DialogService);
     // private deliveryTypeService = inject(DeliveryTypeService);
 
+    detailsRequest = signal<any[]>([]);
+    request = signal<any[]>([]);
     product = signal<any[]>([]);
     condition = signal<any[]>(CONDITION);
     outputTypes = signal<any[]>([]);
@@ -38,9 +47,28 @@ import { ProductService } from "../../products/services/product/product-service"
         idTipoSalida: signal<any | null>(null),
     }
 
-    // openDialog(id: number) { this.dialogService.open(PurchasesContractDetailDialog, id) }
-    // openDialogDetails(id: number) { this.dialogService.open(PurchasesContractDetailDialog, id) }
+    openDialog(id: number) { this.dialogService.open(RequestDetail, id) }
+    openDialogDetails(id: number) { this.dialogService.open(ProductDetailDialog, id) }
     // openDialogEntryList(id: number) { this.dialogService.open(EntriesListDialog, id) }
+
+
+    actionsDetails: TableAction[] = [
+        {
+            label: 'Dar salida',
+            icon: 'bi bi-box-seam',
+            class: 'item-createEntry',
+            action: row => this.openDialog(row.row.id)
+        },
+    ];
+
+    actions: TableAction[] = [
+        {
+            label: 'Crear salida',
+            icon: 'bi bi-box-seam',
+            class: 'item-createEntry',
+            action: row => this.openDialog(row.row.id)
+        },
+    ];
 
     // addDetail(form: FormGroup) {
 
@@ -96,6 +124,15 @@ import { ProductService } from "../../products/services/product/product-service"
     //         items.filter((_, i) => i !== index)
     //     );
     // }
+
+    loadRequest(filter: string = '') {
+        this.requestService
+            .getAll({ filter, page: 1, CantItems: 10 })
+            .subscribe(response => {
+                this.request.set(response.data);
+            });
+    }
+
     loadProduct(filter: string = '') {
         this.productService
             .getAll({ filter, page: 1, CantItems: 10 })
@@ -165,6 +202,7 @@ import { ProductService } from "../../products/services/product/product-service"
     // }
 
     loadData() {
+        this.loadRequest()
         this.loadProduct()
         this.loadWarehouseTypes()
         this.loadOutputTypes()

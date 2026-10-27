@@ -1,0 +1,9 @@
+.detail-container {
+  display: grid;
+  grid-template-columns: calc(32% - 8px) calc(68% - 2px);
+  gap: 5px;
+}
+
+.detail-container > :only-child {
+  grid-column: 1 / -1;
+}

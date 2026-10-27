@@ -4,28 +4,29 @@ import { OutputService } from '../../services/output-service';
 import { OutputColumns } from '../../../../shared/constant/table-columns';
 import { TableOfContent } from '../../../../shared/components/table-of-content/table-of-content';
 import { RouterLink } from '@angular/router';
-import { OutputsFacade } from '../../facades/outputs-facade';
+import { DialogService } from '../../../../core/service/dialog-service/dialog';
+import { OutputDetail } from '../../dialog/output-detail/output-detail';
 
 @Component({
   selector: 'app-outputs',
   imports: [TableOfContent, RouterLink],
   templateUrl: './outputs.html',
   styleUrl: './outputs.css',
-  providers: [OutputsFacade]
 })
 export class Outputs extends BaseCrud<any> implements OnInit {
 
   tableColumns = OutputColumns
   filteringOutput: boolean = false
 
-  facade = inject(OutputsFacade);
   private outputService = inject(OutputService);
+  private dialogService = inject(DialogService);
   override getService() { return this.outputService }
 
   constructor() { super(); }
 
   ngOnInit(): void {
     this.loadData()
-    this.facade.loadData();
   }
+
+  openDetail(id: number) { this.dialogService.open(OutputDetail, id); }
 }
