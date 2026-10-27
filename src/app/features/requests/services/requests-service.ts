@@ -31,11 +31,11 @@ export class RequestsService extends BaseApiService<any> {
       const body = {
          page,
          CantItems: pageSize,
-         noRequerimiento: params.noRequerimiento ?? params.filter ?? null,
+         noRequerimiento: (params.noRequerimiento ?? params.filter)?.trim() || null,
          idEstadoSolicitud: params.idEstadoSolicitud ?? params.estado ?? null,
          idTipoArticulo: params.idTipoArticulo ?? null,
          idTipoSolicitud: params.idTipoSolicitud ?? null,
-         unidadOrganizativa: params.unidadOrganizativa ?? null,
+         unidadOrganizativa: params.unidadOrganizativa?.trim() || null,
          idRecinto: params.idRecinto ?? null,
       };
       return this.http.post<ApiResponse<any[]> & { totalItems: number }>(this.endpoint, body).pipe(
@@ -71,5 +71,9 @@ export class RequestsService extends BaseApiService<any> {
 
    getRequestTypes() {
       return this.get<ApiResponse<{ id: number; nombre: string }[]>>('tipo_solicitudes');
+   }
+
+   getRequestStatuses() {
+      return this.get<ApiResponse<{ id: number; nombre: string }[]>>('estados');
    }
 }

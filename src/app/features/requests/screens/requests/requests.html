@@ -16,52 +16,45 @@
 </div>
 
 @if (filteringRequests()) {
-  <form [formGroup]="filterForm" (submit)="loadData(filterForm.getRawValue())" class="box mb-2">
-    <app-create-conditional-box [formName]="'Filtrar productos'">
-      <div class="col-md-2 form-floating">
-        <input
-          type="text"
-          formControlName="filter"
-          class="form-control"
-          [placeholder]="'Número de expediente'"
-        />
-        <label for="filter">Número de Exp / Orden</label>
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="box mb-2">
+    <app-create-conditional-box [formName]="'Filtrar solicitudes'">
+      <div class="col-md-4 form-floating">
+        <input id="noRequerimiento" type="text" formControlName="noRequerimiento" class="form-control" placeholder="Número de requerimiento" />
+        <label for="noRequerimiento">Número de requerimiento</label>
       </div>
-
-      <app-search-select
-        class="col-md-2"
-        placeholder="Estado de orden"
-        [items]="facade.filteredStatus()"
-        [initialItems]="facade.status()"
-        [displayField]="'name'"
-        [valueField]="'value'"
-        [value]="filterForm.get('estado')?.value"
-        [selectedItem]="facade.filterSelections.status()"
-        (search)="facade.filterStatus($event)"
-        [showAll]="true"
-        (selected)="
-          setSelection(
-            facade.filterSelections.status,
-            filterForm,
-            'estado',
-            $event,
-            'value'
-          )
-        "
-      />
-
-      <app-form-actions
-        [nameActionBoton]="'Filtrar'"
-        [iconActionBoton]="'bi bi-search'"
-        [editing]="filterForm.dirty"
-        [disabled]="!filterForm.dirty || loading()"
-        (clear)="clearForm(); loadData()"
-      >
-      </app-form-actions>
+      <app-search-select class="col-md-4" placeholder="Estado de solicitud"
+        [items]="facade.filteredStatus()" [initialItems]="facade.status()"
+        displayField="nombre" valueField="id" [showAll]="true"
+        [value]="filterForm.controls.idEstadoSolicitud.value" [selectedItem]="facade.filterSelections.status()"
+        (search)="facade.statusSearch.set($event)"
+        (selected)="selectFilter(facade.filterSelections.status, 'idEstadoSolicitud', $event, 'id')" />
+      <app-search-select class="col-md-4" placeholder="Tipo de artículo"
+        [items]="facade.articleTypes()" [initialItems]="facade.articleTypes()"
+        displayField="nombre" valueField="idTipoArt" [showAll]="true"
+        [value]="filterForm.controls.idTipoArticulo.value" [selectedItem]="facade.filterSelections.articleType()"
+        (search)="facade.loadArticleTypes($event)"
+        (selected)="selectFilter(facade.filterSelections.articleType, 'idTipoArticulo', $event, 'idTipoArt')" />
+      <app-search-select class="col-md-4" placeholder="Tipo de solicitud"
+        [items]="facade.filteredRequestTypes()" [initialItems]="facade.requestTypes()"
+        displayField="nombre" valueField="id" [showAll]="true"
+        [value]="filterForm.controls.idTipoSolicitud.value" [selectedItem]="facade.filterSelections.requestType()"
+        (search)="facade.requestTypeSearch.set($event)"
+        (selected)="selectFilter(facade.filterSelections.requestType, 'idTipoSolicitud', $event, 'id')" />
+      <div class="col-md-4 form-floating">
+        <input id="unidadOrganizativa" type="text" formControlName="unidadOrganizativa" class="form-control" placeholder="Unidad organizativa" />
+        <label for="unidadOrganizativa">Unidad organizativa</label>
+      </div>
+      <app-search-select class="col-md-4" placeholder="Recinto"
+        [items]="facade.filteredCampuses()" [initialItems]="facade.campuses()"
+        displayField="nombre" valueField="idRecinto" [showAll]="true"
+        [value]="filterForm.controls.idRecinto.value" [selectedItem]="facade.filterSelections.campus()"
+        (search)="facade.campusSearch.set($event)"
+        (selected)="selectFilter(facade.filterSelections.campus, 'idRecinto', $event, 'idRecinto')" />
+      <app-form-actions nameActionBoton="Filtrar" iconActionBoton="bi bi-search"
+        [editing]="true" [disabled]="loading()" (clear)="clearForm()" />
     </app-create-conditional-box>
   </form>
 }
-
 <div class="box">
   <app-table-of-content
     [showDetail]="true"
@@ -72,12 +65,13 @@
     [tableColumns]="tableColumns"
     [totalItems]="pagination().totalItems"
     [showPagination]="true"
+    [showTotal]="false"
     [totalPages]="pagination().totalPages"
     [currentPage]="pagination().currentPage"
     [pageSize]="pagination().pageSize"
     (pageChange)="changePage($event)"
     (pageSizeChange)="changePageSize($event)"
-    (showDialog)="openDialog($event.id)"
+    (showDialog)="facade.openDialog($event.id)"
     (remove)="remove($event.row.id)"
   ></app-table-of-content>
     <!-- (edit)="facade.editPurchaseContract($event.row.id)" -->
