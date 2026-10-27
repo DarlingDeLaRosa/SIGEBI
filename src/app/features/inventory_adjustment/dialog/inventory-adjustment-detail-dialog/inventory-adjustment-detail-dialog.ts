@@ -3,10 +3,11 @@ import { Component, inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { InventoryAdjustmentDetailFacade } from '../../facades/inventory-adjustment-detail-facade';
 import { InventoryAdjustmentReferenceFacade } from '../../facades/inventory-adjustment-reference-facade';
+import { Skeleton } from '../../../../shared/components/skeleton/skeleton';
 
 @Component({
   selector: 'app-inventory-adjustment-detail-dialog',
-  imports: [CommonModule],
+  imports: [CommonModule, Skeleton],
   templateUrl: './inventory-adjustment-detail-dialog.html',
   styleUrl: './inventory-adjustment-detail-dialog.css',
   providers: [InventoryAdjustmentDetailFacade, InventoryAdjustmentReferenceFacade],

@@ -1,86 +1,101 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2>Detalle de conciliación</h2>
-    <button type="button" class="btn-close" aria-label="Cerrar" (click)="close()"></button>
+    <div>
+      <h2>Detalle de conciliación</h2>
+      <span class="dialog-subtitle">Información completa de la toma física y sus diferencias</span>
+    </div>
+    <button type="button" class="btn-close" aria-label="Cerrar detalle de conciliación" (click)="close()">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
   </div>
+
   <div class="dialog-body">
     @if (facade.loading()) {
-      <p role="status">Cargando conciliación…</p>
-    }
-    @if (facade.error()) {
+      <app-skeleton [config]="{ cards: 6, columns: 2, sections: [{ height: 60 }, { height: 120 }] }" />
+    } @else if (facade.error()) {
       <p class="alert alert-danger" role="alert">{{ facade.error() }}</p>
-    }
-    @if (facade.adjustment(); as adjustment) {
-      <dl class="info-grid">
-        <div>
-          <dt>Toma física</dt>
-          <dd>{{ adjustment.countNumber }}</dd>
+    } @else if (facade.adjustment(); as adjustment) {
+      <div class="info-grid">
+        <div class="info-card">
+          <label>Toma física</label>
+          <span>{{ adjustment.countNumber }}</span>
         </div>
-        <div>
-          <dt>Fecha</dt>
-          <dd>{{ adjustment.date | date: 'dd/MM/yyyy' }}</dd>
+        <div class="info-card">
+          <label>Fecha</label>
+          <span>{{ adjustment.date | date: 'dd/MM/yyyy' }}</span>
         </div>
-        <div>
-          <dt>Recinto</dt>
-          <dd>{{ campusName(adjustment.campusId) }}</dd>
+        <div class="info-card">
+          <label>Recinto</label>
+          <span>{{ campusName(adjustment.campusId) ?? 'Sin registrar' }}</span>
         </div>
-        <div>
-          <dt>Almacén</dt>
-          <dd>{{ adjustment.warehouseName || adjustment.warehouseId }}</dd>
+        <div class="info-card">
+          <label>Almacén</label>
+          <span>{{ adjustment.warehouseName || adjustment.warehouseId || 'Sin registrar' }}</span>
         </div>
-        <div>
-          <dt>Hora de inicio</dt>
-          <dd>{{ adjustment.startTime || 'Sin registrar' }}</dd>
+        <div class="info-card">
+          <label>Hora de inicio</label>
+          <span>{{ adjustment.startTime || 'Sin registrar' }}</span>
         </div>
-        <div>
-          <dt>Hora de término</dt>
-          <dd>{{ adjustment.endTime || 'Sin registrar' }}</dd>
+        <div class="info-card">
+          <label>Hora de término</label>
+          <span>{{ adjustment.endTime || 'Sin registrar' }}</span>
         </div>
-      </dl>
-      <h3 class="h5">Participantes</h3>
-      <ul>
-        @for (participant of adjustment.participants; track $index) {
-          <li>{{ participant.name }} — {{ participant.position }}</li>
-        } @empty {
-          <li>No hay participantes registrados.</li>
-        }
-      </ul>
-      <h3 class="h5">Detalles del conteo</h3>
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Producto</th>
-              <th>Detalle de entrada</th>
-              <th>Almacén</th>
-              <th>Existencia</th>
-              <th>Conteo físico</th>
-              <th>Diferencia</th>
-              <th>Observaciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (detail of adjustment.details; track $index) {
-              <tr>
-                <td>{{ detail.productName || detail.productId }}</td>
-                <td>{{ detail.entryDetailId }}</td>
-                <td>{{ detail.warehouseName || detail.warehouseId }}</td>
-                <td>{{ detail.inventoryQuantity }}</td>
-                <td>{{ detail.countedQuantity }}</td>
-                <td>{{ detail.difference }}</td>
-                <td>{{ detail.observations }}</td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="7">No hay detalles registrados.</td>
-              </tr>
-            }
-          </tbody>
-        </table>
+      </div>
+
+      <div class="section">
+        <label>Participantes</label>
+        <div class="participant-list">
+          @for (participant of adjustment.participants; track $index) {
+            <div class="product-card">
+              <h5>{{ participant.name }}</h5>
+              <p class="text-muted">{{ participant.position || 'Sin cargo registrado' }}</p>
+            </div>
+          } @empty {
+            <p class="text-muted">No hay participantes registrados.</p>
+          }
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Detalles del conteo</label>
+        <div class="product-list">
+          @for (detail of adjustment.details; track $index) {
+            <div class="product-card">
+              <div class="product-header">
+                <h5>{{ detail.productName || ('Producto #' + detail.productId) }}</h5>
+                <span class="difference" [class.difference-negative]="detail.difference < 0"
+                  [class.difference-positive]="detail.difference > 0">
+                  Diferencia: {{ detail.difference }}
+                </span>
+              </div>
+              <div class="product-grid">
+                <div>
+                  <small>Detalle de entrada</small>
+                  <strong>{{ detail.entryDetailId }}</strong>
+                </div>
+                <div>
+                  <small>Almacén</small>
+                  <strong>{{ detail.warehouseName || detail.warehouseId }}</strong>
+                </div>
+                <div>
+                  <small>Existencia</small>
+                  <strong>{{ detail.inventoryQuantity }}</strong>
+                </div>
+                <div>
+                  <small>Conteo físico</small>
+                  <strong>{{ detail.countedQuantity }}</strong>
+                </div>
+              </div>
+              <div class="observations">
+                <small>Observaciones</small>
+                <p>{{ detail.observations || 'Sin observaciones' }}</p>
+              </div>
+            </div>
+          } @empty {
+            <p class="text-muted">No hay detalles registrados.</p>
+          }
+        </div>
       </div>
     }
-  </div>
-  <div class="dialog-footer">
-    <button type="button" class="btn save" (click)="close()">Cerrar</button>
   </div>
 </div>
