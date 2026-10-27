@@ -26,6 +26,10 @@ describe('Requests', () => {
     http = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(Requests);
     fixture.detectChanges();
+    http.expectOne(`${endpoint}/estados`).flush({ success: true, data: [{ id: 2, nombre: 'Aprobada' }] });
+    http.expectOne(`${endpoint}/tipo_solicitudes`).flush({ success: true, data: [{ id: 3, nombre: 'Interna' }] });
+    http.expectOne(`${environment.apiUrlIntranet}/GenericService/getallrecintos`).flush({ success: true, data: [{ idRecinto: 7, nombre: 'Central' }] });
+    http.expectOne(req => req.url === `${environment.apiUrl}/TipoArticulo`).flush({ success: true, data: [{ idTipoArt: 4, nombre: 'Materiales' }] });
     initialRequest = http.expectOne(endpoint);
     initialRequest.flush(page);
   });
@@ -48,8 +52,8 @@ describe('Requests', () => {
 
   it('retains the form filters when changing page', () => {
     const component = fixture.componentInstance;
-    component.filterForm.controls.filter.setValue('REQ-1');
-    component.loadData();
+    component.filterForm.controls.noRequerimiento.setValue('REQ-1');
+    component.applyFilters();
     const filter = http.expectOne(endpoint);
     expect(filter.request.body.noRequerimiento).toBe('REQ-1');
     filter.flush(page);
@@ -58,5 +62,40 @@ describe('Requests', () => {
     expect(next.request.body).toMatchObject({ page: 2, CantItems: 10, noRequerimiento: 'REQ-1' });
     next.flush({ ...page, currentPage: 1 });
     expect(component.pagination().currentPage).toBe(2);
+  });
+
+  it('submits every filter from page one and preserves them when resizing the page', () => {
+    const component = fixture.componentInstance;
+    component.pagination.update(value => ({ ...value, currentPage: 3 }));
+    const filters = { noRequerimiento: 'REQ-2', idEstadoSolicitud: 2, idTipoArticulo: 4,
+      idTipoSolicitud: 3, unidadOrganizativa: 'Compras', idRecinto: 7 };
+    component.filterForm.patchValue(filters);
+    component.applyFilters();
+    const filtered = http.expectOne(endpoint);
+    expect(filtered.request.body).toEqual({ ...filters, page: 1, CantItems: 10 });
+    filtered.flush(page);
+    component.filterForm.controls.noRequerimiento.setValue('DRAFT');
+    component.changePageSize(5);
+    const resized = http.expectOne(endpoint);
+    expect(resized.request.body).toEqual({ ...filters, page: 1, CantItems: 5 });
+    resized.flush(page);
+  });
+
+  it('supports Todos and clears selections and filters with a single list POST', () => {
+    const component = fixture.componentInstance;
+    component.selectFilter(component.facade.filterSelections.status, 'idEstadoSolicitud', { id: 2, nombre: 'Aprobada' }, 'id');
+    expect(component.filterForm.controls.idEstadoSolicitud.value).toBe(2);
+    component.selectFilter(component.facade.filterSelections.status, 'idEstadoSolicitud', null, 'id');
+    expect(component.filterForm.controls.idEstadoSolicitud.value).toBeNull();
+    component.filterForm.patchValue({ noRequerimiento: 'REQ-2', idRecinto: 7 });
+    component.clearForm();
+    http.expectOne(req => req.url === `${environment.apiUrl}/TipoArticulo`).flush({ success: true, data: [] });
+    const cleared = http.expectOne(endpoint);
+    expect(cleared.request.body).toEqual({ page: 1, CantItems: 10, noRequerimiento: null,
+      idEstadoSolicitud: null, idTipoArticulo: null, idTipoSolicitud: null,
+      unidadOrganizativa: null, idRecinto: null });
+    cleared.flush(page);
+    expect(component.facade.filterSelections.status()).toBeNull();
+    expect(component.filterForm.pristine).toBe(true);
   });
 });

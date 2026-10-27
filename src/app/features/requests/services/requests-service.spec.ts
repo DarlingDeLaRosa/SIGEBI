@@ -52,4 +52,15 @@ describe('RequestsService', () => {
     http.expectOne(endpoint).flush({ success: true, data: null, currentPage: 0, cantPage: 0, totalItems: 0 });
     expect(result).toMatchObject({ currentPage: 1, cantPage: 1, cantItem: 10, data: [] });
   });
+
+  it('sends all API filters in the POST body and normalizes blank text', () => {
+    service.getAll({ noRequerimiento: '  ', unidadOrganizativa: ' Compras ', idEstadoSolicitud: 2,
+      idTipoArticulo: 3, idTipoSolicitud: 4, idRecinto: 7 }).subscribe();
+    const req = http.expectOne(endpoint);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.params.keys()).toEqual([]);
+    expect(req.request.body).toEqual({ page: 1, CantItems: 10, noRequerimiento: null,
+      unidadOrganizativa: 'Compras', idEstadoSolicitud: 2, idTipoArticulo: 3, idTipoSolicitud: 4, idRecinto: 7 });
+    req.flush({ success: true, data: [] });
+  });
 });
