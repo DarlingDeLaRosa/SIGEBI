@@ -1,6 +1,28 @@
 import { DeliveryTypeDto, EntryTypeDto, RecintoDto, SupplierDto } from "../../maintenance/DTO/maintenance";
 import { ProductModel } from "../../products/model/productModel";
 
+export interface EntryDetailSnapshot {
+  idEntradaDet: number;
+  idEntrada: number | null;
+  producto: { idProducto: number; nombre: string | null; descripcion?: string | null } | null;
+  marca: string | null;
+  modelo: string | null;
+  serial: string | null;
+  cantidad: number | null;
+  condicion?: string | null;
+  precio?: number | null;
+  itbisProducto?: number | null;
+  subTotal?: number | null;
+  observacion?: string | null;
+  idTipoAlmacen?: number | null;
+}
+
+export interface EntryDetailDialogData {
+  detail: EntryDetailSnapshot;
+  campusName: string;
+  warehouseName: string;
+}
+
 export interface StockEntryModel {
   idEntrada: number;
   idRecinto: number;

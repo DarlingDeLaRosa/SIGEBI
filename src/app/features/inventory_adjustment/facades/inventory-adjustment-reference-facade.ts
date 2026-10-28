@@ -1,6 +1,6 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { WarehouseNameService } from '../../maintenance/services/warehouseName/warehouse-name-service';
 import { ProductService } from '../../products/services/product/product-service';
 import { CampusDto, ProductOptionDto, WarehouseDto } from '../DTOs/inventory-adjustment-dto';
@@ -20,8 +20,15 @@ export class InventoryAdjustmentReferenceFacade {
   readonly campuses = signal<CampusDto[]>([]);
   readonly warehouses = signal<WarehouseDto[]>([]);
   readonly products = signal<ProductOptionDto[]>([]);
-  recintos = signal<any[]>([]);
+  readonly recintos = this.campuses;
   readonly error = signal('');
+  private readonly errorEvents = new Subject<string>();
+  readonly errors = this.errorEvents.asObservable();
+
+  private reportError(message: string) {
+    this.error.set(message);
+    this.errorEvents.next(message);
+  }
 
   formSelections = {
     idRecinto: signal<any | null>(null),
@@ -36,8 +43,16 @@ export class InventoryAdjustmentReferenceFacade {
   loadRecintos() {
     this.intranetService
       .getAllRecinto()
-      .subscribe(response => {
-        this.recintos.set(response.data);
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: response => {
+          if (response.success === false) {
+            this.reportError('No se pudieron cargar los recintos.');
+            return;
+          }
+          this.campuses.set(response.data ?? []);
+        },
+        error: () => this.reportError('No se pudieron cargar los recintos.'),
       });
   }
 
@@ -47,8 +62,11 @@ export class InventoryAdjustmentReferenceFacade {
       .getAll({ filter, page: 1, CantItems: 10 })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => this.warehouses.set(response.data),
-        error: () => this.error.set('No se pudieron cargar los almacenes.'),
+        next: (response) => {
+          if (response.success === false) { this.reportError('No se pudieron cargar los almacenes.'); return; }
+          this.warehouses.set(response.data ?? []);
+        },
+        error: () => this.reportError('No se pudieron cargar los almacenes.'),
       });
   }
 
@@ -58,8 +76,16 @@ export class InventoryAdjustmentReferenceFacade {
       .getAll({ filter, page: 1, CantItems: 10 })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => this.products.set(response.data),
-        error: () => this.error.set('No se pudieron cargar los productos.'),
+        next: (response) => {
+          if (response.success === false) { this.reportError('No se pudieron cargar los productos.'); return; }
+          this.products.set(response.data ?? []);
+        },
+        error: () => this.reportError('No se pudieron cargar los productos.'),
       });
+  }
+
+  clearProductSearch() {
+    this.productRequest?.unsubscribe();
+    this.products.set([]);
   }
 }
