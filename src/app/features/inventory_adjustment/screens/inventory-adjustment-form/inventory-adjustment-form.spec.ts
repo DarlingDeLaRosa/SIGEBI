@@ -46,7 +46,7 @@ describe('InventoryAdjustmentForm', () => {
     fixture.detectChanges();
     const button = () => [...fixture.nativeElement.querySelectorAll('button')]
       .find((item: any) => item.textContent.includes('Ver información de la entrada')) as HTMLButtonElement;
-    expect(button().disabled).toBe(true);
+    expect(button()).toBeUndefined();
     select('Producto *').selected.emit({ idProducto: 1, nombre: 'Papel' });
     const entry = { idEntradaDet: 2, idEntrada: 4, producto: { idProducto: 1, nombre: 'Papel' },
       cantidad: 12, marca: 'Marca', modelo: 'Modelo', serial: 'ABC', precio: 100, subTotal: 1200 };
