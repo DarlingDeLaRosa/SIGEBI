@@ -10,7 +10,7 @@ import { Loading } from '../../../../core/service/loading-service/loading';
 import { BaseCrud } from '../../../../shared/abstracts/base-crud';
 import { DialogService } from '../../../../core/service/dialog-service/dialog';
 import { ProductDetailDialog } from '../../dialog/product-detail-dialog/product-detail-dialog';
-import { ProductFacade } from '../../facades/product-facade';
+import { ProductCampus, ProductFacade } from '../../facades/product-facade';
 import { ProductForms } from '../../forms/product-form';
 import { ProductModel } from '../../model/productModel';
 
@@ -32,6 +32,7 @@ export class Product extends BaseCrud<any> implements OnInit {
   private loadingService = inject(Loading);
   private dialogService = inject(DialogService);
   private productService = inject(ProductService);
+  private appliedFilters = {};
 
   filterForm = ProductForms.filters(this.fb);
   productForm = ProductForms.create(this.fb);
@@ -47,6 +48,31 @@ export class Product extends BaseCrud<any> implements OnInit {
   }
 
   openDialog(data: any) { this.dialogService.open(ProductDetailDialog, data) }
+
+  override loadData(params: any = {}) {
+    super.loadData({ ...this.appliedFilters, ...params });
+  }
+
+  applyFilters() {
+    this.appliedFilters = this.filterForm.getRawValue();
+    this.pagination.update(value => ({ ...value, currentPage: 1 }));
+    this.loadData();
+  }
+
+  selectCampus(campus: ProductCampus | null) {
+    this.facade.filterSelections.campus.set(campus || null);
+    this.filterForm.patchValue({ idRecinto: campus?.idRecinto ?? null });
+    this.filterForm.markAsDirty();
+  }
+
+  clearFilters() {
+    this.filterForm.reset();
+    this.facade.filterSelections.campus.set(null);
+    this.facade.filterSelections.catalog.set(null);
+    this.facade.filterSelections.productType.set(null);
+    this.facade.campusSearch.set('');
+    this.applyFilters();
+  }
 
   toggleFilters() {
     this.filteringProduct.update(v => !v);
@@ -75,6 +101,7 @@ export class Product extends BaseCrud<any> implements OnInit {
   }
 
   clearForm() {
+    this.appliedFilters = {};
     this.productForm.reset();
     this.filterForm.reset();
     this.facade.clearSelections();

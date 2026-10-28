@@ -1,18 +1,30 @@
-import { inject, Injectable, signal } from "@angular/core";
+import { computed, DestroyRef, inject, Injectable, signal } from "@angular/core";
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UnitOfMeasureService } from "../../maintenance/services/unitOfMeasure/unit-of-measure-service";
 import { ProductTypeService } from "../../maintenance/services/productType/product-type-service";
 import { CatalogService } from "../../maintenance/services/catalog/catalog-service";
 import { ProductModel } from "../model/productModel";
+import { IntranetService } from '../../../shared/service/general.service';
+import { Alert } from '../../../core/service/alert-service/alert';
+
+export interface ProductCampus { idRecinto: number; nombre: string; }
 
 @Injectable() export class ProductFacade {
 
     private unitsService = inject(UnitOfMeasureService);
     private productTypeService = inject(ProductTypeService);
     private catalogService = inject(CatalogService);
+    private intranetService = inject(IntranetService);
+    private destroyRef = inject(DestroyRef);
+    private alert = inject(Alert);
 
     unitsOfMeasure = signal<any[]>([]);
     productTypes = signal<any[]>([]);
     catalogs = signal<any[]>([]);
+    campuses = signal<ProductCampus[]>([]);
+    campusSearch = signal('');
+    filteredCampuses = computed(() => this.campuses().filter(campus =>
+        campus.nombre.toLowerCase().includes(this.campusSearch().trim().toLowerCase())));
 
     formSelections = {
         productType: signal<any | null>(null),
@@ -21,14 +33,26 @@ import { ProductModel } from "../model/productModel";
     };
 
     filterSelections = {
+        campus: signal<ProductCampus | null>(null),
         productType: signal<any | null>(null),
         catalog: signal<any | null>(null),
     };
 
     loadSelections() {
+        this.loadCampuses();
         this.loadCatalogs();
         this.loadUnits();
         this.loadProductTypes();
+    }
+
+    loadCampuses() {
+        this.intranetService.getAllRecinto().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+            next: response => {
+                if (response.success === false) { this.alert.error('No se pudieron cargar los recintos'); return; }
+                this.campuses.set(response.data ?? []);
+            },
+            error: () => this.alert.error('No se pudieron cargar los recintos'),
+        });
     }
 
     loadUnits(filter = '') {
@@ -70,6 +94,8 @@ import { ProductModel } from "../model/productModel";
         this.formSelections.unitOfMeasure.set(null);
         this.filterSelections.catalog.set(null);
         this.filterSelections.productType.set(null);
+        this.filterSelections.campus.set(null);
+        this.campusSearch.set('');
 
     }
 }

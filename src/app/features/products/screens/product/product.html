@@ -138,10 +138,10 @@
 }
 
 @if (filteringProduct()) {
-  <form [formGroup]="filterForm" (submit)="loadData(filterForm.getRawValue())" class="box mb-2">
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="box mb-2">
     <app-create-conditional-box [formName]="'Filtrar productos'">
       
-      <div class="col-md-4 form-floating">
+      <div class="col-md-3 form-floating">
         <input
           type="text"
           formControlName="filter"
@@ -152,7 +152,7 @@
       </div>
 
       <app-search-select
-        class="col-md-4"
+        class="col-md-3"
         placeholder="Tipo de producto"
         [items]="facade.productTypes()"
         [initialItems]="facade.productTypes()"
@@ -174,7 +174,21 @@
       />
 
       <app-search-select
-        class="col-md-4"
+        class="col-md-3"
+        placeholder="Recinto"
+        [items]="facade.filteredCampuses()"
+        [initialItems]="facade.campuses()"
+        displayField="nombre"
+        valueField="idRecinto"
+        [value]="filterForm.controls.idRecinto.value"
+        [selectedItem]="facade.filterSelections.campus()"
+        [showAll]="true"
+        (search)="facade.campusSearch.set($event)"
+        (selected)="selectCampus($event)"
+      />
+      
+      <app-search-select
+        class="col-md-3"
         placeholder="Catalogo"
         [items]="facade.catalogs()"
         [initialItems]="facade.catalogs()"
@@ -194,7 +208,7 @@
         [iconActionBoton]="'bi bi-search'"
         [editing]="filterForm.dirty"
         [disabled]="!filterForm.dirty || loading()"
-        (clear)="clearForm(); loadData()"
+        (clear)="clearFilters()"
       >
       </app-form-actions>
     </app-create-conditional-box>

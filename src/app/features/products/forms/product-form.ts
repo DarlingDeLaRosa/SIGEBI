@@ -23,11 +23,12 @@ export class ProductForms {
 
     static filters(fb: FormBuilder) {
 
-        return fb.nonNullable.group({
+        return fb.group({
 
-            filter: [''],
-            idCatalogo: [null],
-            idTipoArticulo: [null],
+            filter: fb.nonNullable.control(''),
+            idCatalogo: fb.control<number | null>(null),
+            idTipoArticulo: fb.control<number | null>(null),
+            idRecinto: fb.control<number | null>(null),
 
         });
     }
