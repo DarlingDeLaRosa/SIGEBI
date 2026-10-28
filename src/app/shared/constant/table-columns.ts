@@ -29,7 +29,7 @@ export const InventoryAdjustmentDetailColumns: tableColumnsInterface[] = [
     { key: 'inventoryQuantity', label: 'Existencia', format: 'number' },
     { key: 'countedQuantity', label: 'Conteo físico', format: 'number' },
     { key: 'difference', label: 'Diferencia', format: 'number' },
-    { key: 'observations', label: 'Observaciones' },
+    // { key: 'observations', label: 'Observaciones' },
     { key: 'acciones', label: 'Acciones', align: 'center' },
 ];
 

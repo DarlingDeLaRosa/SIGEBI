@@ -8,6 +8,7 @@ import { InventoryAdjustmentForms } from '../forms/inventory-adjustment-forms';
 import {
   InventoryAdjustmentDetail,
   InventoryAdjustmentParticipant,
+  ParticipantPerson,
 } from '../model/inventory-adjustment-model';
 import {
   EntryDetailOptionDto,
@@ -17,6 +18,7 @@ import {
 import { InventoryAdjustmentService } from '../services/inventory-adjustment-service';
 import { InventoryAdjustmentReferenceService } from '../services/inventory-adjustment-reference-service';
 import { InventoryAdjustmentMapper } from '../mappers/inventory-adjustment-mapper';
+import { IntranetService } from '../../../shared/service/general.service';
 
 @Injectable()
 export class InventoryAdjustmentFormFacade {
@@ -26,8 +28,12 @@ export class InventoryAdjustmentFormFacade {
   private readonly referenceService = inject(InventoryAdjustmentReferenceService);
   private readonly router = inject(Router);
   private readonly alert = inject(Alert);
+  private readonly intranet = inject(IntranetService);
   private entryRequest?: Subscription;
-
+  private personRequest?: Subscription;
+  readonly people = signal<ParticipantPerson[]>([]);
+  readonly selectedParticipant = signal<ParticipantPerson | null>(null);
+  showinfoEntry: boolean = false
   readonly form = InventoryAdjustmentForms.create(this.fb);
   readonly participantForm = InventoryAdjustmentForms.participant(this.fb);
   readonly detailForm = InventoryAdjustmentForms.detail(this.fb);
@@ -39,6 +45,7 @@ export class InventoryAdjustmentFormFacade {
   readonly selectedWarehouse = signal<WarehouseDto | null>(null);
   readonly selectedProduct = signal<ProductOptionDto | null>(null);
   readonly entryDetails = signal<EntryDetailOptionDto[]>([]);
+  readonly selectedEntry = signal<EntryDetailOptionDto | null>(null);
   readonly editingDetailIndex = signal<number | null>(null);
   readonly editingParticipantIndex = signal<number | null>(null);
   readonly loading = signal(false);
@@ -57,6 +64,68 @@ export class InventoryAdjustmentFormFacade {
       { inventory: 0, counted: 0, difference: 0 },
     ),
   );
+
+  private reportError(message: string) {
+    this.error.set(message);
+    if (message) this.alert.error(message);
+  }
+
+  private reportDetailError(message: string) {
+    this.detailError.set(message);
+    if (message) this.alert.error(message);
+  }
+
+  participantSearchChanged() {
+    this.personRequest?.unsubscribe();
+    this.people.set([]);
+    this.selectedParticipant.set(null);
+    this.participantForm.patchValue({ name: '', position: '' });
+    this.participantForm.markAsDirty();
+  }
+
+  loadPeople(filter: string) {
+    this.personRequest?.unsubscribe();
+    if (!filter.trim()) { this.people.set([]); return; }
+    this.personRequest = this.intranet.filterPeople(filter.trim())
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: response => {
+          if (!response.status) {
+            this.people.set([]);
+            this.reportError('No se pudieron buscar los participantes');
+            return;
+          }
+          this.people.set((response.data ?? []).map(person => ({ ...person,
+            nombreCompleto: [person.nombre, person.apellidos].filter(Boolean).join(' ').trim(),
+          })));
+        },
+        error: () => { this.people.set([]); this.reportError('No se pudieron buscar los participantes'); },
+      });
+  }
+
+  selectParticipant(person: ParticipantPerson | null) {
+    this.personRequest?.unsubscribe();
+    if (!person) { this.participantSearchChanged(); return; }
+    if (!person.nombreCompleto?.trim() || !person.cargo?.nombre?.trim()) {
+      this.participantSearchChanged();
+      this.reportError('La persona seleccionada no tiene nombre o cargo registrado');
+      return;
+    }
+    this.selectedParticipant.set(person);
+    this.participantForm.patchValue({ name: person.nombreCompleto.trim(), position: person.cargo.nombre.trim() });
+    this.participantForm.markAsDirty();
+  }
+
+  selectCampus(campusId: number) {
+    if (this.details().length || this.loading() || this.saving()) return;
+    this.form.patchValue({ campusId });
+    this.form.markAsDirty();
+    this.changeCampus();
+  }
+
+  productSearchChanged() {
+    this.clearDetail();
+    this.detailForm.markAsDirty();
+  }
 
   load(id: number) {
     this.loading.set(true);
@@ -82,7 +151,7 @@ export class InventoryAdjustmentFormFacade {
         },
         error: () => {
           this.loadFailed.set(true);
-          this.error.set(
+          this.reportError(
             'No se pudo cargar la conciliación. Vuelve al listado e intenta nuevamente.',
           );
         },
@@ -93,10 +162,10 @@ export class InventoryAdjustmentFormFacade {
     if (this.details().length) return;
     const campusId = this.form.controls.campusId.value;
     if (item?.idRecinto && campusId && item.idRecinto !== campusId) {
-      this.error.set('El almacén seleccionado no pertenece al recinto.');
+      this.reportError('El almacén seleccionado no pertenece al recinto.');
       return;
     }
-    this.error.set('');
+    this.reportError('');
     this.selectedWarehouse.set(item || null);
     this.form.patchValue({ warehouseId: item?.idTipoAlm ?? 0 });
     this.form.markAsDirty();
@@ -110,7 +179,8 @@ export class InventoryAdjustmentFormFacade {
   selectProduct(item: ProductOptionDto | null) {
     this.entryRequest?.unsubscribe();
     this.entryDetails.set([]);
-    this.detailError.set('');
+    this.selectedEntry.set(null);
+    this.reportDetailError('');
     this.selectedProduct.set(item || null);
     this.detailForm.patchValue({
       productId: item?.idProducto ?? 0,
@@ -130,31 +200,33 @@ export class InventoryAdjustmentFormFacade {
         next: (details) => {
           this.entryDetails.set(details);
           if (!details.length)
-            this.detailError.set('No hay entradas disponibles para este producto y almacén.');
+            this.reportDetailError('No hay entradas disponibles para este producto y almacén.');
         },
-        error: () => this.detailError.set('No se pudieron cargar los detalles de entrada.'),
+        error: () => this.reportDetailError('No se pudieron cargar los detalles de entrada.'),
       });
   }
 
   selectEntry() {
-    // Inventory balance must come from the confirmed source, never from a guessed received quantity.
-    this.detailForm.patchValue({ inventoryQuantity: null });
-    this.detailError.set(
-      this.detailForm.controls.entryDetailId.value
-        ? 'La existencia no está disponible para esta entrada. No se puede agregar al conteo.'
-        : '',
-    );
+    this.showinfoEntry = true
+    const entry = this.entryDetails().find(item => item.idEntradaDet === this.detailForm.controls.entryDetailId.value) ?? null;
+    this.selectedEntry.set(entry);
+    const quantity = entry?.cantidad;
+    const valid = typeof quantity === 'number' && Number.isInteger(quantity) && quantity >= 0;
+    this.detailForm.patchValue({ inventoryQuantity: valid ? quantity : null });
+    this.detailForm.markAsDirty();
+    this.reportDetailError(entry && !valid ? 'La entrada seleccionada no tiene una cantidad válida para completar la existencia.' : '');
   }
 
   addDetail() {
-    this.detailError.set('');
+    if (this.saving() || this.loading() || this.loadingEntries()) return;
+    this.reportDetailError('');
     if (
       this.detailForm.invalid ||
       !this.selectedProduct() ||
       !this.form.controls.warehouseId.value
     ) {
       this.detailForm.markAllAsTouched();
-      this.detailError.set(
+      this.reportDetailError(
         'Selecciona una entrada con existencia disponible y completa un conteo entero mayor o igual a cero.',
       );
       return;
@@ -166,7 +238,7 @@ export class InventoryAdjustmentFormFacade {
         (detail, position) => position !== index && detail.entryDetailId === value.entryDetailId,
       )
     ) {
-      this.detailError.set('Este detalle de entrada ya está incluido en el conteo.');
+      this.reportDetailError('Este detalle de entrada ya está incluido en el conteo.');
       return;
     }
     const detail: InventoryAdjustmentDetail = {
@@ -191,6 +263,7 @@ export class InventoryAdjustmentFormFacade {
   editDetail(index: number) {
     const detail = this.details()[index];
     if (!detail) return;
+    this.selectedEntry.set(null);
     this.entryRequest?.unsubscribe();
     this.editingDetailIndex.set(index);
     this.selectedProduct.set({ idProducto: detail.productId, nombre: detail.productName });
@@ -207,7 +280,7 @@ export class InventoryAdjustmentFormFacade {
         cantidad: null,
       },
     ]);
-    this.detailError.set('');
+    this.reportDetailError('');
   }
 
   removeDetail(index: number) {
@@ -219,19 +292,33 @@ export class InventoryAdjustmentFormFacade {
     this.entryRequest?.unsubscribe();
     this.editingDetailIndex.set(null);
     this.selectedProduct.set(null);
+    this.selectedEntry.set(null);
     this.entryDetails.set([]);
-    this.detailError.set('');
+    this.reportDetailError('');
     this.detailForm.reset();
   }
 
   addParticipant() {
-    if (this.participantForm.invalid) {
+    if (this.saving() || this.loading()) return;
+    if (this.participantForm.invalid || !this.selectedParticipant()) {
       this.participantForm.markAllAsTouched();
+      this.reportError('Selecciona un participante con nombre y cargo registrados');
       return;
     }
     const value = this.participantForm.getRawValue();
-    const participant = { name: value.name.trim(), position: value.position.trim() };
+    const participant: InventoryAdjustmentParticipant = {
+      name: value.name.trim(), position: value.position.trim(),
+      personId: this.selectedParticipant()?.idPersona,
+    };
     const index = this.editingParticipantIndex();
+    const normalize = (text: string) => text.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+    if (this.participants().some((item, position) => position !== index && (
+      (participant.personId != null && item.personId === participant.personId) ||
+      (normalize(item.name) === normalize(participant.name) && normalize(item.position) === normalize(participant.position))
+    ))) {
+      this.reportError('Esta persona ya está incluida en los participantes');
+      return;
+    }
     this.participants.update((items) =>
       index === null
         ? [...items, participant]
@@ -243,6 +330,10 @@ export class InventoryAdjustmentFormFacade {
   editParticipant(index: number) {
     const participant = this.participants()[index];
     if (!participant) return;
+    this.personRequest?.unsubscribe();
+    this.people.set([]);
+    this.selectedParticipant.set({ idPersona: participant.personId,
+      nombreCompleto: participant.name, cargo: { nombre: participant.position } });
     this.editingParticipantIndex.set(index);
     this.participantForm.reset(participant);
     this.participantForm.markAsDirty();
@@ -254,20 +345,23 @@ export class InventoryAdjustmentFormFacade {
   }
 
   clearParticipant() {
+    this.personRequest?.unsubscribe();
+    this.people.set([]);
+    this.selectedParticipant.set(null);
     this.editingParticipantIndex.set(null);
     this.participantForm.reset();
   }
 
   save() {
     if (this.saving() || this.loading() || this.loadFailed()) return;
-    this.error.set('');
+    this.reportError('');
     if (this.form.invalid || !this.details().length) {
       this.form.markAllAsTouched();
-      this.error.set('Completa la información general y agrega al menos un detalle de conteo.');
+      this.reportError('Completa la información general y agrega al menos un detalle de conteo.');
       return;
     }
     if (this.detailForm.dirty || this.participantForm.dirty) {
-      this.error.set(
+      this.reportError(
         'Agrega los datos pendientes del participante o del conteo, o limpia esos formularios antes de guardar.',
       );
       return;
@@ -283,7 +377,7 @@ export class InventoryAdjustmentFormFacade {
           detail.warehouseId <= 0,
       )
     ) {
-      this.error.set(
+      this.reportError(
         'Revisa las existencias, cantidades y almacenes de los detalles antes de guardar.',
       );
       return;
@@ -306,7 +400,7 @@ export class InventoryAdjustmentFormFacade {
           this.router.navigate(['/layout/conciliaciones/Ajuste-de-inventario']);
         },
         error: () =>
-          this.error.set(
+          this.reportError(
             'No se pudo guardar la conciliación. Los datos se conservan para volver a intentar.',
           ),
       });

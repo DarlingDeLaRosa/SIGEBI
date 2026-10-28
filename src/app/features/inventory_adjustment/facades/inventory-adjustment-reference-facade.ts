@@ -83,4 +83,9 @@ export class InventoryAdjustmentReferenceFacade {
         error: () => this.reportError('No se pudieron cargar los productos.'),
       });
   }
+
+  clearProductSearch() {
+    this.productRequest?.unsubscribe();
+    this.products.set([]);
+  }
 }

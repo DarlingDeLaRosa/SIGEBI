@@ -1,3 +1,57 @@
+@if (snapshot; as data) {
+  <div class="dialog-container">
+    <div class="dialog-header">
+      <div>
+        <h2>Detalle de la Entrada</h2>
+        <span class="dialog-subtitle">Información de la entrada y del detalle seleccionado</span>
+      </div>
+      <button type="button" class="btn-close" aria-label="Cerrar detalle de entrada" (click)="closeDialog()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="dialog-body">
+      <div class="info-grid">
+        <div class="info-card"><label>No. Entrada</label><span>{{ data.detail.idEntrada ?? 'No disponible' }}</span></div>
+        <div class="info-card"><label>Detalle de entrada</label><span>{{ data.detail.idEntradaDet }}</span></div>
+        <div class="info-card"><label>Recinto</label><span>{{ data.campusName }}</span></div>
+        <div class="info-card"><label>Almacén</label><span>{{ data.warehouseName }}</span></div>
+      </div>
+      <div class="section">
+        <label>Detalle seleccionado</label>
+        <div class="product-card">
+          <div class="product-header">
+            <div>
+              <h5>{{ data.detail.producto?.nombre || 'Producto no disponible' }}</h5>
+              @if (data.detail.producto?.descripcion) { <small>{{ data.detail.producto?.descripcion }}</small> }
+            </div>
+          </div>
+          <div class="product-grid">
+            <div><small>Cantidad de la entrada</small><strong>{{ data.detail.cantidad ?? 'No disponible' }}</strong></div>
+            <div><small>Marca</small><strong>{{ data.detail.marca || 'Sin registrar' }}</strong></div>
+            <div><small>Modelo</small><strong>{{ data.detail.modelo || 'Sin registrar' }}</strong></div>
+            <div><small>Condición</small><strong>{{ data.detail.condicion || 'Sin registrar' }}</strong></div>
+            <div><small>Serial</small><strong>{{ data.detail.serial || 'Sin registrar' }}</strong></div>
+            <div>
+              <small>Precio unitario</small>
+              <strong>{{ data.detail.precio != null ? (data.detail.precio | currency: 'DOP ' : 'symbol' : '1.2-2') : 'No disponible' }}</strong>
+            </div>
+            <div>
+              <small>ITBIS</small>
+              <strong>{{ data.detail.itbisProducto != null ? (data.detail.itbisProducto | currency: 'DOP ' : 'symbol' : '1.2-2') : 'No disponible' }}</strong>
+            </div>
+            <div>
+              <small>Subtotal</small>
+              <strong>{{ data.detail.subTotal != null ? (data.detail.subTotal | currency: 'DOP ' : 'symbol' : '1.2-2') : 'No disponible' }}</strong>
+            </div>
+          </div>
+          <div class="product-observation">
+            <small>Observación</small><span>{{ data.detail.observacion || 'Sin observaciones' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
 @if (facade.loading()) {
   <app-skeleton
     [config]="{
@@ -349,4 +403,5 @@
       }
     </div>
   </div>
+}
 }

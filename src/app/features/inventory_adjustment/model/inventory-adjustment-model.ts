@@ -1,6 +1,15 @@
 export interface InventoryAdjustmentParticipant {
+  personId?: number;
   name: string;
   position: string;
+}
+
+export interface ParticipantPerson {
+  idPersona?: number;
+  nombre?: string;
+  apellidos?: string;
+  nombreCompleto: string;
+  cargo: { nombre: string } | null;
 }
 
 export interface InventoryAdjustmentDetail {

@@ -1,3 +1,5 @@
+import { EntryDetailSnapshot } from '../../stock-entries/model/entry-model';
+
 export interface InventoryAdjustmentFilterDto {
   idRecinto: number | null;
   idTipoAlmacen: number | null;
@@ -64,15 +66,7 @@ export interface InventoryAdjustmentDto extends Omit<CreateInventoryAdjustmentDt
   })[];
 }
 
-export interface EntryDetailOptionDto {
-  idEntradaDet: number;
-  idEntrada: number | null;
-  producto: ProductOptionDto;
-  marca: string | null;
-  modelo: string | null;
-  serial: string | null;
-  cantidad: number | null;
-}
+export interface EntryDetailOptionDto extends EntryDetailSnapshot {}
 
 export interface InventoryAdjustmentResponse<T> {
   data: T;
