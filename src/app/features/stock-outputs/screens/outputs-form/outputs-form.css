@@ -1,9 +1,10 @@
 .detail-container {
   display: grid;
-  grid-template-columns: calc(32% - 8px) calc(68% - 2px);
-  gap: 5px;
+  grid-template-columns: minmax(0, 38fr) minmax(0, 62fr);
+  gap: 8px;
 }
-
-.detail-container > :only-child {
-  grid-column: 1 / -1;
+.summary { display: flex; justify-content: flex-end; padding-top: 16px; }
+.summary-total { font-weight: 600; }
+@media (max-width: 991px) {
+  .detail-container { grid-template-columns: minmax(0, 1fr); }
 }

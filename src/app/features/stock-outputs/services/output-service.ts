@@ -4,6 +4,7 @@ import { BaseApiService } from '../../../shared/abstracts/base-api-service';
 import { map } from 'rxjs';
 import { ApiResponse } from '../../../shared/interface/abstracts-class';
 import { OutputModel } from '../model/output-model';
+import { CreateOutputDto, DispatchProduct, OutputEntry } from '../DTOs/outputs-form-dto';
 
 export interface OutputQuery {
   page?: number;
@@ -16,6 +17,33 @@ export interface OutputQuery {
 })
 export class OutputService extends BaseApiService<any>{
    constructor() { super(`${environment.apiUrl}/Salida`) }
+
+   getDispatchProduct(id: number) {
+      return this.http.get<ApiResponse<DispatchProduct | null>>(`${environment.apiUrl}/Producto/${id}`).pipe(
+         map(response => {
+            if (response.success === false || !response.data || response.data.idProducto !== id) throw new Error('No se pudo cargar el producto');
+            return response.data;
+         }),
+      );
+   }
+
+   getProductEntries(productId: number, warehouseId: number) {
+      return this.http.get<ApiResponse<OutputEntry[]>>(`${environment.apiUrl}/Entrada/by_idproducto_idtipoalmacen/${productId}/${warehouseId}`).pipe(
+         map(response => {
+            if (response.success === false) throw new Error('No se pudieron cargar las entradas');
+            return response.data ?? [];
+         }),
+      );
+   }
+
+   createOutput(body: CreateOutputDto) {
+      return this.http.post<ApiResponse<OutputModel | null>>(this.endpoint, body).pipe(
+         map(response => {
+            if (response.success === false) throw new Error(response.message || 'No se pudo guardar la salida');
+            return response;
+         }),
+      );
+   }
 
    getOutputDetails(id: number) {
       return this.http.get<ApiResponse<OutputModel | null>>(`${this.endpoint}/${id}`).pipe(

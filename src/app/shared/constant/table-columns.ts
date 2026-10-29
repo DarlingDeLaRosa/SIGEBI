@@ -85,6 +85,26 @@ export const OutputProductColumns: tableColumnsInterface[] = [
     { key: 'acciones', label: 'Acciones', align: 'center' }
 ]
 
+export const OutputRequestDetailColumns: tableColumnsInterface[] = [
+    { key: 'nombre', label: 'Producto' },
+    { key: 'cantidadSolicitada', label: 'Solicitada', format: 'number' },
+    { key: 'pendiente', label: 'Pendiente', format: 'number' },
+    { key: 'acciones', label: 'Acciones', align: 'center' }
+]
+
+export const OutputDispatchColumns: tableColumnsInterface[] = [
+    { key: 'nombre', label: 'Producto' },
+    { key: 'warehouseName', label: 'Almacén' },
+    { key: 'marca', label: 'Marca' },
+    { key: 'modelo', label: 'Modelo' },
+    { key: 'condicion', label: 'Condición' },
+    { key: 'serial', label: 'Serial' },
+    { key: 'cantidad', label: 'Cantidad', format: 'number' },
+    { key: 'precio', label: 'Precio', format: 'currency' },
+    { key: 'subTotal', label: 'Subtotal', format: 'currency' },
+    { key: 'acciones', label: 'Acciones', align: 'center' }
+]
+
 export const RequestList: tableColumnsInterface[] = [
     { key: 'noRequerimiento', label: 'Número de Requerimiento' },
     { key: 'tipoArtiucloObj.nombre', label: 'Tipo de Artículo' },

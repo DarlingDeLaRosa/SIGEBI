@@ -78,7 +78,7 @@ export class RequestFacade {
   openDialog(id: number) { this.dialogService.open(RequestDetail, id); }
 
   createOutputs(row: any) {
-    this.router.navigate(['/layout/salidas/gestionar-Salidas'], { state: { purchaseContract: row } });
+    this.router.navigate(['/layout/salidas/gestionar-Salidas'], { state: { requestId: row.row.id } });
   }
 
   clearSelections() {

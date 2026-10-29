@@ -1,238 +1,296 @@
-import { inject, Injectable, signal } from "@angular/core";
-import { WarehouseNameService } from "../../maintenance/services/warehouseName/warehouse-name-service";
-import { CONDITION } from "../../../shared/constant/select-options";
-import { StockOutputService } from "../../maintenance/services/stockOutput/stock-output-service";
-import { filterByProperty } from "../../../shared/helpers/filter.helper";
-import { IntranetService } from "../../../shared/service/general.service";
-import { ProductService } from "../../products/services/product/product-service";
-import { DialogService } from "../../../core/service/dialog-service/dialog";
-import { RequestDetail } from "../../requests/dialog/request-detail/request-detail";
-import { TableAction } from "../../../interfaces/table-content-interface";
-import { RequestsService } from "../../requests/services/requests-service";
-import { ProductDetailDialog } from "../../products/dialog/product-detail-dialog/product-detail-dialog";
+import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize, Subscription } from 'rxjs';
+import { FormBuilder } from '@angular/forms';
+import { Router } from '@angular/router';
+import { CONDITION } from '../../../shared/constant/select-options';
+import { TableAction } from '../../../interfaces/table-content-interface';
+import { Alert } from '../../../core/service/alert-service/alert';
+import { DialogService } from '../../../core/service/dialog-service/dialog';
+import { IntranetService } from '../../../shared/service/general.service';
+import { RequestsService } from '../../requests/services/requests-service';
+import { RequestDetail, RequestModel } from '../../requests/model/request-model';
+import { RequestDetail as RequestDetailDialog } from '../../requests/dialog/request-detail/request-detail';
+import { StockOutputService } from '../../maintenance/services/stockOutput/stock-output-service';
+import { OutputService } from '../services/output-service';
+import { StockOutputsForms } from '../forms/stock-outputs-forms';
+import { CreateOutputDto, DispatchDetail, DispatchProduct, OutputEntry, OutputStock } from '../DTOs/outputs-form-dto';
 
-@Injectable() export class OutputsManagementFacade {
+@Injectable()
+export class OutputsManagementFacade {
+  private requestService = inject(RequestsService);
+  private outputService = inject(OutputService);
+  private outputTypeService = inject(StockOutputService);
+  private intranet = inject(IntranetService);
+  private dialog = inject(DialogService);
+  private alert = inject(Alert);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
+  private requestQuery?: Subscription;
+  private selectedRequestQuery?: Subscription;
+  private productQuery?: Subscription;
+  private entriesQuery?: Subscription;
+  private nextRowId = 1;
 
-    loading = signal(false);
-    sectionOpen = signal(true);
-    sectionOpenDetail = signal(false);
-    sectionOpenGeneral = signal(false);
-    details = signal<any[]>([]);
+  readonly form = StockOutputsForms.createForm(this.fb);
+  readonly detailForm = StockOutputsForms.createDetailForm(this.fb);
+  readonly loading = signal(false);
+  readonly loadingDetail = signal(false);
+  readonly loadingEntries = signal(false);
+  readonly saving = signal(false);
+  readonly sectionOpen = signal(true);
+  readonly sectionOpenGeneral = signal(false);
+  readonly sectionOpenDetail = signal(false);
+  readonly request = signal<RequestModel[]>([]);
+  readonly selectedRequest = signal<RequestModel | null>(null);
+  readonly selectedProduct = signal<DispatchProduct | null>(null);
+  readonly selectedEntry = signal<OutputEntry | null>(null);
+  readonly selectedStock = signal<OutputStock | null>(null);
+  readonly outputTypes = signal<{ idTipoSalida: number; nombre: string }[]>([]);
+  readonly recintos = signal<{ idRecinto: number; nombre: string }[]>([]);
+  readonly entries = signal<OutputEntry[]>([]);
+  readonly details = signal<DispatchDetail[]>([]);
+  readonly editingIndex = signal<number | null>(null);
+  readonly activeDetailId = signal<number | null>(null);
+  readonly condition = CONDITION;
+  readonly pagination = signal({ currentPage: 1, pageSize: 5, totalPages: 1 });
+  private appliedSearch = '';
 
-    private productService = inject(ProductService);
-    private requestService = inject(RequestsService);
-    private intranetService = inject(IntranetService);
-    private warehouseTypeService = inject(WarehouseNameService);
-    private outputTypeService = inject(StockOutputService);
-    private dialogService = inject(DialogService);
-    // private deliveryTypeService = inject(DeliveryTypeService);
+  readonly warehouseOptions = computed(() => (this.selectedProduct()?.stockPorAlmacen ?? [])
+    .filter(stock => stock.cantidad > 0)
+    .map(stock => ({ ...stock, nombre: stock.tipoAlmacenObj?.nombre || `Almacén #${stock.idTipoAlmacen}` })));
+  readonly detailsRequest = computed(() => (this.selectedRequest()?.detallesSolicitud ?? [])
+    .map(detail => ({ ...detail, nombre: detail.productoObj?.nombre || `Producto #${detail.idProducto}`,
+      pendiente: Math.max(0, (detail.cantidadSolicitada ?? 0) - this.details()
+        .filter(item => item.requestDetailId === detail.id).reduce((sum, item) => sum + item.cantidad, 0)) })));
+  readonly total = computed(() => this.details().reduce((sum, item) => sum + item.subTotal, 0));
+  readonly actions: TableAction[] = [{ label: 'Crear salida', icon: 'bi bi-box-seam',
+    class: 'item-createEntry', action: event => this.loadRequestById(event.row.id) }];
+  readonly actionsDetails: TableAction[] = [{ label: 'Dar salida', icon: 'bi bi-box-seam',
+    class: 'item-createEntry', visible: row => row.pendiente > 0,
+    action: event => this.prepareDetail(event.row) }];
 
-    detailsRequest = signal<any[]>([]);
-    request = signal<any[]>([]);
-    product = signal<any[]>([]);
-    condition = signal<any[]>(CONDITION);
-    outputTypes = signal<any[]>([]);
-    recintos = signal<any[]>([]);
-    departments = signal<any[]>([]);
-    warehouseTypes = signal<any[]>([]);
+  loadData() {
+    this.loadRequest();
+    this.loadOutputTypes();
+    this.intranet.getAllRecinto().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: response => {
+        if (response.success === false) { this.alert.error('No se pudieron cargar los recintos'); return; }
+        this.recintos.set(response.data ?? []);
+      }, error: () => this.alert.error('No se pudieron cargar los recintos'),
+    });
+  }
 
-    filteredCondition = signal(this.condition());
+  loadOutputTypes(filter = '') {
+    this.outputTypeService.getAll({ filter, page: 1, CantItems: 10 })
+      .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+        next: response => {
+          if (response.success === false) { this.alert.error('No se pudieron cargar los tipos de salida'); return; }
+          this.outputTypes.set(response.data ?? []);
+        }, error: () => this.alert.error('No se pudieron cargar los tipos de salida'),
+      });
+  }
 
-    formSelections = {
-        idProducto: signal<any | null>(null),
-        condition: signal<any | null>(null),
-        idRecinto: signal<any | null>(null),
-        idDepar: signal<any | null>(null),
-        idTipoAlmcacen: signal<any | null>(null),
-        idTipoSalida: signal<any | null>(null),
+  loadRequest(filter = this.appliedSearch, page = 1) {
+    this.requestQuery?.unsubscribe();
+    this.appliedSearch = filter.trim();
+    this.requestQuery = this.requestService.getAll({ noRequerimiento: this.appliedSearch,
+      page, CantItems: this.pagination().pageSize }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: response => {
+        this.request.set(response.data ?? []);
+        this.pagination.update(value => ({ ...value, currentPage: page, totalPages: response.cantPage }));
+      }, error: () => this.alert.error('No se pudieron cargar las solicitudes'),
+    });
+  }
+
+  changePage(page: number) { this.loadRequest(this.appliedSearch, page); }
+  changePageSize(pageSize: number) {
+    this.pagination.update(value => ({ ...value, pageSize }));
+    this.loadRequest(this.appliedSearch);
+  }
+
+  loadRequestById(id: number) {
+    if (this.saving() || id === this.selectedRequest()?.id) return;
+    if (this.details().length || this.detailForm.dirty) {
+      this.alert.error('Elimina los productos a despachar y limpia el detalle pendiente antes de cambiar de solicitud'); return;
     }
+    this.selectedRequestQuery?.unsubscribe();
+    this.loading.set(true);
+    this.selectedRequestQuery = this.requestService.getRequestDetails(id)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.loading.set(false))).subscribe({
+        next: request => {
+          if (!request) { this.alert.error('No se encontró la solicitud'); return; }
+          this.clearDetail();
+          this.selectedRequest.set(request);
+          this.form.patchValue({ idSolicitud: request.id, idTipoArticulo: request.idTipoArticulo ?? 0,
+            idRecinto: request.idRecinto ?? 0, noRequerimiento: request.noRequerimiento ?? '',
+            solicitante: request.solicitante ?? '', solicitanteCargo: request.cargoSolicitante ?? '',
+            unidadOrganizativa: request.unidadOrganizativa ?? '' });
+          this.sectionOpenGeneral.set(true);
+          this.sectionOpenDetail.set(true);
+          if (!this.request().some(item => item.id === request.id)) this.request.update(items => [request, ...items]);
+        }, error: () => this.alert.error('No se pudo cargar la solicitud'),
+      });
+  }
 
-    openDialog(id: number) { this.dialogService.open(RequestDetail, id) }
-    openDialogDetails(id: number) { this.dialogService.open(ProductDetailDialog, id) }
-    // openDialogEntryList(id: number) { this.dialogService.open(EntriesListDialog, id) }
+  prepareDetail(detail: RequestDetail) {
+    if (this.saving() || this.loading() || !detail.idProducto) return;
+    if (this.detailForm.dirty) { this.alert.error('Agrega o limpia el detalle pendiente antes de seleccionar otro'); return; }
+    const pending = this.remainingRequested(detail.id);
+    if (pending <= 0) { this.alert.error('La cantidad solicitada ya está incluida en los productos a despachar'); return; }
+    this.clearDetail();
+    this.activeDetailId.set(detail.id);
+    this.loadingDetail.set(true);
+    this.productQuery = this.outputService.getDispatchProduct(detail.idProducto)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.loadingDetail.set(false))).subscribe({
+        next: product => {
+          this.selectedProduct.set(product);
+          this.detailForm.patchValue({ requestDetailId: detail.id, idProducto: product.idProducto,
+            nombre: product.nombre, cantSolicitada: detail.cantidadSolicitada ?? 0, cantidad: pending, precio: product.precio ?? 0 });
+          this.detailForm.markAsDirty();
+          this.sectionOpenDetail.set(true);
+          const options = this.warehouseOptions();
+          if (options.length === 1) this.selectWarehouse(options[0]);
+          else if (!options.length) this.alert.error('Este producto no tiene existencia disponible en almacén');
+        }, error: () => { this.activeDetailId.set(null); this.alert.error('No se pudo cargar el producto para despachar'); },
+      });
+  }
 
+  selectWarehouse(stock: OutputStock | null) {
+    this.entriesQuery?.unsubscribe();
+    this.entries.set([]);
+    this.selectedEntry.set(null);
+    this.selectedStock.set(stock || null);
+    this.detailForm.patchValue({ idTipoAlmcacen: stock?.idTipoAlmacen ?? 0, idEntradaDetalle: 0,
+      marca: '', modelo: '', condicion: '', serial: '' });
+    this.detailForm.markAsDirty();
+    const product = this.selectedProduct();
+    if (!stock || !product) return;
+    this.loadingEntries.set(true);
+    this.entriesQuery = this.outputService.getProductEntries(product.idProducto, stock.idTipoAlmacen)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.loadingEntries.set(false))).subscribe({
+        next: entries => {
+          const matching = entries.filter(entry => entry.producto?.idProducto === product.idProducto && entry.idTipoAlmacen === stock.idTipoAlmacen);
+          this.entries.set(matching);
+          if (matching.length === 1) this.selectEntry(matching[0]);
+          else if (!matching.length) this.alert.error('No hay entradas disponibles para este producto y almacén');
+        }, error: () => this.alert.error('No se pudieron cargar las entradas del producto'),
+      });
+  }
 
-    actionsDetails: TableAction[] = [
-        {
-            label: 'Dar salida',
-            icon: 'bi bi-box-seam',
-            class: 'item-createEntry',
-            action: row => this.openDialog(row.row.id)
-        },
-    ];
+  selectEntry(entry: OutputEntry | null) {
+    this.selectedEntry.set(entry || null);
+    const stock = this.selectedStock();
+    this.detailForm.patchValue({ idEntradaDetalle: entry?.idEntradaDet ?? 0,
+      marca: entry?.marca ?? '', modelo: entry?.modelo ?? '', condicion: entry?.condicion ?? '', serial: entry?.serial ?? '',
+      precio: entry?.precio ?? this.selectedProduct()?.precio ?? 0 });
+    if (entry && stock) this.detailForm.patchValue({ cantidad: Math.min(this.remainingRequested(this.activeDetailId()!),
+      this.remainingStock(stock.idTipoAlmacen, this.selectedProduct()!.idProducto), entry.serial ? 1 : Number.MAX_SAFE_INTEGER) });
+    this.detailForm.markAsDirty();
+  }
 
-    actions: TableAction[] = [
-        {
-            label: 'Crear salida',
-            icon: 'bi bi-box-seam',
-            class: 'item-createEntry',
-            action: row => this.openDialog(row.row.id)
-        },
-    ];
+  private remainingRequested(id: number) {
+    const requested = this.selectedRequest()?.detallesSolicitud?.find(item => item.id === id)?.cantidadSolicitada ?? 0;
+    return requested - this.details().filter((item, index) => item.requestDetailId === id && index !== this.editingIndex())
+      .reduce((sum, item) => sum + item.cantidad, 0);
+  }
 
-    // addDetail(form: FormGroup) {
+  private remainingStock(warehouseId: number, productId: number) {
+    const quantity = this.selectedProduct()?.stockPorAlmacen?.find(stock => stock.idTipoAlmacen === warehouseId)?.cantidad ?? 0;
+    return quantity - this.details().filter((item, index) => item.idProducto === productId && item.idTipoAlmcacen === warehouseId && index !== this.editingIndex())
+      .reduce((sum, item) => sum + item.cantidad, 0);
+  }
 
-    //     const detail = form.getRawValue();
-
-    //     // Cálculos
-    //     const subtotal = detail.cantidad * detail.precio;
-    //     const detailCalculated = {
-    //         ...detail,
-    //         subTotal: subtotal,
-    //     };
-
-    //     this.details.update(details => [...details, detailCalculated]);
-
-    //     form.reset();
-    //     this.clearDetailsSelections();
-    //     // this.clearGeneralSelections();
-    // }
-
-    // totals = computed(() => {
-    //     return this.details().reduce((acc, item) => {
-    //         acc.total += item.subTotal;
-    //         return acc;
-    //     }, {
-    //         total: 0,
-    //     });
-    // });
-
-    // editDetail(product: any, form: FormGroup) {
-    //     this.loadDetail(form, product.row);
-    //     this.clearDetail(product.index, this.details);
-    // }
-
-    // private loadDetail(form: FormGroup, product: any) {
-    //     form.reset(product);
-
-    //     this.formSelections.condition.set(product.condicion);
-    //     this.formSelections.idTipoAlmcacen.set(product.idTipoAlmcacen);
-
-    //     form.markAsDirty();
-    // }
-
-    // setDetailsToForm(detail: purchaseDetailContractModel, index: number) {
-    //     this.selectedDetail.set(detail);
-    //     this.clearDetail(index, this.detailsPurchasesDetails);
-    // }
-
-    // clearDetail(index: number, target: WritableSignal<any[]>) {
-    //     console.log(index);
-    //     console.log(target());
-
-    //     target.update(items =>
-    //         items.filter((_, i) => i !== index)
-    //     );
-    // }
-
-    loadRequest(filter: string = '') {
-        this.requestService
-            .getAll({ filter, page: 1, CantItems: 10 })
-            .subscribe(response => {
-                this.request.set(response.data);
-            });
+  addDetail() {
+    if (this.saving() || this.loadingDetail() || this.loadingEntries()) return;
+    const value = this.detailForm.getRawValue();
+    if (value.cantidad === 0) { this.alert.error('La cantidad no puede ser 0'); return; }
+    if (this.detailForm.invalid || !this.selectedEntry() || !this.selectedStock()) {
+      this.detailForm.markAllAsTouched(); this.alert.error('Selecciona una entrada y completa los datos del producto'); return;
     }
-
-    loadProduct(filter: string = '') {
-        this.productService
-            .getAll({ filter, page: 1, CantItems: 10 })
-            .subscribe(response => {
-                this.product.set(response.data);
-            });
+    if (value.cantidad > this.remainingRequested(value.requestDetailId)) {
+      this.alert.error('La cantidad supera lo pendiente de la solicitud'); return;
     }
-
-    loadWarehouseTypes(filter: string = '') {
-        this.warehouseTypeService
-            .getAll({ filter, page: 1, CantItems: 10 })
-            .subscribe(response => {
-                this.warehouseTypes.set(response.data);
-            });
+    if (value.cantidad > this.remainingStock(value.idTipoAlmcacen, value.idProducto)) {
+      this.alert.error('La cantidad supera la existencia disponible del almacén'); return;
     }
-
-    loadOutputTypes(filter: string = '') {
-        this.outputTypeService
-            .getAll({ filter, page: 1, CantItems: 10 })
-            .subscribe(response => {
-                this.outputTypes.set(response.data);
-            });
+    if (value.serial && this.details().some((item, index) => index !== this.editingIndex() && item.serial === value.serial && item.idProducto === value.idProducto)) {
+      this.alert.error('Este serial ya está incluido en los productos a despachar'); return;
     }
+    if (value.serial && value.cantidad !== 1) { this.alert.error('Un producto con serial debe despacharse de uno en uno'); return; }
+    const editing = this.editingIndex();
+    const detail: DispatchDetail = { ...value,
+      rowId: editing === null ? this.nextRowId++ : this.details()[editing].rowId,
+      warehouseName: this.selectedStock()?.tipoAlmacenObj?.nombre ?? '',
+      subTotal: Math.round(value.cantidad * value.precio * 100) / 100 };
+    this.details.update(items => editing === null ? [...items, detail] : items.map((item, index) => index === editing ? detail : item));
+    this.clearDetail();
+  }
 
-    loadRecintos() {
-        this.intranetService
-            .getAllRecinto()
-            .subscribe(response => {
-                this.recintos.set(response.data);
-            });
+  editDetail(index: number) {
+    if (this.saving() || this.detailForm.dirty) { this.alert.error('Agrega o limpia el detalle pendiente antes de editar otro'); return; }
+    const detail = this.details()[index];
+    if (!detail) return;
+    this.productQuery?.unsubscribe();
+    this.loadingDetail.set(true);
+    this.productQuery = this.outputService.getDispatchProduct(detail.idProducto)
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.loadingDetail.set(false))).subscribe({
+        next: product => {
+          this.selectedProduct.set(product);
+          this.editingIndex.set(index);
+          this.activeDetailId.set(detail.requestDetailId);
+          this.selectedStock.set(product.stockPorAlmacen?.find(stock => stock.idTipoAlmacen === detail.idTipoAlmcacen) ?? null);
+          const entry: OutputEntry = { idEntradaDet: detail.idEntradaDetalle, idEntrada: null, idTipoAlmacen: detail.idTipoAlmcacen,
+            producto: { idProducto: detail.idProducto, nombre: detail.nombre }, cantidad: null,
+            marca: detail.marca, modelo: detail.modelo, condicion: detail.condicion, serial: detail.serial, precio: detail.precio };
+          this.entries.set([entry]);
+          this.selectedEntry.set(entry);
+          this.detailForm.reset(detail);
+          this.detailForm.markAsDirty();
+        }, error: () => this.alert.error('No se pudo cargar el producto para editar'),
+      });
+  }
+
+  removeDetail(index: number) {
+    if (this.saving()) return;
+    this.details.update(items => items.filter((_, position) => position !== index));
+    this.clearDetail();
+  }
+
+  clearDetail() {
+    this.productQuery?.unsubscribe();
+    this.entriesQuery?.unsubscribe();
+    this.selectedProduct.set(null);
+    this.selectedEntry.set(null);
+    this.selectedStock.set(null);
+    this.entries.set([]);
+    this.editingIndex.set(null);
+    this.activeDetailId.set(null);
+    this.detailForm.reset();
+  }
+
+  buildCreateDto(): CreateOutputDto {
+    return { ...this.form.getRawValue(), total: this.total(), fechaCreacion: `${this.form.controls.fechaCreacion.value}T00:00:00`,
+      detalles: this.details().map(detail => ({ idSalida: 0, idProducto: detail.idProducto,
+        marca: detail.marca.trim(), modelo: detail.modelo.trim(), serial: detail.serial.trim(),
+        cantSolicitada: detail.cantSolicitada, cantidadDespachada: detail.cantidad, precio: detail.precio,
+        subTotal: detail.subTotal, idTipoAlmcacen: detail.idTipoAlmcacen })) };
+  }
+
+  save() {
+    if (this.saving() || this.loading() || this.loadingDetail() || this.loadingEntries()) return;
+    if (!this.selectedRequest() || this.form.invalid || !this.details().length) {
+      this.form.markAllAsTouched(); this.alert.error('Completa la información general y agrega productos a despachar'); return;
     }
+    if (this.detailForm.dirty) { this.alert.error('Agrega o limpia el detalle pendiente antes de guardar'); return; }
+    this.saving.set(true);
+    this.outputService.createOutput(this.buildCreateDto())
+      .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false))).subscribe({
+        next: () => { this.alert.success('Salida guardada'); this.router.navigate(['/layout/salidas/Salidas']); },
+        error: () => this.alert.error('No se pudo guardar la salida. Los datos se conservan para volver a intentar'),
+      });
+  }
 
-    loadDepartments() {
-        this.intranetService
-            .getAllAreas()
-            .subscribe(response => {
-                this.departments.set(response.data);
-            });
-    }
-
-    // loadPurchaseContractById(id: number) {
-    //     this.loading.set(true);
-    //     this.purchaseContractService.getById(id)
-    //         .subscribe({
-    //             next: (data) => {
-    //                 this.purchaseContractById.set(data.data);
-    //                 this.detailsPurchasesDetails.set(data.data.detalles);
-
-    //                 this.sectionOpenGeneral.set(true);
-    //                 this.sectionOpenDetail.set(true);
-    //                 this.loading.set(false);
-    //             },
-    //             error: () => { this.loading.set(false); }
-    //         });
-    // }
-
-    filterCondition(search: string) {
-        this.filteredCondition.set(
-            filterByProperty(this.condition(), search, 'name')
-        );
-    }
-
-    // loadPurchaseContract(filter: any) {
-    //     this.purchaseContractService
-    //         .getAll({ estado: 1, filter, page: 1, CantItems: 3 })
-    //         .subscribe(response => { this.purchaseContract.set(response.data); });
-    // }
-
-    loadData() {
-        this.loadRequest()
-        this.loadProduct()
-        this.loadWarehouseTypes()
-        this.loadOutputTypes()
-        this.loadRecintos()
-        this.loadDepartments()
-    }
-
-    // clearDetailsSelections() {
-    //     this.formSelections.condition.set(null);
-    //     this.formSelections.idTipoAlmcacen.set(null);
-    // }
-
-    // clearGeneralSelections() {
-    //     this.formSelections.idTipoEntrada.set(null);
-    //     this.formSelections.idTipoEntrega.set(null);
-    // }
-
-    // clearPurchaseContract() {
-    //     this.purchaseContractById.set(null);
-    //     this.detailsPurchasesDetails.set([]);
-    // }
-
-    // clearDetails() {
-    //     this.details.set([]);
-    // }
-
-    // buildCreateDto(form: FormGroup) {
-    //     return StockEntryMapper.toCreateDto(
-    //         form.getRawValue(),
-    //         this.details()
-    //     );
-    // }
+  openDialog(id: number) { this.dialog.open(RequestDetailDialog, id); }
 }

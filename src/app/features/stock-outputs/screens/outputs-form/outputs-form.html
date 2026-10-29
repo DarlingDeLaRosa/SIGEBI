@@ -1,204 +1,135 @@
 <div class="title">
   <h1>Gestionar salidas</h1>
-
-  <span class="d-flex gap-1">
-    <button class="btn navigate" [routerLink]="['../Salidas']">Listado de salidas</button>
-  </span>
+  <a class="btn navigate" routerLink="../Salidas">Listado de salidas</a>
 </div>
 
-@if (showRequest) {
 <app-section-box title="Solicitudes" [opened]="facade.sectionOpen()">
-  <div class="row">
-    <div class="position-relative col-md-4">
-      <i class="bi bi-search position-absolute top-50 start-5 translate-middle-y ms-3"></i>
-
-      <input type="text" class="form-control ps-5" [placeholder]="'Buscar solicitudes'" />
+  <form [formGroup]="searchForm" (ngSubmit)="searchRequests()" class="row g-2 mb-2">
+    <div class="col-md-6 form-floating">
+      <input id="request-number-search" type="text" class="form-control" formControlName="noRequerimiento" placeholder="Número de solicitud" />
+      <label for="request-number-search">Número de solicitud / requerimiento</label>
     </div>
-
-    <div class="col-md-8 d-flex justify-content-end gap-1">
-      <button class="btn save">
-        <i class="bi bi-search"></i> Buscar
-      </button>
+    <div class="col-md-6 d-flex justify-content-end align-items-center">
+      <button type="submit" class="btn save" [disabled]="loading() || facade.saving()"><i class="bi bi-search"></i> Buscar</button>
     </div>
-  </div>
-
-  <app-table-of-content [trackByField]="'id'" (showDialog)="facade.openDialog($event.id)" [actions]="facade.actions"
-    [showDetail]="true" [tableData]="facade.request()" [tableColumns]="tableRequestColumns"
-    [showbasicActions]="false" />
-  <!-- [selectedRowId]="facade.purchaseContractById()?.id"  -->
-
+  </form>
+  <app-table-of-content trackByField="id" [tableData]="facade.request()" [tableColumns]="tableRequestColumns"
+    [actions]="facade.actions" [showDetail]="true" [showbasicActions]="false"
+    [selectedRowId]="facade.selectedRequest()?.id" (showDialog)="facade.openDialog($event.id)"
+    [showPagination]="true" [showTotal]="false" [currentPage]="facade.pagination().currentPage"
+    [pageSize]="facade.pagination().pageSize" [totalPages]="facade.pagination().totalPages"
+    (pageChange)="facade.changePage($event)" (pageSizeChange)="facade.changePageSize($event)" />
 </app-section-box>
-}
 
-<form [formGroup]="stockOutputForm" (ngSubmit)="save(stockOutputForm)">
-  <!-- ===================================== -->
-  <!-- INFORMACIÓN GENERAL -->
-  <!-- ===================================== -->
-
-  <app-section-box title="Información general de salida">
-    <div class="row gx-1 gy-1">
-      <app-search-select class="col-md-2" placeholder="Tipo de salida" [items]="facade.outputTypes()"
-        [initialItems]="facade.outputTypes()" [displayField]="'nombre'" [valueField]="'idTipoSalida'"
-        [value]="stockOutputForm.get('idTipoSalida')?.value" (search)="facade.loadOutputTypes($event)"
-        [selectedItem]="facade.formSelections.idTipoSalida()" (selected)="
-          setSelection(
-            facade.formSelections.idTipoSalida,
-            stockOutputForm,
-            'idTipoSalida',
-            $event,
-            'idTipoSalida'
-          )
-        " />
-
-      <app-search-select class="col-md-4" placeholder="Departamento" [items]="facade.departments()"
-        [initialItems]="facade.departments()" [displayField]="'nombre'" [valueField]="'idDepar'"
-        [value]="stockOutputForm.get('idDepar')?.value" [selectedItem]="facade.formSelections.idDepar()" (selected)="
-          setSelection(facade.formSelections.idDepar, stockOutputForm, 'idDepar', $event, 'idDepar')
-        " />
-
-      <app-search-select class="col-md-3" placeholder="Recinto" [items]="facade.recintos()"
-        [initialItems]="facade.recintos()" [displayField]="'nombre'" [valueField]="'idRecinto'"
-        [value]="stockOutputForm.get('idRecinto')?.value" [selectedItem]="facade.formSelections.idRecinto()" (selected)="
-          setSelection(
-            facade.formSelections.idRecinto,
-            stockOutputForm,
-            'idRecinto',
-            $event,
-            'idRecinto'
-          )
-        " />
-
+@if (facade.selectedRequest()) {
+  <app-section-box title="Información general de salida" [opened]="facade.sectionOpenGeneral()">
+    <form [formGroup]="facade.form" (ngSubmit)="facade.save()" class="row gx-1 gy-1">
+      <app-search-select class="col-md-3" placeholder="Tipo de salida *" [items]="facade.outputTypes()"
+        [initialItems]="facade.outputTypes()" displayField="nombre" valueField="idTipoSalida"
+        [value]="facade.form.controls.idTipoSalida.value" [selectedItem]="selectedOutputType()"
+        (search)="facade.loadOutputTypes($event)" (selected)="selectOutputType($event)" />
       <div class="col-md-3 form-floating">
-        <input class="form-control" id="noreq" formControlName="Noquerimiento" placeholder="No. Requerimiento" />
+        <input id="output-campus" class="form-control" placeholder="Recinto" [value]="campusName()" readonly />
+        <label for="output-campus">Recinto</label>
+      </div>
+      <div class="col-md-3 form-floating">
+        <input id="noreq" class="form-control" placeholder="No. Requerimiento" formControlName="noRequerimiento" readonly />
         <label for="noreq">No. Requerimiento</label>
       </div>
-
       <div class="col-md-3 form-floating">
-        <input type="date" class="form-control" formControlName="fechaCreacion" id="fechaSalida" placeholder="Fecha" />
-        <label for="fechaSalida">Fecha de salida</label>
+        <input id="fechaSalida" type="date" class="form-control" formControlName="fechaCreacion" />
+        <label for="fechaSalida">Fecha de salida *</label>
       </div>
-
-      <div class="col-md-9 form-floating">
-        <textarea class="form-control" id="observacion" formControlName="observacion"
-          placeholder="Observación"></textarea>
+      <div class="col-md-4 form-floating">
+        <input id="output-applicant" class="form-control" formControlName="solicitante" placeholder="Solicitante" readonly />
+        <label for="output-applicant">Solicitante</label>
+      </div>
+      <div class="col-md-4 form-floating">
+        <input id="output-position" class="form-control" formControlName="solicitanteCargo" placeholder="Cargo" readonly />
+        <label for="output-position">Cargo del solicitante</label>
+      </div>
+      <div class="col-md-4 form-floating">
+        <input id="output-department" class="form-control" formControlName="unidadOrganizativa" placeholder="Departamento" readonly />
+        <label for="output-department">Departamento / unidad organizativa</label>
+      </div>
+      <div class="col-md-12 form-floating">
+        <textarea id="observacion" class="form-control" formControlName="observacion" placeholder="Observación"></textarea>
         <label for="observacion">Observación</label>
       </div>
-    </div>
+    </form>
   </app-section-box>
 
-  <!-- ===================================== -->
-  <!-- DETALLES -->
-  <!-- ===================================== -->
-
   <div class="detail-container">
-    @if(showListRequestDetails){
-    <app-section-box [opened]="facade.sectionOpenDetail()" title="Listado de detalles de solicitud">
-      <app-table-of-content 
-      [trackByField]="'idProducto'" 
-      (showDialog)="facade.openDialogDetails($event)"
-      [actions]="facade.actionsDetails" 
-      [tableData]="facade.detailsRequest() || []" 
-      [showDetail]="true"
-      [tableColumns]="tableColumsRequestProducts" 
-      [showbasicActions]="false" />
+    <app-section-box title="Listado de detalles de solicitud" [opened]="facade.sectionOpenDetail()">
+      <app-table-of-content trackByField="id" [tableData]="facade.detailsRequest()" [tableColumns]="tableRequestDetailColumns"
+        [actions]="facade.actionsDetails" [showbasicActions]="false" [selectedRowId]="facade.activeDetailId() ?? undefined" />
     </app-section-box>
-    }
 
     <app-section-box title="Detalles de la salida">
-      <!-- (ngSubmit)="facade.addDetail(stockOutputDetailForm)" -->
-      <form [formGroup]="stockOutputDetailForm" class="row gx-1 gy-1 mt-2">
-
-        <app-search-select class="col-md-4" placeholder="Producto" [items]="facade.product()"
-          [initialItems]="facade.product()" [displayField]="'nombre'" [displaySubField]="'descripcion'"
-          [valueField]="'idProducto'" [value]="stockOutputDetailForm.get('idProducto')?.value"
-          (search)="facade.loadProduct($event)" [selectedItem]="facade.formSelections.idProducto()"
-          (selected)="productSelection($event)" />
-
-        <div class="col-md-2 form-floating">
-          <input type="number" class="form-control" formControlName="cantidad" id="cantidad" placeholder="Cantidad" />
-          <label for="cantidad">Cantidad</label>
-        </div>
-
-        <div class="col-md-2 form-floating">
-          <input type="number" class="form-control" formControlName="precio" id="precio" placeholder="Precio" />
-          <label for="precio">Precio</label>
-        </div>
-
-        <app-search-select class="col-md-4" placeholder="Tipo de almacén" [items]="facade.warehouseTypes()"
-          [initialItems]="facade.warehouseTypes()" [displayField]="'nombre'" [valueField]="'idTipoAlm'"
-          [value]="stockOutputDetailForm.get('idTipoAlmcacen')?.value" (search)="facade.loadWarehouseTypes($event)"
-          [selectedItem]="facade.formSelections.idTipoAlmcacen()" (selected)="
-          setSelection(
-            facade.formSelections.idTipoAlmcacen,
-            stockOutputDetailForm,
-            'idTipoAlmcacen',
-            $event,
-            'idTipoAlm',
-            true
-          )
-        " />
-
-        <div class="col-md-3 form-floating">
-          <input type="text" class="form-control" formControlName="marca" id="marca" placeholder="Marca" />
-          <label for="marca">Marca</label>
-        </div>
-
-        <div class="col-md-3 form-floating">
-          <input type="text" class="form-control" formControlName="modelo" id="modelo" placeholder="Modelo" />
-          <label for="modelo">Modelo</label>
-        </div>
-
-        <app-search-select class="col-md-3" placeholder="Condición" [items]="facade.filteredCondition()"
-          [initialItems]="facade.condition()" [displayField]="'name'" [valueField]="'value'"
-          [value]="stockOutputDetailForm.get('condicion')?.value" (search)="facade.filterCondition($event)"
-          [selectedItem]="facade.formSelections.condition()" [showAll]="true" (selected)="
-          setSelection(
-            facade.formSelections.condition,
-            stockOutputDetailForm,
-            'condicion',
-            $event,
-            'value',
-            true
-          )
-        " />
-
-        <div class="col-md-3 form-floating">
-          <input type="text" class="form-control" formControlName="serial" id="serial" placeholder="Serial" />
-          <label for="serial">No. Serial</label>
-        </div>
-
-        <app-form-actions [editing]="stockOutputDetailForm.dirty || (stockOutputDetailForm.value.idProducto ?? 0) > 0"
-          [disabled]="!stockOutputDetailForm.valid" />
-        <!-- (clear)="clearDetailForm()" -->
-      </form>
+      @if (facade.selectedProduct()) {
+        <form [formGroup]="facade.detailForm" (ngSubmit)="facade.addDetail()" class="row gx-1 gy-1 mt-2">
+          <div class="col-md-6 form-floating">
+            <input id="output-product" class="form-control" formControlName="nombre" placeholder="Producto" readonly />
+            <label for="output-product">Producto</label>
+          </div>
+          <div class="col-md-3 form-floating">
+            <input id="output-requested" type="number" class="form-control" formControlName="cantSolicitada" readonly />
+            <label for="output-requested">Cantidad solicitada</label>
+          </div>
+          <div class="col-md-3 form-floating">
+            <input id="cantidad" type="number" min="1" step="1" class="form-control" formControlName="cantidad" />
+            <label for="cantidad">Cantidad a despachar *</label>
+          </div>
+          <app-search-select class="col-md-6" placeholder="Tipo de almacén *" [items]="facade.warehouseOptions()"
+            [initialItems]="facade.warehouseOptions()" displayField="nombre" valueField="idTipoAlmacen"
+            [value]="facade.detailForm.controls.idTipoAlmcacen.value"
+            (selected)="facade.selectWarehouse($event)" />
+          <div class="col-md-6 form-floating">
+            <select id="output-entry" class="form-select" [value]="facade.detailForm.controls.idEntradaDetalle.value"
+              [disabled]="facade.loadingEntries()" (change)="selectEntry($event)">
+              <option value="0">Seleccionar entrada o serial</option>
+              @for (entry of facade.entries(); track entry.idEntradaDet) {
+                <option [value]="entry.idEntradaDet">Entrada {{ entry.idEntrada }} · Detalle {{ entry.idEntradaDet }} {{ entry.serial ? '· ' + entry.serial : '' }}</option>
+              }
+            </select>
+            <label for="output-entry">Entrada / serial *</label>
+          </div>
+          <div class="col-md-4 form-floating">
+            <input id="precio" type="number" min="0" step="0.01" class="form-control" formControlName="precio" />
+            <label for="precio">Precio *</label>
+          </div>
+          <div class="col-md-4 form-floating">
+            <input id="marca" class="form-control" formControlName="marca" placeholder="Marca" />
+            <label for="marca">Marca</label>
+          </div>
+          <div class="col-md-4 form-floating">
+            <input id="modelo" class="form-control" formControlName="modelo" placeholder="Modelo" />
+            <label for="modelo">Modelo</label>
+          </div>
+          <app-search-select class="col-md-6" placeholder="Condición" [items]="facade.condition" [initialItems]="facade.condition"
+            displayField="name" valueField="value" [value]="facade.detailForm.controls.condicion.value"
+            [selectedItem]="selectedCondition()" (selected)="selectCondition($event)" />
+          <div class="col-md-6 form-floating">
+            <input id="serial" class="form-control" formControlName="serial" placeholder="Serial" />
+            <label for="serial">No. Serial</label>
+          </div>
+          <app-form-actions [nameActionBoton]="facade.editingIndex() === null ? 'Agregar producto' : 'Actualizar producto'"
+            [editing]="facade.detailForm.dirty" [disabled]="facade.detailForm.invalid || facade.loadingDetail() || facade.loadingEntries() || facade.saving() || loading()"
+            (clear)="facade.clearDetail()" />
+        </form>
+      } @else {
+        <p class="text-muted">Selecciona «Dar salida» en un detalle de la solicitud para completar el producto.</p>
+      }
     </app-section-box>
   </div>
 
-
-  <!-- ===================================== -->
-  <!-- TABLA -->
-  <!-- ===================================== -->
-
   <div class="box mt-2">
-    <!-- [actions]="actions" -->
-    <app-table-of-content [showContent]="true" [tableTitle]="'Productos a despachar'" [trackByField]="'idProducto'"
-      [tableColumns]="tableColumns" [tableData]="facade.details()">
-      <!-- (remove)="facade.clearDetail($event.index)" -->
-      <!-- (edit)="facade.editDetail($event, stockOutputDetailForm)" -->
-
-      <div class="summary">
-        <span class="summary-total"> Total: {{ 0 | currency: 'DOP ' }} </span>
-        <!-- Total: {{ facade.totals().total | currency:'DOP ' }} -->
-      </div>
+    <app-table-of-content tableTitle="Productos a despachar" trackByField="rowId" [tableColumns]="tableColumns"
+      [tableData]="facade.details()" [showContent]="true" (edit)="facade.editDetail($event.index)" (remove)="facade.removeDetail($event.index)">
+      <div class="summary"><span class="summary-total">Total: {{ facade.total() | currency: 'DOP ' }}</span></div>
     </app-table-of-content>
   </div>
-
-  <!-- ===================================== -->
-  <!-- GUARDAR -->
-  <!-- ===================================== -->
-
-  <div class="box mt-2">
-    <app-form-actions [disabled]="facade.details().length === 0 || !stockOutputForm.valid" />
-  </div>
-
-</form>
+  <form [formGroup]="facade.form" (ngSubmit)="facade.save()" class="box mt-2">
+    <app-form-actions nameActionBoton="Guardar salida" [disabled]="facade.form.invalid || !facade.details().length || facade.saving() || facade.loading() || loading()" />
+  </form>
+}
