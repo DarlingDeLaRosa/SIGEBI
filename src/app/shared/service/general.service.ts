@@ -17,6 +17,11 @@ export class IntranetService extends BaseApiService<any> {
         return this.get<ApiResponse<any[]>>(`GenericService/get_areas`);
     }
 
+    getAllDepartments() {
+        return this.get<{ status: boolean; data: { idDepartamento: number; nombre: string }[] }>(
+            'GenericService/getalldepartamento');
+    }
+
     filterPeople(filter: string) {
         return this.get<{ status: boolean; data: any[] }>(`Persona/filter/${encodeURIComponent(filter)}`);
     }

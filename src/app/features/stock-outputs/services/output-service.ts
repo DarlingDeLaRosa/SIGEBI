@@ -5,11 +5,11 @@ import { map } from 'rxjs';
 import { ApiResponse } from '../../../shared/interface/abstracts-class';
 import { OutputModel } from '../model/output-model';
 import { CreateOutputDto, DispatchProduct, OutputEntry } from '../DTOs/outputs-form-dto';
+import { OutputFilters } from '../DTOs/output-filters';
 
-export interface OutputQuery {
+export interface OutputQuery extends Partial<OutputFilters> {
   page?: number;
   CantItems?: number;
-  idRecinto?: number | null;
 }
 
 @Injectable({
@@ -57,7 +57,18 @@ export class OutputService extends BaseApiService<any>{
    override getAll(params: OutputQuery = {}) {
       const page = params.page ?? 1;
       const pageSize = params.CantItems ?? 10;
-      return super.getAll({ page, CantItems: pageSize, idRecinto: params.idRecinto }).pipe(
+      const body: OutputFilters = {
+         idDepartamento: params.idDepartamento ?? null,
+         idTipoSalida: params.idTipoSalida ?? null,
+         idRecinto: params.idRecinto ?? null,
+         desde: params.desde?.trim() || null,
+         hasta: params.hasta?.trim() || null,
+         idSolicitud: params.idSolicitud ?? null,
+         solicitante: params.solicitante?.trim() || null,
+         noRequerimiento: params.noRequerimiento?.trim() || null,
+      };
+      return this.http.post<ApiResponse<OutputModel[]> & { totalItems?: number | null }>(`${this.endpoint}/filter`, body,
+         { params: { page, CantItems: pageSize } }).pipe(
          map(response => {
             if (response.success === false) throw new Error(response.message || 'No se pudieron cargar las salidas');
             return {
@@ -66,6 +77,7 @@ export class OutputService extends BaseApiService<any>{
                currentPage: page,
                cantItem: pageSize,
                cantPage: Math.max(1, response.cantPage ?? 1),
+               totalItems: response.totalItems ?? null,
             };
          }),
       );

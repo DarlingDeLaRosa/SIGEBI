@@ -1,34 +1,70 @@
 <div class="title">
   <h1>Salidas</h1>
-
   <span class="d-flex gap-1">
-    <button class="btn navigate"  (click)="this.filteringOutput = !this.filteringOutput;" >
-      {{ filteringOutput ? 'Ocultar filtros' : 'Filtrar productos' }}
+    <button type="button" class="btn navigate" (click)="toggleFilters()">
+      {{ filteringOutput() ? 'Ocultar filtros' : 'Filtrar salidas' }}
     </button>
-
-    <button class="btn navigate"  [routerLink]="['../gestionar-Salidas']"  >
-      Crear salida
-    </button>
+    <button type="button" class="btn navigate" [routerLink]="['../gestionar-Salidas']">Crear salida</button>
   </span>
 </div>
 
+@if (filteringOutput()) {
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="box mb-2">
+    <app-create-conditional-box formName="Filtrar salidas">
+      <app-search-select class="col-md-3" placeholder="Departamento"
+        [items]="facade.filteredDepartments()" [initialItems]="facade.departments()"
+        displayField="nombre" valueField="idDepartamento" [showAll]="true"
+        [value]="filterForm.controls.idDepartamento.value" [selectedItem]="facade.selectedDepartment()"
+        (search)="facade.departmentSearch.set($event)"
+        (selected)="selectFilter(facade.selectedDepartment, 'idDepartamento', $event, 'idDepartamento')" />
+      <app-search-select class="col-md-3" placeholder="Tipo de salida"
+        [items]="facade.types()" [initialItems]="facade.types()"
+        displayField="nombre" valueField="idTipoSalida" [showAll]="true"
+        [value]="filterForm.controls.idTipoSalida.value" [selectedItem]="facade.selectedType()"
+        (search)="facade.loadTypes($event)"
+        (selected)="selectFilter(facade.selectedType, 'idTipoSalida', $event, 'idTipoSalida')" />
+      <app-search-select class="col-md-3" placeholder="Recinto"
+        [items]="facade.filteredCampuses()" [initialItems]="facade.campuses()"
+        displayField="nombre" valueField="idRecinto" [showAll]="true"
+        [value]="filterForm.controls.idRecinto.value" [selectedItem]="facade.selectedCampus()"
+        (search)="facade.campusSearch.set($event)"
+        (selected)="selectFilter(facade.selectedCampus, 'idRecinto', $event, 'idRecinto')" />
+      <app-search-select class="col-md-3" placeholder="Solicitud"
+        [items]="facade.requests()" [initialItems]="facade.requests()"
+        displayField="noRequerimiento" valueField="id" [showAll]="true"
+        [value]="filterForm.controls.idSolicitud.value" [selectedItem]="facade.selectedRequest()"
+        (search)="facade.loadRequests($event)"
+        (selected)="selectFilter(facade.selectedRequest, 'idSolicitud', $event, 'id')" />
+      <div class="col-md-3 form-floating">
+        <input id="output-filter-applicant" class="form-control" formControlName="solicitante" placeholder="Solicitante" />
+        <label for="output-filter-applicant">Solicitante</label>
+      </div>
+      <div class="col-md-3 form-floating">
+        <input id="output-filter-number" class="form-control" formControlName="noRequerimiento" placeholder="Número de requerimiento" />
+        <label for="output-filter-number">Número de requerimiento</label>
+      </div>
+      <div class="col-md-3 form-floating">
+        <input id="output-filter-from" type="date" class="form-control" formControlName="desde" />
+        <label for="output-filter-from">Desde</label>
+      </div>
+      <div class="col-md-3 form-floating">
+        <input id="output-filter-to" type="date" class="form-control" formControlName="hasta" />
+        <label for="output-filter-to">Hasta</label>
+      </div>
+      @if (filterForm.hasError('dateRange')) {
+        <small class="text-danger">La fecha desde debe ser igual o anterior a la fecha hasta.</small>
+      }
+      <app-form-actions nameActionBoton="Filtrar" iconActionBoton="bi bi-search" [editing]="filterForm.dirty"
+        [disabled]="!filterForm.dirty || filterForm.invalid || loading() || loadingList()" (clear)="clearFilters()" />
+    </app-create-conditional-box>
+  </form>
+}
+
 <div class="box">
-  <app-table-of-content
-    [showDetail]="true"
-    [tableTitle]="'Listado de salidas'"
-    [trackByField]="'idSalida'"
-    [tableData]="data()?.data || []"
-    [tableColumns]="tableColumns"
-    [totalItems]="pagination().totalItems"
-    [showPagination]="true"
-    [showTotal]="false"
-    [totalPages]="pagination().totalPages"
-    [currentPage]="pagination().currentPage"
-    [pageSize]="pagination().pageSize"
-    (pageChange)="changePage($event)"
-    (pageSizeChange)="changePageSize($event)"
-    (showDialog)="openDetail($event.idSalida)"
-    (remove)="remove($event.row.idSalida)"
-    ></app-table-of-content>
-    <!-- (edit)="setProduct($event)" -->
+  <app-table-of-content [showDetail]="true" tableTitle="Listado de salidas" trackByField="idSalida"
+    [tableData]="data()?.data || []" [tableColumns]="tableColumns" [totalItems]="pagination().totalItems"
+    [showPagination]="true" [showTotal]="false" [totalPages]="pagination().totalPages"
+    [currentPage]="pagination().currentPage" [pageSize]="pagination().pageSize"
+    (pageChange)="changePage($event)" (pageSizeChange)="changePageSize($event)"
+    (showDialog)="openDetail($event.idSalida)" (remove)="remove($event.row.idSalida)" />
 </div>
