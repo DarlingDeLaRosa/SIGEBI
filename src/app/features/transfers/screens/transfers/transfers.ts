@@ -13,6 +13,7 @@ import { TransferFilterForm } from '../../forms/transfer-filter-form';
 import { TransferModel } from '../../model/transfer-model';
 import { TransferService } from '../../services/transfer-service';
 import { TransferDetailDialog } from '../../dialog/transfer-detail-dialog/transfer-detail-dialog';
+import { Loading } from '../../../../core/service/loading-service/loading';
 
 @Component({
   selector: 'app-transfers',
@@ -29,6 +30,7 @@ export class Transfers extends BaseCrud<TransferModel> implements OnInit {
   private request?: Subscription;
   readonly filterForm = TransferFilterForm.create(inject(FormBuilder));
   readonly tableColumns = TransferColumns;
+  readonly loading = inject(Loading).loading;
 
   override getService() {
     return this.service;
@@ -47,7 +49,7 @@ export class Transfers extends BaseCrud<TransferModel> implements OnInit {
     const pagination = this.pagination();
     this.request = this.service
       .getAll({
-        filter: this.facade.activeFilter(),
+        ...this.facade.activeFilters(),
         page: pagination.currentPage,
         CantItems: pagination.pageSize,
       })
@@ -67,14 +69,25 @@ export class Transfers extends BaseCrud<TransferModel> implements OnInit {
           });
         },
         error: () => {
-          this.data.set(null);
           this.facade.error.set('No se pudieron cargar las transferencias. Intenta nuevamente.');
+          this.alert.error(this.facade.error());
         },
       });
   }
 
   applyFilters() {
-    this.facade.activeFilter.set(this.filterForm.controls.filter.value.trim());
+    if (this.filterForm.invalid) {
+      this.filterForm.markAllAsTouched();
+      this.alert.error('La fecha desde debe ser igual o anterior a la fecha hasta');
+      return;
+    }
+    const filters = this.filterForm.getRawValue();
+    this.facade.activeFilters.set({
+      CreadoPor: filters.CreadoPor?.trim() || null,
+      Estado: filters.Estado?.trim() || null,
+      Desde: filters.Desde ? `${filters.Desde}T00:00:00` : null,
+      Hasta: filters.Hasta ? `${filters.Hasta}T23:59:59.999` : null,
+    });
     this.pagination.update((value) => ({ ...value, currentPage: 1 }));
     this.loadData();
   }

@@ -8,59 +8,37 @@
 @if (facade.filtering()) {
   <form class="box mb-2" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
     <app-create-conditional-box formName="Filtrar transferencias">
-      <div class="col-12 form-floating">
-        <input
-          id="transfer-filter"
-          type="search"
-          class="form-control"
-          formControlName="filter"
-          placeholder="Buscar transferencias"
-        />
-        <label for="transfer-filter">Buscar transferencias</label>
+      <div class="col-md-3 form-floating">
+        <input id="transfer-created-by" type="text" class="form-control" formControlName="CreadoPor" placeholder="Creado por" />
+        <label for="transfer-created-by">Creado por</label>
       </div>
-      <app-form-actions
-        nameActionBoton="Filtrar"
-        iconActionBoton="bi bi-search"
-        [editing]="true"
-        [disabled]="facade.loading()"
-        (clear)="clearForm()"
-      />
+      <div class="col-md-3 form-floating">
+        <input id="transfer-status" type="text" class="form-control" formControlName="Estado" placeholder="Estado" />
+        <label for="transfer-status">Estado</label>
+      </div>
+      <div class="col-md-3 form-floating">
+        <input id="transfer-from" type="date" class="form-control" formControlName="Desde" />
+        <label for="transfer-from">Desde</label>
+      </div>
+      <div class="col-md-3 form-floating">
+        <input id="transfer-to" type="date" class="form-control" formControlName="Hasta" />
+        <label for="transfer-to">Hasta</label>
+      </div>
+      @if (filterForm.hasError('dateRange')) {
+        <small class="text-danger">La fecha desde debe ser igual o anterior a la fecha hasta.</small>
+      }
+      <app-form-actions nameActionBoton="Filtrar" iconActionBoton="bi bi-search" [editing]="filterForm.dirty"
+        [disabled]="!filterForm.dirty || filterForm.invalid || facade.loading() || loading()" (clear)="clearForm()" />
     </app-create-conditional-box>
   </form>
 }
 
-@if (facade.error()) {
-  <div
-    class="alert alert-danger d-flex align-items-center justify-content-between gap-2"
-    role="alert"
-  >
-    <span>{{ facade.error() }}</span>
-    <button type="button" class="btn save" (click)="loadData()">Reintentar</button>
-  </div>
-}
 <div class="box" [attr.aria-busy]="facade.loading()">
-  @if (facade.loading()) {
-    <p role="status">Cargando transferencias…</p>
-  }
-  @if (!facade.error()) {
-    <div class="table-scroll">
-      <app-table-of-content
-        tableTitle="Listado de transferencias"
-        [tableData]="data()?.data || []"
-        [tableColumns]="tableColumns"
-        trackByField="id"
-        [showbasicActions]="false"
-        [showDetail]="true"
-        [showPagination]="true"
-        [showTotal]="facade.hasKnownTotal()"
-        [currentPage]="pagination().currentPage"
-        [pageSize]="pagination().pageSize"
-        [totalPages]="pagination().totalPages"
-        [totalItems]="pagination().totalItems"
-        (pageChange)="changePage($event)"
-        (pageSizeChange)="changePageSize($event)"
-        (showDialog)="openDetail($event)"
-      />
-    </div>
-  }
+  <div class="table-scroll">
+    <app-table-of-content tableTitle="Listado de transferencias" [tableData]="data()?.data || []"
+      [tableColumns]="tableColumns" trackByField="id" [showbasicActions]="false" [showDetail]="true"
+      [showPagination]="true" [showTotal]="facade.hasKnownTotal()" [currentPage]="pagination().currentPage"
+      [pageSize]="pagination().pageSize" [totalPages]="pagination().totalPages" [totalItems]="pagination().totalItems"
+      (pageChange)="changePage($event)" (pageSizeChange)="changePageSize($event)" (showDialog)="openDetail($event)" />
+  </div>
 </div>

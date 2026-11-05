@@ -1,9 +1,10 @@
 import { Injectable, signal } from '@angular/core';
+import { TransferFilters } from '../DTOs/transfer-filters';
 
 @Injectable()
 export class TransferFacade {
   readonly filtering = signal(false);
-  readonly activeFilter = signal('');
+  readonly activeFilters = signal<TransferFilters>({ CreadoPor: null, Estado: null, Desde: null, Hasta: null });
   readonly loading = signal(false);
   readonly error = signal('');
   readonly hasKnownTotal = signal(true);

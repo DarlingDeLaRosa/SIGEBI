@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
 import { map } from 'rxjs';
 import { BaseApiService } from '../../../shared/abstracts/base-api-service';
 import { ApiResponse } from '../../../shared/interface/abstracts-class';
@@ -6,9 +7,9 @@ import { environment } from '../../../../environments/environment';
 import { TransferListDto } from '../DTOs/transfer-dto';
 import { TransferModel } from '../model/transfer-model';
 import { TransferMapper } from '../mappers/transfer-mapper';
+import { TransferFilters } from '../DTOs/transfer-filters';
 
-export interface TransferQuery {
-  filter?: string;
+export interface TransferQuery extends Partial<TransferFilters> {
   page?: number;
   CantItems?: number;
 }
@@ -24,14 +25,15 @@ export class TransferService extends BaseApiService<TransferModel> {
   }
 
   override getAll(query: TransferQuery = {}) {
-    const filter = query.filter?.trim() ?? '';
     const page = query.page ?? 1;
     const pageSize = query.CantItems ?? 10;
-    const path = filter
-      ? `gettrasferencias_filter/${encodeURIComponent(filter)}/${page}/${pageSize}`
-      : `gettrasferencias/${page}/${pageSize}`;
+    let params = new HttpParams()
+      .set('CreadoPor', query.CreadoPor?.trim() || 'null')
+      .set('Estado', query.Estado?.trim() || 'null');
+    if (query.Desde?.trim()) params = params.set('Desde', query.Desde.trim());
+    if (query.Hasta?.trim()) params = params.set('Hasta', query.Hasta.trim());
 
-    return this.get<TransferListDto>(path).pipe(
+    return this.http.get<TransferListDto>(`${this.endpoint}/gettrasferencias/${page}/${pageSize}`, { params }).pipe(
       map((response): TransferPage => {
         if (!response.success)
           throw new Error(response.message || 'No se pudieron cargar las transferencias.');
