@@ -8,10 +8,10 @@ export class TransferMapper {
       date: transfer.fecha,
       status: transfer.estado?.trim() || 'Sin especificar',
       createdBy: this.userName(transfer.creadoPor),
-      creatorPosition: transfer.creadoPor?.cargo ?? '',
-      creatorCampus: transfer.creadoPor?.recinto?.nombre ?? '',
+      creatorPosition: this.userDetails(transfer.creadoPor)?.cargo ?? '',
+      creatorCampus: this.userDetails(transfer.creadoPor)?.recinto?.nombre ?? '',
       verifiedBy: this.userName(transfer.verificadoPor),
-      verifierPosition: transfer.verificadoPor?.cargo ?? '',
+      verifierPosition: this.userDetails(transfer.verificadoPor)?.cargo ?? '',
       // Keep these references distinct: Swagger does not document their direction.
       transferCampus: transfer.recinto?.nombre ?? '',
       outputCampus: transfer.salida?.recinto?.nombre ?? '',
@@ -25,7 +25,12 @@ export class TransferMapper {
     };
   }
 
-  private static userName(user: TransferUserDto | null): string {
+  private static userDetails(user: string | TransferUserDto | null) {
+    return typeof user === 'string' ? null : user;
+  }
+
+  private static userName(user: string | TransferUserDto | null): string {
+    if (typeof user === 'string') return user.trim();
     return [user?.nombre?.trim(), user?.apellido?.trim()].filter(Boolean).join(' ');
   }
 }

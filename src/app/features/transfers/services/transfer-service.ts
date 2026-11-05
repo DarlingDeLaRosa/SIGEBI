@@ -28,8 +28,12 @@ export class TransferService extends BaseApiService<TransferModel> {
     const page = query.page ?? 1;
     const pageSize = query.CantItems ?? 10;
     let params = new HttpParams()
-      .set('CreadoPor', query.CreadoPor?.trim() || 'null')
-      .set('Estado', query.Estado?.trim() || 'null');
+
+    const creadoPor = query.CreadoPor?.trim();
+    const estado = query.Estado?.trim();
+
+    if (creadoPor) params = params.set('CreadoPor', creadoPor);
+    if (estado) params = params.set('Estado', estado);
     if (query.Desde?.trim()) params = params.set('Desde', query.Desde.trim());
     if (query.Hasta?.trim()) params = params.set('Hasta', query.Hasta.trim());
 

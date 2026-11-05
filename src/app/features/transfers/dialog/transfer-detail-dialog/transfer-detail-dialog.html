@@ -1,79 +1,70 @@
 <div class="dialog-container">
   <div class="dialog-header">
-    <h2>Transferencia #{{ transfer.id }}</h2>
-    <button type="button" class="btn-close" aria-label="Cerrar detalle" (click)="close()"></button>
-  </div>
-  <div class="dialog-body">
-    <dl class="info-grid">
-      <div>
-        <dt>Fecha de transferencia</dt>
-        <dd>{{ (transfer.date | date: 'dd/MM/yyyy HH:mm') || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Estado</dt>
-        <dd>{{ transfer.status }}</dd>
-      </div>
-      <div>
-        <dt>Creado por</dt>
-        <dd>{{ transfer.createdBy || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Cargo del creador</dt>
-        <dd>{{ transfer.creatorPosition || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Recinto del creador</dt>
-        <dd>{{ transfer.creatorCampus || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Recinto de transferencia</dt>
-        <dd>{{ transfer.transferCampus || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Recinto de salida</dt>
-        <dd>{{ transfer.outputCampus || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Departamento de salida</dt>
-        <dd>{{ transfer.department || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Número de salida</dt>
-        <dd>{{ transfer.outputId ?? 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Tipo de salida</dt>
-        <dd>{{ transfer.outputType || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Fecha de salida</dt>
-        <dd>{{ (transfer.outputDate | date: 'dd/MM/yyyy HH:mm') || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Última modificación de salida</dt>
-        <dd>{{ (transfer.modifiedDate | date: 'dd/MM/yyyy HH:mm') || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Verificado por</dt>
-        <dd>{{ transfer.verifiedBy || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Cargo del verificador</dt>
-        <dd>{{ transfer.verifierPosition || 'Sin registrar' }}</dd>
-      </div>
-      <div>
-        <dt>Total de salida</dt>
-        <dd>
-          {{ transfer.total === null ? 'Sin registrar' : (transfer.total | currency: 'DOP ') }}
-        </dd>
-      </div>
-    </dl>
     <div>
-      <h3 class="h6">Observaciones de salida</h3>
-      <p class="observations">{{ transfer.observations || 'Sin observaciones' }}</p>
+      <h2>Detalle de la transferencia</h2>
+      <span class="dialog-subtitle">Transferencia #{{ transfer.id }}</span>
     </div>
+    <button type="button" class="btn-close" aria-label="Cerrar detalle de transferencia" (click)="close()">
+      <i class="bi bi-x-lg" aria-hidden="true"></i>
+    </button>
   </div>
-  <div class="dialog-footer">
-    <button type="button" class="btn save" (click)="close()">Cerrar</button>
+
+  <div class="dialog-body">
+    <div class="info-grid">
+      <div class="info-card">
+        <label>Fecha de transferencia</label>
+        <span>{{ (transfer.date | date: 'dd/MM/yyyy HH:mm') || 'Sin registrar' }}</span>
+      </div>
+      <div class="info-card">
+        <label>Estado</label>
+        <span class="status">{{ transfer.status }}</span>
+      </div>
+      <div class="info-card">
+        <label>Recinto de transferencia</label>
+        <span>{{ transfer.transferCampus || 'Sin registrar' }}</span>
+      </div>
+      <div class="info-card">
+        <label>Creado por</label>
+        <span>{{ transfer.createdBy || 'Sin registrar' }}</span>
+      </div>
+      <div class="info-card">
+        <label>Verificado por</label>
+        <span>{{ transfer.verifiedBy || 'Sin registrar' }}</span>
+      </div>
+    </div>
+
+    @if (transfer.outputId !== null) {
+      <div class="section">
+        <label>Salida asociada</label>
+        <div class="info-grid">
+          <div class="info-card">
+            <label>No. salida</label>
+            <span>{{ transfer.outputId }}</span>
+          </div>
+          @if (transfer.outputCampus) {
+            <div class="info-card"><label>Recinto de salida</label><span>{{ transfer.outputCampus }}</span></div>
+          }
+          @if (transfer.department) {
+            <div class="info-card"><label>Departamento</label><span>{{ transfer.department }}</span></div>
+          }
+          @if (transfer.outputType) {
+            <div class="info-card"><label>Tipo de salida</label><span>{{ transfer.outputType }}</span></div>
+          }
+          @if (transfer.outputDate) {
+            <div class="info-card"><label>Fecha de salida</label><span>{{ transfer.outputDate | date: 'dd/MM/yyyy HH:mm' }}</span></div>
+          }
+          @if (transfer.total !== null) {
+            <div class="info-card"><label>Total de salida</label><span>{{ transfer.total | currency: 'DOP ' }}</span></div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (transfer.observations) {
+      <div class="section">
+        <label>Observaciones de salida</label>
+        <div class="info-card observations">{{ transfer.observations }}</div>
+      </div>
+    }
   </div>
 </div>

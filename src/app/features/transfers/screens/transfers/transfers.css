@@ -8,10 +8,7 @@
 .table-scroll {
   overflow-x: auto;
 }
-app-table-of-content {
-  display: block;
-  min-width: 1400px;
-}
+
 app-form-actions {
   display: block;
   margin-top: 0.75rem;

@@ -18,14 +18,14 @@ describe('TransferService', () => {
   });
   afterEach(() => http.verify());
 
-  it('uses GET with literal null text parameters and omits empty dates', () => {
+  it('uses GET without query parameters when filters are empty', () => {
     const next = vi.fn();
     service.getAll({ CreadoPor: ' ', Estado: null, Desde: null, Hasta: '', page: 1, CantItems: 10 }).subscribe(next);
     const request = http.expectOne(req => req.url === `${endpoint}/1/10`);
     expect(request.request.method).toBe('GET');
-    expect(request.request.params.keys().sort()).toEqual(['CreadoPor', 'Estado']);
-    expect(request.request.params.get('CreadoPor')).toBe('null');
-    expect(request.request.params.get('Estado')).toBe('null');
+    expect(request.request.params.keys().sort()).toEqual([]);
+    expect(request.request.params.get('CreadoPor')).toBeNull();
+    expect(request.request.params.get('Estado')).toBeNull();
     expect(request.request.body).toBeNull();
     request.flush(empty);
     expect(next).toHaveBeenCalledWith(expect.objectContaining({ data: [], currentPage: 1, cantItem: 10, cantPage: 1, totalItems: 0 }));
@@ -48,12 +48,12 @@ describe('TransferService', () => {
     service.getAll({ CreadoPor: 'Ana', Desde: '2026-11-01T00:00:00' }).subscribe();
     const from = http.expectOne(req => req.url === `${endpoint}/1/10`);
     expect(from.request.params.has('Hasta')).toBe(false);
-    expect(from.request.params.get('Estado')).toBe('null');
+    expect(from.request.params.get('Estado')).toBeNull();
     from.flush(empty);
     service.getAll({ Estado: 'Pendiente', Hasta: '2026-11-04T23:59:59.999' }).subscribe();
     const to = http.expectOne(req => req.url === `${endpoint}/1/10`);
     expect(to.request.params.has('Desde')).toBe(false);
-    expect(to.request.params.get('CreadoPor')).toBe('null');
+    expect(to.request.params.get('CreadoPor')).toBeNull();
     to.flush(empty);
   });
 
@@ -61,9 +61,9 @@ describe('TransferService', () => {
     let result: any;
     service.getAll({ page: 2, CantItems: 20 }).subscribe(value => result = value);
     http.expectOne(req => req.url === `${endpoint}/2/20`).flush({ ...empty, currentPage: 2, cantItem: 1, cantPage: 2,
-      data: [{ id: 1, estado: 'Pendiente', fecha: null, creadoPor: { nombre: 'Ana', apellido: 'Pérez' }, verificadoPor: null, recinto: null, salida: null }] });
+      data: [{ id: 1, estado: 'Pendiente', fecha: null, creadoPor: ' Ana Pérez ', verificadoPor: 'Luis Gómez', recinto: null, salida: null }] });
     expect(result).toMatchObject({ currentPage: 2, cantItem: 20, totalItems: null });
-    expect(result.data[0]).toMatchObject({ id: 1, status: 'Pendiente', createdBy: 'Ana Pérez' });
+    expect(result.data[0]).toMatchObject({ id: 1, status: 'Pendiente', createdBy: 'Ana Pérez', verifiedBy: 'Luis Gómez' });
   });
 
   it('propagates business failures instead of displaying empty successful results', () => {

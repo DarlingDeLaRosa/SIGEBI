@@ -29,8 +29,8 @@ describe('Transfers', () => {
     http = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
     const initial = http.expectOne(req => req.url === `${endpoint}/1/10`);
-    expect(initial.request.params.get('CreadoPor')).toBe('null');
-    expect(initial.request.params.get('Estado')).toBe('null');
+    expect(initial.request.params.get('CreadoPor')).toBeNull();
+    expect(initial.request.params.get('Estado')).toBeNull();
     initial.flush(response);
     fixture.detectChanges();
   });
@@ -57,9 +57,9 @@ describe('Transfers', () => {
     resized.flush(response);
     component.clearForm();
     const cleared = http.expectOne(req => req.url === `${endpoint}/1/20`);
-    expect(cleared.request.params.keys().sort()).toEqual(['CreadoPor', 'Estado']);
-    expect(cleared.request.params.get('CreadoPor')).toBe('null');
-    expect(cleared.request.params.get('Estado')).toBe('null');
+    expect(cleared.request.params.keys().sort()).toEqual([]);
+    expect(cleared.request.params.get('CreadoPor')).toBeNull();
+    expect(cleared.request.params.get('Estado')).toBeNull();
     cleared.flush(response);
     expect(component.filterForm.getRawValue()).toEqual({ CreadoPor: null, Estado: null, Desde: null, Hasta: null });
     expect(component.filterForm.pristine).toBe(true);

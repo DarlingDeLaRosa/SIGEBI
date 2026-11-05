@@ -15,8 +15,8 @@ export interface TransferDto {
   fecha: string | null;
   estado: string | null;
   recinto: TransferCampusDto | null;
-  creadoPor: TransferUserDto | null;
-  verificadoPor: TransferUserDto | null;
+  creadoPor: string | TransferUserDto | null;
+  verificadoPor: string | TransferUserDto | null;
   salida: {
     idSalida: number;
     recinto: TransferCampusDto | null;

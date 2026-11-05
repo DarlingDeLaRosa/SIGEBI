@@ -1,13 +1,19 @@
-:host {
-  display: block;
+:host { display: block; }
+
+.info-card { overflow-wrap: anywhere; }
+.observations { white-space: pre-wrap; }
+
+.status {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: #e8f0fb;
+  color: #004b8d;
+  font-weight: 600;
 }
-dd,
-.observations {
-  overflow-wrap: anywhere;
-  white-space: pre-wrap;
-}
-@media (max-width: 600px) {
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
+
+@media (max-width: 576px) {
+  .dialog-container { padding: 18px; }
+  .dialog-header h2 { font-size: 22px; }
+  .info-grid { grid-template-columns: minmax(0, 1fr); }
 }
