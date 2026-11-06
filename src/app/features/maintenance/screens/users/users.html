@@ -1,4 +1,12 @@
-<h2>Usuarios</h2>
+
+<header>
+  <div class="title">
+    <div>
+      <h1>Usuarios</h1>
+      <p class="intro"> Consulta y actualiza los datos de los usuarios del sistema. </p>
+    </div>
+  </div>
+</header>
 
 <form [formGroup]="userForm" (ngSubmit)="save()" class="row g-2">
   <app-search-select

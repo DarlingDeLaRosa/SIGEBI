@@ -1,5 +1,11 @@
 <div class="title">
-  <h1>Productos</h1>
+  <div>
+    <p class="eyebrow">INVENTARIO Y ALMACENES</p>
+    <h1>Productos</h1>
+    <p class="intro">
+      {{ creatingProduct() ? "Registra o actualiza los datos del producto, su clasificación y su unidad de medida." : "productos y consulta su información en el catálogo." }}
+     </p>
+  </div>
 
   <span class="d-flex gap-1">
     <button class="btn navigate" (click)="toggleFilters()">
@@ -13,63 +19,33 @@
 </div>
 
 @if (creatingProduct()) {
-  <form class="box mb-2" [formGroup]="productForm" (submit)="save(productForm, 'idProducto')">
-    <app-create-conditional-box [formName]="'Crear producto'">
-      <div class="col-md-6 form-floating">
-        <input
-          type="text"
-          class="form-control"
-          formControlName="nombre"
-          placeholder="Nombre de producto"
-          id="prodName"
-        />
-        <label for="prodName">Nombre de producto</label>
-      </div>
+<form class="box mb-2" [formGroup]="productForm" (submit)="save(productForm, 'idProducto')">
+  <app-create-conditional-box [formName]="'Crear producto'">
+    <div class="col-md-6 form-floating">
+      <input type="text" class="form-control" formControlName="nombre" placeholder="Nombre de producto" id="prodName" />
+      <label for="prodName">Nombre de producto</label>
+    </div>
 
-      <div class="col-md-2 form-floating">
-        <input
-          placeholder="Precio"
-          type="number"
-          class="form-control"
-          formControlName="precio"
-          id="price"
-        />
-        <label for="price">Precio</label>
-      </div>
+    <div class="col-md-2 form-floating">
+      <input placeholder="Precio" type="number" class="form-control" formControlName="precio" id="price" />
+      <label for="price">Precio</label>
+    </div>
 
-      <div class="col-md-2 form-floating">
-        <input
-          placeholder="ITBIS"
-          type="number"
-          class="form-control"
-          formControlName="itbis"
-          id="itbis"
-        />
-        <label for="itbis">ITBIS</label>
-      </div>
+    <div class="col-md-2 form-floating">
+      <input placeholder="ITBIS" type="number" class="form-control" formControlName="itbis" id="itbis" />
+      <label for="itbis">ITBIS</label>
+    </div>
 
-      <div class="col-md-2 form-floating">
-        <input
-          placeholder="Existencia minima"
-          type="number"
-          class="form-control"
-          formControlName="stockMinimo"
-          id="stockMin"
-        />
-        <label for="stockMin">Existencia mínima</label>
-      </div>
+    <div class="col-md-2 form-floating">
+      <input placeholder="Existencia minima" type="number" class="form-control" formControlName="stockMinimo"
+        id="stockMin" />
+      <label for="stockMin">Existencia mínima</label>
+    </div>
 
-      <app-search-select
-        class="col-md-4"
-        placeholder="Unidad de medida"
-        [items]="facade.unitsOfMeasure()"
-        [initialItems]="facade.unitsOfMeasure()"
-        [displayField]="'descripcion'"
-        [valueField]="'idUnidadMe'"
-        [value]="productForm.get('idUnidadMe')?.value"
-        (search)="facade.loadUnits($event)"
-        [selectedItem]="facade.formSelections.unitOfMeasure()"
-        (selected)="
+    <app-search-select class="col-md-4" placeholder="Unidad de medida" [items]="facade.unitsOfMeasure()"
+      [initialItems]="facade.unitsOfMeasure()" [displayField]="'descripcion'" [valueField]="'idUnidadMe'"
+      [value]="productForm.get('idUnidadMe')?.value" (search)="facade.loadUnits($event)"
+      [selectedItem]="facade.formSelections.unitOfMeasure()" (selected)="
           setSelection(
             facade.formSelections.unitOfMeasure,
             productForm,
@@ -77,20 +53,12 @@
             $event,
             'idUnidadMe'
           )
-        "
-      />
+        " />
 
-      <app-search-select
-        class="col-md-4"
-        placeholder="Tipo de producto"
-        [items]="facade.productTypes()"
-        [initialItems]="facade.productTypes()"
-        [displayField]="'nombre'"
-        [valueField]="'idTipoArt'"
-        [value]="productForm.get('idTipoArt')?.value"
-        (search)="facade.loadProductTypes($event)"
-        [selectedItem]="facade.formSelections.productType()"
-        (selected)="
+    <app-search-select class="col-md-4" placeholder="Tipo de producto" [items]="facade.productTypes()"
+      [initialItems]="facade.productTypes()" [displayField]="'nombre'" [valueField]="'idTipoArt'"
+      [value]="productForm.get('idTipoArt')?.value" (search)="facade.loadProductTypes($event)"
+      [selectedItem]="facade.formSelections.productType()" (selected)="
           setSelection(
             facade.formSelections.productType,
             productForm,
@@ -98,71 +66,41 @@
             $event,
             'idTipoArt'
           )
-        "
-      />
+        " />
 
-      <app-search-select
-        class="col-md-4"
-        placeholder="Catalogo"
-        [items]="facade.catalogs()"
-        [initialItems]="facade.catalogs()"
-        [displayField]="'nombre'"
-        [valueField]="'id'"
-        [value]="productForm.get('idCatalogo')?.value"
-        (search)="facade.loadCatalogs($event)"
-        [selectedItem]="facade.formSelections.catalog()"
-        (selected)="
+    <app-search-select class="col-md-4" placeholder="Catalogo" [items]="facade.catalogs()"
+      [initialItems]="facade.catalogs()" [displayField]="'nombre'" [valueField]="'id'"
+      [value]="productForm.get('idCatalogo')?.value" (search)="facade.loadCatalogs($event)"
+      [selectedItem]="facade.formSelections.catalog()" (selected)="
           setSelection(facade.formSelections.catalog, productForm, 'idCatalogo', $event, 'id')
-        "
-      />
+        " />
 
-      <div class="col-md-12 form-floating">
-        <input
-          placeholder="Descripción"
-          type="text"
-          class="form-control"
-          formControlName="descripcion"
-          id="description"
-        />
-        <label for="description">Descripción</label>
-      </div>
+    <div class="col-md-12 form-floating">
+      <input placeholder="Descripción" type="text" class="form-control" formControlName="descripcion"
+        id="description" />
+      <label for="description">Descripción</label>
+    </div>
 
-      <app-form-actions
-        [editing]="productForm.dirty || (productForm.value.idProducto ?? 0) > 0"
-        [disabled]="!productForm.valid || loading()"
-        (clear)="clearForm()"
-      >
-      </app-form-actions>
-    </app-create-conditional-box>
-  </form>
+    <app-form-actions [editing]="productForm.dirty || (productForm.value.idProducto ?? 0) > 0"
+      [disabled]="!productForm.valid || loading()" (clear)="clearForm()">
+    </app-form-actions>
+  </app-create-conditional-box>
+</form>
 }
 
 @if (filteringProduct()) {
-  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="box mb-2">
-    <app-create-conditional-box [formName]="'Filtrar productos'">
-      
-      <div class="col-md-3 form-floating">
-        <input
-          type="text"
-          formControlName="filter"
-          class="form-control"
-          [placeholder]="'Nombre de producto'"
-        />
-        <label for="filter">Nombre de producto</label>
-      </div>
+<form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="box mb-2">
+  <app-create-conditional-box [formName]="'Filtrar productos'">
 
-      <app-search-select
-        class="col-md-3"
-        placeholder="Tipo de producto"
-        [items]="facade.productTypes()"
-        [initialItems]="facade.productTypes()"
-        [displayField]="'nombre'"
-        [valueField]="'idTipoArt'"
-        [value]="filterForm.get('idTipoArticulo')?.value"
-        (search)="facade.loadProductTypes($event)"
-        [selectedItem]="facade.filterSelections.productType()"
-        [showAll]="true"
-        (selected)="
+    <div class="col-md-3 form-floating">
+      <input type="text" formControlName="filter" class="form-control" [placeholder]="'Nombre de producto'" />
+      <label for="filter">Nombre de producto</label>
+    </div>
+
+    <app-search-select class="col-md-3" placeholder="Tipo de producto" [items]="facade.productTypes()"
+      [initialItems]="facade.productTypes()" [displayField]="'nombre'" [valueField]="'idTipoArt'"
+      [value]="filterForm.get('idTipoArticulo')?.value" (search)="facade.loadProductTypes($event)"
+      [selectedItem]="facade.filterSelections.productType()" [showAll]="true" (selected)="
           setSelection(
             facade.filterSelections.productType,
             filterForm,
@@ -170,67 +108,32 @@
             $event,
             'idTipoArt'
           )
-        "
-      />
+        " />
 
-      <app-search-select
-        class="col-md-3"
-        placeholder="Recinto"
-        [items]="facade.filteredCampuses()"
-        [initialItems]="facade.campuses()"
-        displayField="nombre"
-        valueField="idRecinto"
-        [value]="filterForm.controls.idRecinto.value"
-        [selectedItem]="facade.filterSelections.campus()"
-        [showAll]="true"
-        (search)="facade.campusSearch.set($event)"
-        (selected)="selectCampus($event)"
-      />
-      
-      <app-search-select
-        class="col-md-3"
-        placeholder="Catalogo"
-        [items]="facade.catalogs()"
-        [initialItems]="facade.catalogs()"
-        [displayField]="'nombre'"
-        [valueField]="'id'"
-        [value]="filterForm.get('idCatalogo')?.value"
-        (search)="facade.loadCatalogs($event)"
-        [selectedItem]="facade.filterSelections.catalog()"
-        [showAll]="true"
-        (selected)="
+    <app-search-select class="col-md-3" placeholder="Recinto" [items]="facade.filteredCampuses()"
+      [initialItems]="facade.campuses()" displayField="nombre" valueField="idRecinto"
+      [value]="filterForm.controls.idRecinto.value" [selectedItem]="facade.filterSelections.campus()" [showAll]="true"
+      (search)="facade.campusSearch.set($event)" (selected)="selectCampus($event)" />
+
+    <app-search-select class="col-md-3" placeholder="Catalogo" [items]="facade.catalogs()"
+      [initialItems]="facade.catalogs()" [displayField]="'nombre'" [valueField]="'id'"
+      [value]="filterForm.get('idCatalogo')?.value" (search)="facade.loadCatalogs($event)"
+      [selectedItem]="facade.filterSelections.catalog()" [showAll]="true" (selected)="
           setSelection(facade.filterSelections.catalog, filterForm, 'idCatalogo', $event, 'id')
-        "
-      />
+        " />
 
-      <app-form-actions
-        [nameActionBoton]="'Filtrar'"
-        [iconActionBoton]="'bi bi-search'"
-        [editing]="filterForm.dirty"
-        [disabled]="!filterForm.dirty || loading()"
-        (clear)="clearFilters()"
-      >
-      </app-form-actions>
-    </app-create-conditional-box>
-  </form>
+    <app-form-actions [nameActionBoton]="'Filtrar'" [iconActionBoton]="'bi bi-search'" [editing]="filterForm.dirty"
+      [disabled]="!filterForm.dirty || loading()" (clear)="clearFilters()">
+    </app-form-actions>
+  </app-create-conditional-box>
+</form>
 }
 
 <div class="box">
-  <app-table-of-content
-    [showDetail]="true"
-    (showDialog)="openDialog($event)"
-    [tableTitle]="'Listado de productos'"
-    [trackByField]="'idProducto'"
-    [tableData]="data()?.data || []"
-    [tableColumns]="tableColumns"
-    [totalItems]="pagination().totalItems"
-    [showPagination]="true"
-    [totalPages]="pagination().totalPages"
-    [currentPage]="pagination().currentPage"
-    [pageSize]="pagination().pageSize"
-    (pageChange)="changePage($event)"
-    (pageSizeChange)="changePageSize($event)"
-    (edit)="editProduct($event.row)"
-    (remove)="remove($event.idProducto)"
-  ></app-table-of-content>
+  <app-table-of-content [showDetail]="true" (showDialog)="openDialog($event)" [tableTitle]="'Listado de productos'"
+    [trackByField]="'idProducto'" [tableData]="data()?.data || []" [tableColumns]="tableColumns"
+    [totalItems]="pagination().totalItems" [showPagination]="true" [totalPages]="pagination().totalPages"
+    [currentPage]="pagination().currentPage" [pageSize]="pagination().pageSize" (pageChange)="changePage($event)"
+    (pageSizeChange)="changePageSize($event)" (edit)="editProduct($event.row)"
+    (remove)="remove($event.idProducto)"></app-table-of-content>
 </div>

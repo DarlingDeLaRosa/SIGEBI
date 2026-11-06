@@ -1,9 +1,13 @@
-<div class="title">
-  <h1>Transferencias</h1>
+<header class="title">
+  <div>
+    <p class="eyebrow">INVENTARIO Y ALMACENES</p>
+    <h1>Transferencias</h1>
+    <p class="intro"> Busca transferencias entre almacenes, consulta su estado y valida los movimientos pendientes. </p>
+  </div>
   <button type="button" class="btn navigate" (click)="facade.toggleFilters()">
     {{ facade.filtering() ? 'Ocultar filtros' : 'Filtrar transferencias' }}
   </button>
-</div>
+</header>
 
 @if (facade.filtering()) {
   <form class="box mb-2" [formGroup]="filterForm" (ngSubmit)="applyFilters()">

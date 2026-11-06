@@ -1,5 +1,9 @@
-<div class="title">
-  <h1>Solicitudes</h1>
+<header class="title">
+  <div>
+    <p class="eyebrow">INVENTARIO Y ALMACENES</p>
+    <h1>Solicitudes</h1>
+    <p class="intro">Registra solicitudes de productos y consulta el detalle de cada una. </p>
+  </div>
 
   <span class="d-flex gap-1">
     <button
@@ -13,7 +17,7 @@
       Crear solicitud
     </button>
   </span>
-</div>
+</header>
 
 @if (filteringRequests()) {
   <form [formGroup]="filterForm" (ngSubmit)="applyFilters()" class="box mb-2">

@@ -9,24 +9,13 @@
   gap: 24px;
   margin-bottom: 26px;
 }
-.eyebrow {
-  margin: 0 0 7px;
-  color: #468169;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-}
+
 h1 {
-  font-size: 30px;
-  font-weight: 650;
+  font-size: 27px;
+  /* font-weight: 650; */
   color: #18344d;
 }
-.intro {
-  margin: 8px 0 0;
-  color: #6a7888;
-  font-size: 14px;
-  line-height: 1.6;
-}
+
 .header-icon {
   display: flex;
   align-items: center;
