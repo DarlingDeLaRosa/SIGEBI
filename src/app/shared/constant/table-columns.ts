@@ -215,3 +215,27 @@ export const UsersColumns: tableColumnsInterface[] = [
     { key: 'rol.nombre', label: 'Rol' },
     { key: 'acciones', label: 'Acciones', align: 'center' },
 ];
+
+export const HomeEntryColumns: tableColumnsInterface[] = [
+    { key: 'noFactura', label: 'Número de factura' },
+    { key: 'fechaCreacion', label: 'Fecha de creación', format: 'date' },
+    { key: 'proveedor.razonSocial', label: 'Proveedor' },
+    { key: 'tipoEntrada.nombre', label: 'Tipo de entrada' },
+];
+
+export const HomeOutputColumns: tableColumnsInterface[] = [
+    { key: 'noRequerimiento', label: 'Número de requerimiento' },
+    { key: 'fechaCreacion', label: 'Fecha de creación', format: 'date' },
+    { key: 'solicitante', label: 'Solicitante' },
+    { key: 'recinto.nombre', label: 'Recinto' },
+];
+
+export const HomePurchaseColumns: tableColumnsInterface[] = [
+    { key: 'noOrden', label: 'Número de orden' },
+    { key: 'noExpediente', label: 'Expediente' },
+    { key: 'proveedorObj.razonSocial', label: 'Proveedor' },
+    { key: 'total', label: 'Total', format: 'currency', align: 'right' },
+    { key: 'acciones', label: 'Acciones', align: 'center' },
+];
+
+export const HomeAdjustmentColumns = InventoryAdjustmentColumns.slice(0, 4);

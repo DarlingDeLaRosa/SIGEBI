@@ -31,6 +31,7 @@ export class TableOfContent {
   showPagination = input<boolean>(false);
   showTotal = input<boolean>(true);
   showContent = input<boolean>(false);
+  emptyValue = input<string>();
   tableTitle = input<string>('');
   trackByField = input<string>('id');
   tableColumns = input<tableColumnsInterface[]>([]);
@@ -44,6 +45,13 @@ export class TableOfContent {
   @Output() showDialog = new EventEmitter<any>();
   @Output() pageChange = new EventEmitter<number>();
   @Output() pageSizeChange = new EventEmitter<number>();
+
+  gridColumns = computed(() => {
+    const columns = this.tableColumns();
+    return columns.at(-1)?.key === 'acciones'
+      ? 'repeat(' + (columns.length - 1) + ', minmax(0, 1fr)) 65px'
+      : 'repeat(' + columns.length + ', minmax(0, 1fr))';
+  });
 
   pages = computed(() => {
     const maxVisible = 5;
@@ -100,6 +108,8 @@ export class TableOfContent {
   formatValue(row: any, col: any): any {
 
     let value = this.getValue(row, col.key);
+
+    if ((value == null || value === '') && this.emptyValue() !== undefined) return this.emptyValue();
 
     if ((col.format === 'currency' || col.format === 'number') && value == null) {
       value = 0;

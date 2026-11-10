@@ -38,7 +38,7 @@ export class RequestsService extends BaseApiService<any> {
          unidadOrganizativa: params.unidadOrganizativa?.trim() || null,
          idRecinto: params.idRecinto ?? null,
       };
-      return this.http.post<ApiResponse<any[]> & { totalItems: number }>(this.endpoint, body).pipe(
+      return this.http.post<ApiResponse<any[]> & { totalItems?: number | null }>(this.endpoint, body).pipe(
          map(response => {
             if (response.success === false) throw new Error(response.message || 'No se pudieron cargar las solicitudes');
             return {
@@ -47,7 +47,7 @@ export class RequestsService extends BaseApiService<any> {
                currentPage: page,
                cantItem: pageSize,
                cantPage: Math.max(1, response.cantPage ?? 1),
-               totalItems: response.totalItems ?? 0,
+               totalItems: response.totalItems ?? null,
             };
          }),
       );

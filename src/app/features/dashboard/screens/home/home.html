@@ -1,1 +1,83 @@
-<p>home works!</p>
+<header class="title">
+  <div>
+    <p class="eyebrow">INVENTARIO Y ALMACENES</p>
+    <h1>Inicio</h1>
+    <p class="dashboard-subtitle">Resumen operativo de tus movimientos y tareas pendientes.</p>
+  </div>
+</header>
+
+<div class="summary-grid">
+  @for (card of summaries; track card.link) {
+  <article class="dashboard-panel summary-card">
+    <a class="summary-link" [routerLink]="card.link">
+      <span class="summary-icon" [attr.data-color]="card.color">
+        <i class="bi" [class]="card.icon" aria-hidden="true"></i>
+      </span>
+      <i class="bi bi-chevron-right dashboard-arrow" aria-hidden="true"></i>
+      <h2>{{ card.title }}</h2>
+    </a>
+    @let result = card.result();
+    <div aria-live="polite">
+      @switch (result.state) {
+      @case ('loading') {
+      <p class="dashboard-loading">
+        <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+        Cargando…
+      </p>
+      }
+      @case ('error') {
+      <p>Datos no disponibles</p>
+      <button type="button" class="btn btn-outline-secondary btn-sm" (click)="load(card)">Reintentar</button>
+      }
+      @case ('ready') {
+      @if (result.total !== null) {
+      <p class="summary-total">{{ result.total }}</p>
+      } @else if (result.rows.length) {
+      <p>{{ card.present }}</p>
+      }
+      @if (!result.rows.length && !result.total) {
+      <p>{{ card.empty }}</p>
+      }
+      }
+      }
+    </div>
+  </article>
+  }
+</div>
+
+<div class="movement-grid">
+  @for (block of tables; track block.link) {
+  <section class="dashboard-panel movement-panel">
+    <header class="movement-header">
+      <h2>{{ block.title }}</h2>
+      <a [routerLink]="block.link" [attr.aria-label]="'Ver listado de ' + block.title.toLowerCase()">
+        <i class="bi bi-chevron-right dashboard-arrow" aria-hidden="true"></i>
+      </a>
+    </header>
+
+    @let result = block.result();
+    @switch (result.state) {
+    @case ('loading') {
+    <p class="dashboard-loading" role="status">
+      <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+      Cargando registros…
+    </p>
+    }
+    @case ('error') {
+    <p role="status">No se pudieron cargar los registros.</p>
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="load(block)">Reintentar</button>
+    }
+    @case ('ready') {
+    @if (result.rows.length) {
+    <div class="movement-table">
+      <app-table-of-content [tableColumns]="block.columns" [tableData]="result.rows" [trackByField]="block.trackBy"
+        [actions]="block.actions" [showbasicActions]="false" emptyValue="—" />
+    </div>
+    } @else {
+    <p role="status">{{ block.empty }}</p>
+    }
+    }
+    }
+  </section>
+  }
+</div>

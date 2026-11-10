@@ -5,7 +5,7 @@
     <!-- HEADER -->
     <div
       class="tabla-header"
-      [style.gridTemplateColumns]="'repeat(' + (tableColumns().length - 1) + ', 1fr) 65px'"
+      [style.gridTemplateColumns]="gridColumns()"
     >
       @for (col of tableColumns(); track col.key) {
         <span class="table-cell" [ngClass]="getAlignment(col)">{{ col.label }}</span>
@@ -17,7 +17,7 @@
       <div
         class="tabla-row"
         [class.selected-row]="isSelected(row)"
-        [style.gridTemplateColumns]="'repeat(' + (tableColumns().length - 1) + ', 1fr) 65px'"
+        [style.gridTemplateColumns]="gridColumns()"
       >
         @for (col of tableColumns(); track col.key) {
           <div class="table-cell" [ngClass]="getAlignment(col)">
