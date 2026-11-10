@@ -37,7 +37,7 @@ describe('Inicio', () => {
     outputs.flush({ success: true, data: [] });
     const adjustments = http.expectOne(req => req.url.endsWith('/AjusteInventario/get_filter'));
     expect(adjustments.request.params.get('CantItems')).toBe('3');
-    adjustments.flush({ success: true, data: [] });
+    adjustments.flush({ success: true, data: [], totalItems: 0 });
 
     fixture.detectChanges();
     const page: HTMLElement = fixture.nativeElement;
@@ -48,8 +48,10 @@ describe('Inicio', () => {
     expect(text).toContain('Hay pendientes');
     expect(text).toContain('Sin pendientes');
     expect(text).toContain('—');
-    expect(page.querySelector('.summary-total')?.textContent).toBe('0');
-    expect(Array.from(page.querySelectorAll('.summary-total'), node => node.textContent)).toContain('8');
+    expect(text).toContain('Sin conciliaciones');
+    expect(Array.from(page.querySelectorAll('.summary-total'), node => node.textContent)).toEqual(['8']);
+    expect(page.querySelectorAll('.movement-panel .empty-table .bi-database-x')).toHaveLength(2);
+    expect(page.querySelector('.summary-card .empty-table')).toBeNull();
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     page.querySelector<HTMLButtonElement>('.dropdown-item')!.click();
     expect(navigate).toHaveBeenCalledWith(['/layout/entradas/gestionar-Entradas'], {
@@ -63,11 +65,19 @@ describe('Inicio', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Cargando');
     http.expectOne(req => req.url.endsWith('/Solicitudes/estados')).flush({ success: true, data: [] });
-    for (const endpoint of ['/OrdenCompras', '/gettrasferencias/1/3', '/Entrada/getFilters', '/Salida/filter', '/AjusteInventario/get_filter']) {
+    for (const endpoint of ['/OrdenCompras', '/gettrasferencias/1/3', '/Entrada/getFilters', '/Salida/filter']) {
       http.expectOne(req => req.url.endsWith(endpoint)).flush({ success: true, data: [] });
     }
+    http.expectOne(req => req.url.endsWith('/AjusteInventario/get_filter'))
+      .flush({ success: true, data: [{ id: 4, idRecinto: 2, tomaFisicaNo: 'TF-4' }] });
+    const campuses = http.expectOne(req => req.url.endsWith('/GenericService/getallrecintos'));
     fixture.detectChanges();
     const page: HTMLElement = fixture.nativeElement;
+    expect(page.textContent).toContain('TF-4');
+    campuses.flush('Error', { status: 500, statusText: 'Error' });
+    fixture.detectChanges();
+    expect(page.textContent).toContain('TF-4');
+    expect(page.textContent).toContain('No disponible');
     expect(page.querySelector('a[href="/layout/salidas"]')).toBeTruthy();
     expect(page.textContent).toContain('Datos no disponibles');
     page.querySelector<HTMLButtonElement>('.summary-card button')!.click();

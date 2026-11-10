@@ -2,7 +2,7 @@
   <div>
     <p class="eyebrow">INVENTARIO Y ALMACENES</p>
     <h1>Inicio</h1>
-    <p class="dashboard-subtitle">Resumen operativo de tus movimientos y tareas pendientes.</p>
+    <p class="intro">Resumen operativo de tus movimientos y tareas pendientes.</p>
   </div>
 </header>
 
@@ -30,12 +30,11 @@
       <button type="button" class="btn btn-outline-secondary btn-sm" (click)="load(card)">Reintentar</button>
       }
       @case ('ready') {
-      @if (result.total !== null) {
+      @if (result.total !== null && result.total > 0) {
       <p class="summary-total">{{ result.total }}</p>
       } @else if (result.rows.length) {
       <p>{{ card.present }}</p>
-      }
-      @if (!result.rows.length && !result.total) {
+      } @else {
       <p>{{ card.empty }}</p>
       }
       }
@@ -68,14 +67,10 @@
     <button type="button" class="btn btn-outline-secondary btn-sm" (click)="load(block)">Reintentar</button>
     }
     @case ('ready') {
-    @if (result.rows.length) {
     <div class="movement-table">
       <app-table-of-content [tableColumns]="block.columns" [tableData]="result.rows" [trackByField]="block.trackBy"
         [actions]="block.actions" [showbasicActions]="false" emptyValue="—" />
     </div>
-    } @else {
-    <p role="status">{{ block.empty }}</p>
-    }
     }
     }
   </section>

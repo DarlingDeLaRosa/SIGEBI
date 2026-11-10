@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { map, Observable, of, switchMap } from 'rxjs';
+import { catchError, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { TableOfContent } from '../../../../shared/components/table-of-content/table-of-content';
 import { PURCHASE_STATUS } from '../../../../shared/constant/select-options';
 import { HomeAdjustmentColumns, HomeEntryColumns, HomeOutputColumns, HomePurchaseColumns } from '../../../../shared/constant/table-columns';
@@ -58,18 +58,25 @@ export class Home {
       idRecinto: null, idTipoAlmacen: null, numeroTomaFisica: null, idProducto: null,
     }, PAGE.page, PAGE.CantItems).pipe(
       switchMap(response => {
-        const rows = (response.data ?? []).map(InventoryAdjustmentMapper.fromApi);
-        if (!rows.some(row => row.campusId != null)) return of({ ...response, data: rows });
-        return this.intranet.getAllRecinto().pipe(map(catalog => {
-          if (catalog.success === false) throw new Error('Recintos no disponibles');
-          return {
+        const rows = (response.data ?? []).map(item => ({
+          ...InventoryAdjustmentMapper.fromApi(item),
+          campusName: 'No disponible',
+        }));
+        const preview = { ...response, data: rows };
+        if (!rows.some(row => row.campusId != null)) return of(preview);
+
+        return this.intranet.getAllRecinto().pipe(
+          map(catalog => catalog.success === false ? preview : {
             ...response,
             data: rows.map(row => ({
               ...row,
-              campusName: catalog.data?.find(campus => campus.idRecinto === row.campusId)?.nombre,
+              campusName: catalog.data?.find(campus => campus.idRecinto === row.campusId)?.nombre
+                ?? row.campusName,
             })),
-          };
-        }));
+          }),
+          catchError(() => of(preview)),
+          startWith(preview),
+        );
       }),
     ),
   };
@@ -108,24 +115,24 @@ export class Home {
   readonly tables = [
     {
       title: 'Entradas registradas', link: '/layout/entradas', trackBy: 'idEntrada',
-      columns: HomeEntryColumns, actions: [], empty: 'Sin entradas',
+      columns: HomeEntryColumns, actions: [],
       result: signal<Preview>({ state: 'loading' }),
       query: () => this.entries.getFiltersEntries({ page: PAGE.page, cantItems: PAGE.CantItems }),
     },
     {
       title: 'Salidas registradas', link: '/layout/salidas', trackBy: 'idSalida',
-      columns: HomeOutputColumns, actions: [], empty: 'Sin salidas',
+      columns: HomeOutputColumns, actions: [],
       result: signal<Preview>({ state: 'loading' }),
       query: () => this.outputs.getAll(PAGE),
     },
     {
       ...this.purchase, title: 'Órdenes de compra pendientes', trackBy: 'id',
-      columns: HomePurchaseColumns, empty: 'Sin pendientes',
+      columns: HomePurchaseColumns,
       actions: inject(PurchaseContractFacade).actions.filter(action => action.label === 'Crear entrada'),
     },
     {
       ...this.adjustment, title: 'Conciliaciones registradas', trackBy: 'id',
-      columns: HomeAdjustmentColumns, actions: [], empty: 'Sin conciliaciones',
+      columns: HomeAdjustmentColumns, actions: [],
     },
   ];
 
