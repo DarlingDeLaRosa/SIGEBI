@@ -45,6 +45,15 @@ h6 {
   width: 75%;
 }
 
+.filter-field label,
+legend {
+  display: block;
+  color: #4d6073;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
 a i {
   font-size: 19px;
 }

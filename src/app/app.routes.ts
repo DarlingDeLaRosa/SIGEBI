@@ -9,10 +9,10 @@ export const routes: Routes = [
         path: 'layout',
         loadComponent: () => import('./layout/layout').then(m => m.Layout),
         children: [
-        //     {
-        //         path: 'inicio',
-        //         // loadChildren: () => import('./features/news/routes/news.routes').then(m => m.newsRoutes),
-        //     },
+            {
+                path: 'inicio',
+                loadChildren: () => import('./features/dashboard/routes/dashboard.route').then(m => m.HomeRoutes),
+            },
             {
                 path: 'orden-de-compra',
                 loadChildren: () => import('./features/purchases-contracts/routes/purchases-contract.routes').then(m => m.PurchasesContractRoutes),

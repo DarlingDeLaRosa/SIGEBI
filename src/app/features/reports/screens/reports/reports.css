@@ -53,14 +53,7 @@ h1 {
   gap: 16px;
   align-items: start;
 }
-.filter-field label,
-legend {
-  display: block;
-  color: #4d6073;
-  font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
+
 .form-control,
 .form-select {
   min-height: 42px;
