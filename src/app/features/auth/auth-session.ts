@@ -5,6 +5,7 @@ export interface AuthUser {
   nombre: string | null;
   apellidos: string | null;
   rol: { nombre: string } | null;
+  recinto?: { siglas: string | null } | null;
 }
 
 export const INTRANET_URL = 'https://intranet.isfodosu.edu.do';
@@ -23,6 +24,15 @@ export function readSessionToken(key: 'userToken' | 'tokenIntranet'): string | n
   try {
     const token: unknown = JSON.parse(sessionStorage.getItem(key) ?? 'null');
     return typeof token === 'string' && token.trim() ? token : null;
+  } catch {
+    return null;
+  }
+}
+
+export function readSessionUser(): Partial<AuthUser> | null {
+  try {
+    const user = JSON.parse(sessionStorage.getItem('userSystem') ?? 'null');
+    return user && typeof user === 'object' && !Array.isArray(user) ? user : null;
   } catch {
     return null;
   }

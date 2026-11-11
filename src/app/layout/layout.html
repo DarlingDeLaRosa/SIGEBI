@@ -51,14 +51,18 @@
           <i class="bi bi-list"></i>
         </button>
 
-        <h2 class="departamento">REC</h2>
+        @if (campus) {
+          <h2 class="departamento">{{ campus }}</h2>
+        }
       </div>
 
       <div class="logout">
-        <h3 class="nombre">
-          <span style="color: #004b8d; font-weight: 600">{{ 'Administrador' }}</span
-          >, {{ 'Darling' }} {{ 'De la Rosa' }}
-        </h3>
+        @if (role || fullName) {
+          <h3 class="nombre">
+            @if (role) {<span style="color: #004b8d; font-weight: 600">{{ role }}</span>}
+            <span>{{ role && fullName ? ', ' : '' }}{{ fullName }}</span>
+          </h3>
+        }
 
         <div class="dropdown">
           <i
@@ -70,8 +74,7 @@
 
           <ul class="dropdown-menu">
             <li>
-              <button class="dropdown-item item-detail">
-                <!--(click)="logout()"-->
+              <button type="button" class="dropdown-item item-detail" (click)="logout()">
                 <i class="bi bi-box-arrow-left me-2"></i>
                 Cerrar sesión
               </button>
