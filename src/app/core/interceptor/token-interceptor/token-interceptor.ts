@@ -1,13 +1,20 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import { AUTH_EXCHANGE_URL } from '../../../features/auth/auth-service';
+import { isCurrentSystemToken, readSessionToken } from '../../../features/auth/auth-session';
 
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
+  if (req.url === AUTH_EXCHANGE_URL || req.headers.has('Authorization')) return next(req);
 
-  const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkYXJsaW5nLmRlbGFyb3NhIiwianRpIjoiNzI1ODVhYWUtMmE4Yi00YjZjLWJjNDEtNzVlOGNkNzQ3YmI5IiwiSWQiOiI0IiwiRmlyc3RuYW1lIjoiRGFybGluZyBOb21hciIsIkxhc3RuYW1lIjoiRGUgbGEgUm9zYSIsIlVzZXJuYW1lIjoiZGFybGluZy5kZWxhcm9zYSIsIlBvc2l0aW9uIjoiQWRtaW5pc3RyYWRvcihhKSBkZSBCYXNlIGRlIERhdG9zIiwiVW5pZGFkIjoiRGVwYXJ0YW1lbnRvIGRlIFRlY25vbG9nw61hIGRlIGxhIEluZm9ybWFjacOzbiB5IENvbXVuaWNhY2nDs25cclxuIiwiSWRSZWNpbnRvIjoiNyIsIlJlY2ludG9TaWdsYSI6IlJFQyIsInJvbGUiOiJBZG1pbmlzdHJhZG9yIiwiaWRTaXN0ZW1hIjoiMSIsImlkUGVyc29uYSI6IjYiLCJTdXBlcnZpc29yIjoiRmFsc2UiLCJTdXBlcnZpc29ySW50ZXJpbm8iOiJGYWxzZSIsImlkU3VwbGllbmRvQSI6IiIsIkxhdCI6Ii02OS45NjY5OTIzODYxMzUzNiIsIkxvbmciOiIxOC40NDUzNDM4MjgxNjAzOSIsIklkRGVwYXJ0YW1lbnRvIjoiMTkiLCJleHAiOjE4MTE4NTE2NjAsImlzcyI6Imh0dHBzOi8vbG9jYWxob3N0OjcwNzUiLCJhdWQiOiJodHRwczovL2xvY2FsaG9zdDo3MDc1In0.SgwL31pCPC8p4Tplb7fZTuW9JEhJTzqwI5zWXdFqUOc'
-    const clonedReq = req.clone({
-    setHeaders: {
-      Authorization: `${token}`
-    }
-  });
+  if (req.url.startsWith(environment.apiUrlIntranet + '/')) {
+    const token = readSessionToken('tokenIntranet');
+    return next(token ? req.clone({ setHeaders: { Authorization: token } }) : req);
+  }
 
-  return next(clonedReq);
+  if (req.url.startsWith(environment.apiUrl + '/')) {
+    const token = readSessionToken('userToken');
+    return next(isCurrentSystemToken(token) ? req.clone({ setHeaders: { Authorization: token } }) : req);
+  }
+
+  return next(req);
 };

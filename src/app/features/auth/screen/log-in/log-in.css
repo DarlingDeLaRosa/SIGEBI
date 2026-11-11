@@ -1,0 +1,31 @@
+.access-screen {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 1rem;
+  background: #f4f7fa;
+}
+
+.access-card {
+  width: min(100%, 28rem);
+  padding: clamp(1.25rem, 5vw, 2.5rem);
+  border: 1px solid #dfe7ed;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 12px #173d5c12;
+  text-align: center;
+}
+
+.access-card img {
+  margin-bottom: 1.5rem;
+}
+
+.access-card h1 {
+  color: #004b8d;
+  font-size: 1.4rem;
+}
+
+.access-card .spinner-border {
+  margin-bottom: 1rem;
+  color: #004b8d;
+}

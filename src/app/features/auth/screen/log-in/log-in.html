@@ -1,0 +1,17 @@
+<main class="access-screen">
+  <section class="access-card" aria-labelledby="access-title">
+    <img src="SIGEBIsm.png" alt="SIGEBI" width="144" />
+    @if (error(); as message) {
+      <h1 id="access-title">No se pudo iniciar la sesión</h1>
+      <p role="alert">{{ message }}</p>
+      <p>En unos segundos volverás a Intranet.</p>
+      <a class="btn btn-primary" [href]="intranetUrl">Volver a Intranet</a>
+    } @else {
+      <div role="status">
+        <span class="spinner-border" aria-hidden="true"></span>
+        <h1 id="access-title">Validando tu acceso</h1>
+        <p>Estamos comprobando tus credenciales de Intranet.</p>
+      </div>
+    }
+  </section>
+</main>

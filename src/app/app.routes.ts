@@ -1,14 +1,19 @@
 import { Routes } from '@angular/router';
+import { sessionGuard } from './features/auth/session-guard';
 
 export const routes: Routes = [
-    //  {
-    //     path: 'auth',
-    //     loadComponent: () => import('./features/auth/screens/auth/auth').then(m => m.Auth)
-    // },
+    { path: '', redirectTo: 'layout/inicio', pathMatch: 'full' },
+    {
+        path: 'auth',
+        loadChildren: () => import('./features/auth/routes/auth.routes').then(m => m.AuthRoutes)
+    },
     {
         path: 'layout',
+        canActivate: [sessionGuard],
+        canActivateChild: [sessionGuard],
         loadComponent: () => import('./layout/layout').then(m => m.Layout),
         children: [
+            { path: '', redirectTo: 'inicio', pathMatch: 'full' },
             {
                 path: 'inicio',
                 loadChildren: () => import('./features/dashboard/routes/dashboard.route').then(m => m.HomeRoutes),
