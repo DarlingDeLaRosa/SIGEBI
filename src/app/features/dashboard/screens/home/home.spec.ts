@@ -49,6 +49,8 @@ describe('Inicio', () => {
     expect(text).toContain('Sin pendientes');
     expect(text).toContain('—');
     expect(text).toContain('Sin conciliaciones');
+    expect(Array.from(page.querySelectorAll('.summary-empty'), node => node.textContent?.trim()))
+      .toEqual(['Sin pendientes', 'Sin conciliaciones']);
     expect(Array.from(page.querySelectorAll('.summary-total'), node => node.textContent)).toEqual(['8']);
     expect(page.querySelectorAll('.movement-panel .empty-table .bi-database-x')).toHaveLength(2);
     expect(page.querySelector('.summary-card .empty-table')).toBeNull();
@@ -69,11 +71,16 @@ describe('Inicio', () => {
       http.expectOne(req => req.url.endsWith(endpoint)).flush({ success: true, data: [] });
     }
     http.expectOne(req => req.url.endsWith('/AjusteInventario/get_filter'))
-      .flush({ success: true, data: [{ id: 4, idRecinto: 2, tomaFisicaNo: 'TF-4' }] });
+      .flush({ success: true, data: [
+        { id: 4, idRecinto: 2, tomaFisicaNo: 'TF-4', fecha: '2026-10-01' },
+        { id: 5, tomaFisicaNo: 'TF-5', fecha: '2026-11-03' },
+      ] });
     const campuses = http.expectOne(req => req.url.endsWith('/GenericService/getallrecintos'));
     fixture.detectChanges();
     const page: HTMLElement = fixture.nativeElement;
     expect(page.textContent).toContain('TF-4');
+    expect(page.querySelector('.summary-presence:not(.summary-empty)')?.textContent).toContain('Hay conciliaciones');
+    expect(page.querySelector('.summary-date strong')?.textContent).toBe('03/11/2026');
     campuses.flush('Error', { status: 500, statusText: 'Error' });
     fixture.detectChanges();
     expect(page.textContent).toContain('TF-4');

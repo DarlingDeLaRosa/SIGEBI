@@ -33,9 +33,18 @@
       @if (result.total !== null && result.total > 0) {
       <p class="summary-total">{{ result.total }}</p>
       } @else if (result.rows.length) {
-      <p>{{ card.present }}</p>
+      @if (card.link === '/layout/conciliaciones') {
+      <p class="summary-presence"><i class="bi bi-check-circle" aria-hidden="true"></i> {{ card.present }}</p>
       } @else {
-      <p>{{ card.empty }}</p>
+      <p>{{ card.present }}</p>
+      }
+      } @else {
+      <p class="summary-presence summary-empty">
+        <i class="bi bi-check-circle" aria-hidden="true"></i> {{ card.empty }}
+      </p>
+      }
+      @if (result.latestDate; as latestDate) {
+      <p class="summary-date">Fechas de la más reciente<strong>{{ latestDate | date:'dd/MM/yyyy' }}</strong></p>
       }
       }
       }

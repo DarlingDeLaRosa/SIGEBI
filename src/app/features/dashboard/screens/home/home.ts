@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Component, DestroyRef, inject, signal, WritableSignal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
@@ -17,18 +18,18 @@ import { TransferService } from '../../../transfers/services/transfer-service';
 
 type Preview =
   | { state: 'loading' | 'error' }
-  | { state: 'ready'; rows: unknown[]; total: number | null };
+  | { state: 'ready'; rows: unknown[]; total: number | null; latestDate?: string };
 
 interface DashboardQuery {
   result: WritableSignal<Preview>;
-  query: () => Observable<{ success?: boolean; data?: unknown[] | null; totalItems?: number | null }>;
+  query: () => Observable<{ success?: boolean; data?: unknown[] | null; totalItems?: number | null; latestDate?: string }>;
 }
 
 const PAGE = { page: 1, CantItems: 3 };
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, TableOfContent],
+  imports: [DatePipe, RouterLink, TableOfContent],
   providers: [PurchaseContractFacade],
   templateUrl: './home.html',
   styleUrl: './home.css',
@@ -58,16 +59,21 @@ export class Home {
       idRecinto: null, idTipoAlmacen: null, numeroTomaFisica: null, idProducto: null,
     }, PAGE.page, PAGE.CantItems).pipe(
       switchMap(response => {
-        const rows = (response.data ?? []).map(item => ({
+        const rows = (response.data ?? []).slice(0, PAGE.CantItems).map(item => ({
           ...InventoryAdjustmentMapper.fromApi(item),
           campusName: 'No disponible',
         }));
-        const preview = { ...response, data: rows };
+        const latestDate = rows.reduce<string | undefined>((latest, row) => {
+          const date = Date.parse(row.date);
+          if (!Number.isFinite(date)) return latest;
+          return latest === undefined || date > Date.parse(latest) ? row.date : latest;
+        }, undefined);
+        const preview = { ...response, data: rows, latestDate };
         if (!rows.some(row => row.campusId != null)) return of(preview);
 
         return this.intranet.getAllRecinto().pipe(
           map(catalog => catalog.success === false ? preview : {
-            ...response,
+            ...preview,
             data: rows.map(row => ({
               ...row,
               campusName: catalog.data?.find(campus => campus.idRecinto === row.campusId)?.nombre
@@ -145,7 +151,12 @@ export class Home {
     block.query().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: response => block.result.set(response.success === false
         ? { state: 'error' }
-        : { state: 'ready', rows: response.data?.slice(0, PAGE.CantItems) ?? [], total: response.totalItems ?? null }),
+        : {
+          state: 'ready',
+          rows: response.data?.slice(0, PAGE.CantItems) ?? [],
+          total: response.totalItems ?? null,
+          latestDate: response.latestDate,
+        }),
       error: () => block.result.set({ state: 'error' }),
     });
   }
