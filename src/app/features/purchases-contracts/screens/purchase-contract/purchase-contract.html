@@ -138,6 +138,7 @@
     (showDialog)="openDialog($event.id)"
     [showDetail]="true"
     [actions]="facade.actions"
+    [basicActionRules]="facade.basicActionRules"
     [tableTitle]="'Listado de ordenes de compra'"
     [trackByField]="'id'"
     [tableData]="data()?.data || []"

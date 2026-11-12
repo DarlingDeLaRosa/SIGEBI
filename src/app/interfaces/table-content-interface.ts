@@ -6,10 +6,17 @@ export interface tableColumnsInterface {
   align?: 'left' | 'center' | 'right';
 }
 
-export interface TableAction {
+export interface TableActionRule {
+  visible?: (row: any) => boolean;
+  disabled?: (row: any) => boolean;
+  disabledReason?: (row: any) => string;
+}
+
+export type BasicActionRules = Partial<Record<'detail' | 'edit' | 'remove', TableActionRule>>;
+
+export interface TableAction extends TableActionRule {
   label: string;
   icon: string;
   class?: string;
-  visible?: (row: any) => boolean;
   action: (row: any) => void;
 }

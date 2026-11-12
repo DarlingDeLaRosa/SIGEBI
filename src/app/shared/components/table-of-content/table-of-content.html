@@ -31,13 +31,18 @@
                 ></i>
 
                 <ul class="dropdown-menu">
-                  @for (action of actions(); track action.label) {
-                    @if (!action.visible || action.visible(row)) {
-                      <li>
+                  @for (action of menuActions(); track $index) {
+                    @if (action.visible?.(row) !== false) {
+                      @let disabled = action.disabled?.(row) ?? false;
+                      @let reason = disabled ? (action.disabledReason?.(row) ?? '') : '';
+                      <li [matTooltip]="reason" [attr.tabindex]="reason ? 0 : null">
                         <button
+                          type="button"
                           class="dropdown-item"
                           [class]="action.class"
-                          (click)="action.action({row, index: i})"
+                          [disabled]="disabled"
+                          [class.pe-none]="disabled"
+                          (click)="runAction(action, row, i)"
                         >
                           <i [class]="action.icon + ' me-2'"></i>
                           {{ action.label }}
@@ -45,34 +50,6 @@
                       </li>
                     }
                   }
-
-                  @if (showDetail()) {
-                    <li>
-                      <button class="dropdown-item item-detail" (click)="showDialog.emit(row)">
-                        <i class="bi bi-info-circle me-2"></i>
-                        Ver Detalle
-                      </button>
-                    </li>
-                  }
-                  @if(showbasicActions()) {
-                    <li>
-                    <button class="dropdown-item item-edit" (click)="edit.emit({ row, index: i })">
-                      <i class="bi bi-pencil me-2"></i>
-                      Editar
-                    </button>
-                  </li>
-
-                  <li>
-                    <button
-                      class="dropdown-item item-delete"
-                      (click)="remove.emit({ row, index: i })"
-                    >
-                      <i class="bi bi-trash me-2"></i>
-                      Eliminar
-                    </button>
-                  </li>
-                  }
-                  
                 </ul>
               </div>
             } @else {

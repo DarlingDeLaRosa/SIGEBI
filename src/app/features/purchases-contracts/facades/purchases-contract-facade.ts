@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from "@angular/core";
 import { PURCHASE_STATUS } from "../../../shared/constant/select-options";
 import { filterByProperty } from "../../../shared/helpers/filter.helper";
 import { Router } from "@angular/router";
-import { TableAction } from "../../../interfaces/table-content-interface";
+import { BasicActionRules, TableAction } from "../../../interfaces/table-content-interface";
 import { DialogService } from "../../../core/service/dialog-service/dialog";
 import { EntriesListDialog } from "../../stock-entries/dialog/entries-list/entries-list";
 
@@ -15,12 +15,22 @@ import { EntriesListDialog } from "../../stock-entries/dialog/entries-list/entri
 
     private dialogService = inject(DialogService);
 
+    private readonly receivedOrderRule = {
+        disabled: (order: { estado?: string | null }) => order.estado?.trim().toLowerCase() === 'recibida',
+        disabledReason: () => 'Esta orden ya fue recibida.',
+    };
+
+    readonly basicActionRules: BasicActionRules = {
+        edit: this.receivedOrderRule,
+        remove: this.receivedOrderRule,
+    };
 
     actions: TableAction[] = [
         {
             label: 'Crear entrada',
             icon: 'bi bi-box-seam',
             class: 'item-createEntry',
+            ...this.receivedOrderRule,
             action: row => this.createStockEntry(row)
         },
         {

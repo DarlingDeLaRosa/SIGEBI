@@ -1,7 +1,7 @@
 import { CommonModule, CurrencyPipe, DatePipe, DecimalPipe, LowerCasePipe, TitleCasePipe, UpperCasePipe } from '@angular/common';
 import { Component, computed, EventEmitter, inject, input, Output } from '@angular/core';
 import { MaterialModules } from '../../material';
-import { TableAction, tableColumnsInterface } from '../../../interfaces/table-content-interface';
+import { BasicActionRules, TableAction, tableColumnsInterface } from '../../../interfaces/table-content-interface';
 import { Loading } from '../../../core/service/loading-service/loading';
 
 @Component({
@@ -25,6 +25,7 @@ export class TableOfContent {
 
   selectedRowId = input<number | undefined>();
   actions = input<TableAction[]>([]);
+  basicActionRules = input<BasicActionRules>({});
   showbasicActions = input<boolean>(true);
   tableData = input<any[]>([]);
   showDetail = input<boolean>(false);
@@ -45,6 +46,30 @@ export class TableOfContent {
   @Output() showDialog = new EventEmitter<any>();
   @Output() pageChange = new EventEmitter<number>();
   @Output() pageSizeChange = new EventEmitter<number>();
+
+  readonly menuActions = computed<TableAction[]>(() => {
+    const rules = this.basicActionRules();
+    const actions = [...this.actions()];
+
+    if (this.showDetail()) {
+      actions.push({
+        label: 'Ver Detalle', icon: 'bi bi-info-circle', class: 'item-detail',
+        ...rules.detail, action: ({ row }) => this.showDialog.emit(row),
+      });
+    }
+    if (this.showbasicActions()) {
+      actions.push(
+        { label: 'Editar', icon: 'bi bi-pencil', class: 'item-edit', ...rules.edit, action: selection => this.edit.emit(selection) },
+        { label: 'Eliminar', icon: 'bi bi-trash', class: 'item-delete', ...rules.remove, action: selection => this.remove.emit(selection) },
+      );
+    }
+    return actions;
+  });
+
+  runAction(action: TableAction, row: any, index: number): void {
+    if (action.visible?.(row) === false || action.disabled?.(row)) return;
+    action.action({ row, index });
+  }
 
   gridColumns = computed(() => {
     const columns = this.tableColumns();

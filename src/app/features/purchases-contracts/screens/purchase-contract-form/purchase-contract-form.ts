@@ -64,7 +64,7 @@ export class PurchaseContractForm extends BaseCrud<any> implements OnInit {
   override getService() { return this.purchaseService }
 
   ngOnInit(): void {
-    const purchaseContractId = history.state.purchaseContract;
+    const purchaseContractId = history.state?.purchaseContract;
 
     if (purchaseContractId) { this.loadById(purchaseContractId); }
 
@@ -122,7 +122,7 @@ export class PurchaseContractForm extends BaseCrud<any> implements OnInit {
 
     const dto = this.facade.buildCreateDto(this.purchaseContractForm);
     super.save(
-      this.purchaseContractForm, 'idOrdenCompra', () => {
+      this.purchaseContractForm, 'id', () => {
         this.clearForm(), this.facadeReference.clearSelections(), this.facade.clearDetails()
       },
       dto);
