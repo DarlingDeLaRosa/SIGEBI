@@ -91,22 +91,32 @@
   <div class="detail-container">
     @if(showListPurchaseContratDetails){
     <app-section-box [opened]="facade.sectionOpenDetail()" title="Listado de detalles de orden de compra">
-      <app-table-of-content [trackByField]="'idProducto'" (showDialog)="facade.openDialogDetails($event.id)"
+      <app-table-of-content [trackByField]="'idOrdenCompra'" (showDialog)="facade.openDialogDetails($event.id)"
         [actions]="facade.actionsDetails" [tableData]="facade.detailsPurchasesDetails() || []" [showDetail]="true"
         [tableColumns]="tableColumsDetailPurchases" [showbasicActions]="false" />
     </app-section-box>
     }
 
     <app-section-box [opened]="facade.sectionOpenDetail()" title="Detalles de entrada">
-      <form [formGroup]="stockEntryDetailForm" (ngSubmit)="facade.addDetail(stockEntryDetailForm)"
+      <form [formGroup]="stockEntryDetailForm" (ngSubmit)="$event.stopPropagation(); facade.addDetail(stockEntryDetailForm)"
         class="row gx-1 gy-1 mt-2">
-        <div class="col-md-4 form-floating">
+        @let hasProduct = !!stockEntryDetailForm.controls.idProducto.value;
+        @if (hasProduct) {
+          <div class="col-12 d-flex justify-content-end mb-2">
+            <span id="cantidadPendiente" class="pending-quantity">
+              <i class="bi bi-box-seam" aria-hidden="true"></i>
+              Pendiente de recibir {{ facade.pendingQuantity() ?? '—' }}
+            </span>
+          </div>
+        }
+        <div class="col-md-6 form-floating">
           <input type="text" class="form-control" formControlName="nombre" id="item" placeholder="Item" />
           <label for="item">Nombre producto</label>
         </div>
 
-        <div class="col-md-1 form-floating">
-          <input type="text" class="form-control" formControlName="cantidad" id="cantidad" placeholder="Cantidad" />
+        <div class="col-md-2 form-floating">
+          <input type="number" step="1" class="form-control" formControlName="cantidad" id="cantidad"
+            placeholder="Cantidad" [attr.aria-describedby]="hasProduct ? 'cantidadPendiente' : null" />
           <label for="cantidad">Cantidad</label>
         </div>
 
@@ -115,12 +125,12 @@
           <label for="precio">Precio</label>
         </div>
 
-        <div class="col-md-1 form-floating">
+        <div class="col-md-2 form-floating">
           <input type="text" class="form-control" formControlName="itbisProducto" id="itbis" placeholder="ITBIS" />
           <label for="itbis">ITBIS %</label>
         </div>
 
-        <app-search-select class="col-md-4" placeholder="Tipo de almacén" [items]="facade.warehouseType()"
+        <app-search-select class="col-md-3" placeholder="Tipo de almacén" [items]="facade.warehouseType()"
           [initialItems]="facade.warehouseType()" [displayField]="'nombre'" [valueField]="'idTipoAlm'"
           [value]="stockEntryDetailForm.get('idTipoAlmcacen')?.value" (search)="facade.loadWarehouseType($event)"
           [selectedItem]="facade.formSelections.idTipoAlmcacen()" (selected)="
@@ -135,8 +145,8 @@
           " />
 
         <div class="col-md-3 form-floating">
-          <input type="text" class="form-control" formControlName="marca" id="item" placeholder="Item" />
-          <label for="item">Marca</label>
+          <input type="text" class="form-control" formControlName="marca" id="marca" placeholder="Marca" />
+          <label for="marca">Marca</label>
         </div>
 
         <div class="col-md-3 form-floating">
@@ -159,27 +169,26 @@
           " />
 
         <div class="col-md-3 form-floating">
-          <input type="text" class="form-control" formControlName="serial" id="itbis" placeholder="No. serial" />
-          <label for="itbis">No. Serial</label>
+          <input type="text" class="form-control" formControlName="serial" id="serial" placeholder="No. serial" />
+          <label for="serial">No. Serial</label>
         </div>
 
-        <div class="col-md-12 form-floating">
+        <div class="col-md-9 form-floating">
           <textarea type="text" class="form-control" id="observación" formControlName="observacion"
             placeholder="observación"></textarea>
           <label for="observación">observación</label>
         </div>
 
-        <app-form-actions [disabled]="!stockEntryDetailForm.valid || loading()">
-          <!-- [editing]="
-          purchaseContractDetailForm.dirty || (purchaseContractDetailForm.value.idProducto ?? 0) > 0" (clear)="clearDetailForm()" 
-        -->
+        <app-form-actions [disabled]="!stockEntryDetailForm.valid || loading() || saving()"
+          [editing]="stockEntryDetailForm.dirty || hasProduct"
+          (clear)="facade.clearDetailForm(stockEntryDetailForm)">
         </app-form-actions>
       </form>
     </app-section-box>
   </div>
 
   <app-section-box title="Listado de detalles de entrada">
-    <app-table-of-content [showContent]="true" [trackByField]="'idProducto'" [tableData]="facade.details() || []"
+    <app-table-of-content [showContent]="true" [trackByField]="'idDetalleOrden'" [tableData]="facade.details() || []"
       [tableColumns]="tableColumns" [totalItems]="pagination().totalItems" [pageSize]="pagination().pageSize"
       (edit)="facade.editDetail($event, stockEntryDetailForm)"
       (remove)="facade.clearDetail($event.index, facade.details)">
@@ -191,6 +200,6 @@
 
   <div class="box mt-2">
     <app-form-actions
-      [disabled]="loading() || facade.details().length === 0 || !stockEntryForm.valid"></app-form-actions>
+      [disabled]="loading() || saving() || facade.details().length === 0 || !stockEntryForm.valid"></app-form-actions>
   </div>
 </form>

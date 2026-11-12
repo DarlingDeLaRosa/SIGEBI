@@ -76,7 +76,7 @@ export class StockEntryMapper {
     return new Date(`${date}T00:00:00`).toISOString();
   }
 
-  static fromApiDetail(detail: any, idOrden: number) {
+  static fromApiDetail(detail: any) {
     console.log(detail);
     
     return {
@@ -95,7 +95,7 @@ export class StockEntryMapper {
       idEntrada: detail.idEntrada ,
       // idTipoAlmcacen: detail,
       observacion: detail.observacion ,
-      idDetalleOrden: idOrden,
+      idDetalleOrden: detail.idDetalleOrden ?? 0,
     };
 
   }

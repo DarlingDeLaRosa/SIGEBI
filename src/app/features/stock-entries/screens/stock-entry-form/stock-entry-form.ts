@@ -1,4 +1,6 @@
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TableOfContent } from '../../../../shared/components/table-of-content/table-of-content';
 import { FormActions } from '../../../../shared/components/form-actions/form-actions';
@@ -39,6 +41,8 @@ export class StockEntryForm extends BaseCrud<any> implements OnInit {
   stockEntryDetailForm = StockEntryForms.createDetailForm(this.fb);
 
   private stockEntryService = inject(StockEntryService);
+  private readonly destroyRef = inject(DestroyRef);
+  readonly saving = signal(false);
   override getService() { return this.stockEntryService }
 
   constructor() {
@@ -52,7 +56,7 @@ export class StockEntryForm extends BaseCrud<any> implements OnInit {
       this.stockEntryForm.patchValue({
         idOrdenCompra: purchaseContract.id,
         idProveedor: purchaseContract.idProveedor,
-        total: purchaseContract.total
+        total: this.stockEntryForm.controls.id.value ? this.stockEntryForm.controls.total.value : purchaseContract.total
       });
     });
 
@@ -63,7 +67,7 @@ export class StockEntryForm extends BaseCrud<any> implements OnInit {
 
       this.stockEntryDetailForm.patchValue({
         idProducto: detail.idProducto,
-        cantidad: detail.calCantidad,
+        cantidad: this.facade.pendingQuantity() ?? 0,
         precio: detail.productoObj.precio,
         itbisProducto: detail.productoObj.itbis,
         idDetalleOrden: detail.idOrdenCompra,
@@ -73,8 +77,8 @@ export class StockEntryForm extends BaseCrud<any> implements OnInit {
   }
 
   ngOnInit(): void {
-    let purchaseContract = history.state.purchaseContract;
-    let idEntry = history.state.idEntrada;
+    const purchaseContract = history.state?.purchaseContract;
+    const idEntry = history.state?.idEntrada;
 
     if (purchaseContract) { this.facade.loadPurchaseContractById(purchaseContract.row.id) }
 
@@ -92,26 +96,34 @@ export class StockEntryForm extends BaseCrud<any> implements OnInit {
   }
 
   override save(): void {
+    if (this.saving()) return;
 
     if (this.stockEntryForm.invalid || this.facade.details().length == 0) {
       this.stockEntryForm.markAllAsTouched();
       return;
     }
+    if (!this.facade.validateDetails()) return;
 
     const dto = this.facade.buildCreateDto(
       this.stockEntryForm
     );
 
-    super.save(
-      this.stockEntryForm,
-      'id',
-      () => {
+    const request = dto.id > 0 ? this.stockEntryService.update(dto) : this.stockEntryService.create(dto);
+    this.saving.set(true);
+    request.pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false))).subscribe({
+      next: response => {
+        if (response?.success === false) {
+          this.alert.error(response.message || 'No se pudo guardar la entrada.');
+          return;
+        }
         this.facade.clearDetails();
         this.facade.clearGeneralSelections();
         this.facade.clearDetailsSelections();
         this.facade.clearPurchaseContract();
+        this.stockEntryForm.reset();
+        this.alert.success('Registro guardado');
       },
-      dto
-    );
+      error: error => this.alert.error(error.error?.message || 'No se pudo guardar la entrada. Verifica el saldo pendiente.'),
+    });
   }
 }

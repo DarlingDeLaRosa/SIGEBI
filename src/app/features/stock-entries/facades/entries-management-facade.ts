@@ -13,6 +13,7 @@ import { StockEntryMapper } from "../mappers/stock-entry-mapper";
 import { DialogService } from "../../../core/service/dialog-service/dialog";
 import { PurchasesContractDetailDialog } from "../../purchases-contracts/dialog/purchases-contract-detail-dialog/purchases-contract-detail-dialog";
 import { EntriesListDialog } from "../dialog/entries-list/entries-list";
+import { Alert } from "../../../core/service/alert-service/alert";
 
 @Injectable() export class EntriesManagementFacade {
 
@@ -25,12 +26,17 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
     purchaseContract = signal<any[]>([]);
     purchaseContractById = signal<purchaseContractModel | null>(null);
     selectedDetail = signal<purchaseDetailContractModel | null>(null);
+    private readonly activeLine = signal<number | null>(null);
+    private readonly editingDetail = signal<any | null>(null);
+    private originalDetails: any[] = [];
+    readonly pendingQuantity = computed(() => this.remainingQuantity(this.activeLine(), this.editingDetail()));
 
     private purchaseContractService = inject(PurchaseContractService);
     private warehouseTypeService = inject(WarehouseNameService);
     private entryTypeService = inject(StockEntryTypeService);
     private deliveryTypeService = inject(DeliveryTypeService);
     private dialogService = inject(DialogService);
+    private alert = inject(Alert);
 
     condition = signal<any[]>(CONDITION);
     warehouseType = signal<any[]>([]);
@@ -77,6 +83,8 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
     addDetail(form: FormGroup) {
 
         const detail = form.getRawValue();
+        if (!this.validateQuantity(detail.cantidad, this.remainingQuantity(detail.idDetalleOrden, this.editingDetail()), detail.serial)) return;
+        if (form.invalid) return;
 
         // Cálculos
         const subtotal = detail.cantidad * detail.precio;
@@ -85,11 +93,55 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
             subTotal: subtotal,
         };
 
-        this.details.update(details => [...details, detailCalculated]);
+        const editing = this.editingDetail();
+        this.details.update(details => editing
+            ? details.map(row => row === editing ? detailCalculated : row)
+            : [...details, detailCalculated]);
 
         form.reset();
         this.clearDetailsSelections();
-        // this.clearGeneralSelections();
+        this.selectedDetail.set(null);
+        this.activeLine.set(null);
+        this.editingDetail.set(null);
+    }
+
+    private remainingQuantity(lineId: number | null, excluded?: any): number | null {
+        if (!Number.isInteger(lineId) || !lineId || lineId < 0) return null;
+        const lines = this.purchaseContractById()?.detalles?.filter(line => line.idOrdenCompra === lineId);
+        if (lines?.length !== 1) return null;
+        const saldo = lines[0].calCantidad;
+        if (!Number.isInteger(saldo) || saldo < 0) return null;
+
+        const quantity = (rows: any[]) => rows.reduce((total, row) =>
+            row !== excluded && row.idDetalleOrden === lineId ? total + Number(row.cantidad) : total, 0);
+        return Math.max(0, saldo + quantity(this.originalDetails) - quantity(this.details()));
+    }
+
+    private validateQuantity(value: unknown, limit: number | null, serial?: string | null): boolean {
+        const quantity = Number(value);
+        if (limit === null) {
+            this.alert.error('No se pudo confirmar la cantidad pendiente de recibir.');
+        } else if (limit === 0) {
+            this.alert.error('Esta línea no tiene cantidad pendiente de recibir.');
+        } else if (!Number.isInteger(quantity) || quantity <= 0) {
+            this.alert.error('La cantidad debe ser un número entero mayor que cero.');
+        } else if (serial?.trim() && quantity > 1) {
+            this.alert.error('La cantidad no puede ser mayor que 1 cuando se indica un número de serie.');
+        } else if (quantity > limit) {
+            this.alert.error(`La cantidad no puede ser mayor que la pendiente de recibir (${limit}).`);
+        } else {
+            return true;
+        }
+        return false;
+    }
+
+    validateDetails(): boolean {
+        if (this.activeLine() !== null || this.editingDetail()) {
+            this.alert.error('Agrega el detalle en edición antes de guardar la entrada.');
+            return false;
+        }
+        return this.details().every(row =>
+            this.validateQuantity(row.cantidad, this.remainingQuantity(row.idDetalleOrden, row), row.serial));
     }
 
     totals = computed(() => {
@@ -102,9 +154,15 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
     });
 
     editDetail(product: any, form: FormGroup) {
+        if (this.activeLine() !== null || this.editingDetail()) {
+            this.alert.error('Agrega o limpia el detalle actual antes de editar otro.');
+            return;
+        }
         this.sectionOpenDetail.set(true)
+        this.selectedDetail.set(null);
+        this.activeLine.set(product.row.idDetalleOrden);
+        this.editingDetail.set(product.row);
         this.loadDetail(form, product.row);
-        this.clearDetail(product.index, this.details);
     }
 
     private loadDetail(form: FormGroup, product: any) {
@@ -117,13 +175,36 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
     }
 
     setDetailsToForm(detail: purchaseDetailContractModel, index: number) {
+        if (this.activeLine() !== null || this.editingDetail()) {
+            this.alert.error('Agrega o limpia el detalle actual antes de seleccionar otro.');
+            return;
+        }
+        const limit = this.remainingQuantity(detail.idOrdenCompra);
+        if (limit === null || limit === 0) {
+            this.validateQuantity(1, limit);
+            return;
+        }
+        this.editingDetail.set(null);
+        this.activeLine.set(detail.idOrdenCompra);
         this.selectedDetail.set(detail);
         this.clearDetail(index, this.detailsPurchasesDetails);
     }
 
+    clearDetailForm(form: FormGroup): void {
+        const selected = this.selectedDetail();
+        if (selected) this.detailsPurchasesDetails.update(rows => [...rows, selected]);
+        this.selectedDetail.set(null);
+        this.activeLine.set(null);
+        this.editingDetail.set(null);
+        this.clearDetailsSelections();
+        form.reset();
+    }
+
     clearDetail(index: number, target: WritableSignal<any[]>) {
-        console.log(index);
-        console.log(target());
+        if (target === this.details && target()[index] === this.editingDetail()) {
+            this.alert.error('Limpia el detalle en edición antes de eliminarlo.');
+            return;
+        }
 
         target.update(items =>
             items.filter((_, i) => i !== index)
@@ -155,6 +236,11 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
     }
 
     loadPurchaseContractById(id: number) {
+        if (this.loading()) return;
+        if (this.purchaseContractById() && (this.details().length || this.activeLine() !== null)) {
+            this.alert.error('Limpia los detalles antes de cambiar de orden de compra.');
+            return;
+        }
         this.loading.set(true);
         this.purchaseContractService.getById(id)
             .subscribe({
@@ -166,7 +252,10 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
                     this.sectionOpenDetail.set(true);
                     this.loading.set(false);
                 },
-                error: () => { this.loading.set(false); }
+                error: () => {
+                    this.loading.set(false);
+                    this.alert.error('No se pudo consultar el saldo de la orden de compra.');
+                }
             });
     }
 
@@ -202,6 +291,10 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
     clearPurchaseContract() {
         this.purchaseContractById.set(null);
         this.detailsPurchasesDetails.set([]);
+        this.selectedDetail.set(null);
+        this.activeLine.set(null);
+        this.editingDetail.set(null);
+        this.originalDetails = [];
     }
 
     clearDetails() {
@@ -216,11 +309,13 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
     }
 
     loadStockEntryHead(entry: any, form: FormGroup) {
-        // Cabecera
-        console.log(entry);
-
         form.patchValue({
-            fechaFactura: entry.data.fechaFactura,
+            id: entry.data.idEntrada,
+            idOrdenCompra: entry.data.idOrdenCompra,
+            idProveedor: entry.data.proveedor?.idProveedor,
+            idTipoEntrada: entry.data.tipoEntrada?.idTipoEntrada,
+            idTipoEntrega: entry.data.tipoEntrega?.idTipoEntrega,
+            fechaFactura: entry.data.fechaFactura?.slice(0, 10),
             itbisGeneral: entry.data.itbisGeneral,
             total: entry.data.total,
             observacion: entry.data.observacion,
@@ -229,25 +324,11 @@ import { EntriesListDialog } from "../dialog/entries-list/entries-list";
             noFactura: entry.data.noFactura,
         });
 
-        this.details.set(
-            entry.data.detalles.map((detail: any) =>
-                StockEntryMapper.fromApiDetail(detail, entry.idOrdenCompra)
-            )
-        );
+        this.originalDetails = (entry.data.detalles ?? []).map((detail: any) => StockEntryMapper.fromApiDetail(detail));
+        this.details.set([...this.originalDetails]);
+        if (entry.data.idOrdenCompra > 0) {
+            this.loadPurchaseContractById(entry.data.idOrdenCompra);
+        }
 
-        console.log(this.details());
-        
-        // SearchSelect
-
-        // this.formSelections.currency.set({
-        //     name: purchase.moneda,
-        //     value: purchase.moneda
-        // });
-
-        // this.details.set(
-        //     purchase.detalles.map((detail: any) =>
-        //         PurchaseContractMapper.fromApiDetail(detail)
-        //     )
-        // );
     }
 }
