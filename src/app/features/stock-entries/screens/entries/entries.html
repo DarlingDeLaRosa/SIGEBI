@@ -138,7 +138,7 @@
         [iconActionBoton]="'bi bi-search'"
         [editing]="filterForm.dirty"
         [disabled]="!filterForm.dirty || loading()"
-        (clear)="clearForm(); "
+        (clear)="clearForm()"
       >
       </app-form-actions>
     </app-create-conditional-box>
