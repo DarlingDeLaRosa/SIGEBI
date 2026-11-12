@@ -36,6 +36,13 @@ import { StockEntryModel } from "../model/entry-model";
         idTipoAlmcacen: signal<any | null>(null),
     }
 
+    clearFilterSelections(): void {
+        this.formSelections.idTipoEntrada.set(null);
+        this.formSelections.idTipoEntrega.set(null);
+        this.formSelections.idProveedor.set(null);
+        this.formSelections.idRecinto.set(null);
+    }
+
     loadEntryTypes(filter: string = '') {
         this.entryTypeService
             .getAll({ filter, page: 1, CantItems: 10 })

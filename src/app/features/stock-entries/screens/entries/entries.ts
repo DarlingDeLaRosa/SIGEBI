@@ -45,7 +45,11 @@ export class Entries extends BaseCrud<any> implements OnInit {
   }
   
   openDialog(id: number) { this.dialogService.open(EntryDetails, id) }
-  clearForm() { this.filterForm.reset(); this.getDataFromPost({page: 1, cantItems: 10}) }
+  clearForm() {
+    this.filterForm.reset();
+    this.facade.clearFilterSelections();
+    this.getDataFromPost({ page: 1, cantItems: 10 });
+  }
   
   getDataFromPost(params?: any){
     this.loadDataPost(body => this.entryService.getFiltersEntries(body), params);
