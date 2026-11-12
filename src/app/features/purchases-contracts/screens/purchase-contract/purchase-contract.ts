@@ -47,5 +47,10 @@ export class PurchaseContract extends BaseCrud<any> implements OnInit {
   }
 
   openDialog(id: number) { this.dialogService.open(PurchasesContractDetailDialog, id) }
-  clearForm() { this.filterForm.reset(); this.facadeReference.clearSelections(); this.loadData() }
+  clearForm() {
+    this.filterForm.reset();
+    this.facade.clearSelections();
+    this.facadeReference.clearSelections();
+    this.loadData();
+  }
 }
