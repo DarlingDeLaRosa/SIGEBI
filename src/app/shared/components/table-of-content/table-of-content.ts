@@ -189,18 +189,22 @@ export class TableOfContent {
         return 'app-badge app-badge-warning';
 
       case 'aprobado':
+      case 'aprobada':
         return 'app-badge app-badge-success';
 
       case 'recibida':
         return 'app-badge app-badge-info';
 
       case 'rechazado':
+      case 'rechazada':
         return 'app-badge app-badge-danger';
 
       case 'cancelado':
+      case 'cancelada':
         return 'app-badge app-badge-secondary';
 
       case 'en proceso':
+      case 'enproceso':
         return 'app-badge app-badge-primary';
 
       default:

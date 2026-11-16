@@ -65,6 +65,11 @@
                 </span>
               } @else if (col.render === 'app-money-amount' && getValue(row, col.key) != null && getValue(row, col.key) !== '') {
                 <span class="money-amount">{{ formatValue(row, col) }}</span>
+              } @else if ((col.render === 'app-person' || col.render === 'app-calendar-date') && getValue(row, col.key)) {
+                <span class="cell-with-icon" [class.cell-person]="col.render === 'app-person'">
+                  <i class="bi" [ngClass]="col.render === 'app-person' ? 'bi-person-circle' : 'bi-calendar3'" aria-hidden="true"></i>
+                  {{ formatValue(row, col) }}
+                </span>
               } @else {
                 {{ formatValue(row, col) }}
               }

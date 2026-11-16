@@ -254,3 +254,20 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+.cell-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cell-with-icon i {
+  color: #476781;
+}
+
+.cell-person {
+  font-weight: 600;
+}
+.app-badge-primary {
+  background-color: #e8efff;
+  color: #264a8a;
+}

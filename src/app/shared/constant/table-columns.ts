@@ -109,9 +109,9 @@ export const RequestList: tableColumnsInterface[] = [
     { key: 'noRequerimiento', label: 'Número de Requerimiento' },
     { key: 'tipoArtiucloObj.nombre', label: 'Tipo de Artículo' },
     { key: 'tipoSolicitudObj.nombre', label: 'Tipo de Solicitud' },
-    { key: 'solicitante', label: 'Unidad Responsable' },
-    { key: 'fecha', label: 'Fecha de Creación', format: 'date', align: 'center' },
-    { key: 'estadoObj.nombre', label: 'Estado', align: 'center' },
+    { key: 'solicitante', label: 'Solicitante', align: 'center', render: 'app-person' },
+    { key: 'fecha', label: 'Fecha de Creación', format: 'date', render: 'app-calendar-date', align: 'center' },
+    { key: 'estadoObj.nombre', label: 'Estado', render: 'app-badge', align: 'center' },
     { key: 'acciones', label: 'Acciones', align: 'center' }
 ]
 
