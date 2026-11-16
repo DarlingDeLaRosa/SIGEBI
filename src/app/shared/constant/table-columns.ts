@@ -51,7 +51,7 @@ export const EntryColumns: tableColumnsInterface[]= [
     { key: 'proveedor.razonSocial', label: 'Proveedor' },
     { key: 'tipoEntrada.nombre', label: 'Tipo de entrada', align: 'center' },
     { key: 'tipoEntrega.nombre', label: 'Tipo de entrega', align: 'center' },
-    { key: 'total', label: 'Total', format: 'currency',render: 'app-money-amount', align: 'center' },
+    { key: 'total', label: 'Total', format: 'currency', render: 'app-money-amount', align: 'center' },
     { key: 'acciones', label: 'Acciones', align: 'center' }
 ]
 
@@ -73,9 +73,9 @@ export const OutputColumns : tableColumnsInterface[] = [
     { key: 'recinto.nombre', label: 'Recinto' },
     { key: 'tipoSalida.nombre', label: 'Tipo de salida' },
     { key: 'departamento.nombre', label: 'Departamento' },
-    { key: 'solicitante', label: 'Solicitante' },
-    { key: 'fechaCreacion', label: 'Fecha de creación', format: 'date', align: 'center' },
-    { key: 'totalGeneral', label: 'Total', format: 'currency', align: 'right' },
+    { key: 'solicitante', label: 'Solicitante', align: 'center', render: 'app-person'},
+    { key: 'fechaCreacion', label: 'Fecha de creación', format: 'date', render: 'app-calendar-date', align: 'center' },
+    { key: 'total', label: 'Total', format: 'currency', render: 'app-money-amount', align: 'center' },
     { key: 'acciones', label: 'Acciones', align: 'center' }
 ]
 
