@@ -43,6 +43,9 @@
 
         <label>Entradas registradas</label>
 
+        @if (facade.loadFailed()) {
+          <p class="text-muted" role="alert">No se pudieron cargar las entradas de esta orden de compra.</p>
+        } @else {
         <div class="entries-list">
 
           @for (entry of facade.stockEntry(); track entry.idEntrada) {
@@ -367,9 +370,12 @@
 
             </div>
 
+          } @empty {
+            <p class="text-muted" role="status">No hay entradas registradas para esta orden de compra.</p>
           }
 
         </div>
+        }
 
       </div>
 

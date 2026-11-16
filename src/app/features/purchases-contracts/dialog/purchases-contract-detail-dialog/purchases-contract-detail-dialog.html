@@ -112,8 +112,15 @@
       </div>
 
       <!-- =============================== -->
-      <!-- PRODUCTOS -->
+      <!-- DESCRIPCIÓN -->
       <!-- =============================== -->
+
+      <div class="section">
+        <label>Descripción</label>
+        <div class="product-card description">
+          {{ facade.purchaseContract().descripcion?.trim() || 'Sin descripción' }}
+        </div>
+      </div>
 
       <div class="section">
         <label>Productos</label>
