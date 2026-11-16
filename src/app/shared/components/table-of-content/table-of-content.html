@@ -63,6 +63,8 @@
 
                   {{ formatValue(row, col) }}
                 </span>
+              } @else if (col.render === 'app-money-amount' && getValue(row, col.key) != null && getValue(row, col.key) !== '') {
+                <span class="money-amount">{{ formatValue(row, col) }}</span>
               } @else {
                 {{ formatValue(row, col) }}
               }
