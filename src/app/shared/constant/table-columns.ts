@@ -121,7 +121,7 @@ export const PurchaseContractList: tableColumnsInterface[] = [
     { key: 'modalidadCompra', label: 'Modalidad de Compra' },
     { key: 'formaPago', label: 'Forma de Pago', render: 'app-payment-badge', align: 'center', format: 'titlecase' },
     { key: 'proveedorObj.razonSocial', label: 'Proveedor', format: 'titlecase' },
-    { key: 'total', label: 'Total', format: 'currency', align: 'center' },
+    { key: 'total', label: 'Total', format: 'currency', render: 'app-money-amount', align: 'center' },
     { key: 'estado', label: 'Estado', render: 'app-badge', align: 'center' },
     { key: 'acciones', label: 'Acciones', align: 'center' }
 ]

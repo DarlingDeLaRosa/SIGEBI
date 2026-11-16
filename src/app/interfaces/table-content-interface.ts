@@ -2,7 +2,7 @@ export interface tableColumnsInterface {
   key: string | string[];
   label: string;
   format?: 'currency' | 'date' | 'number' | 'titlecase' | 'lowercase' | 'uppercase';
-  render?: 'app-badge' | 'app-payment-badge';
+  render?: 'app-badge' | 'app-payment-badge' | 'app-money-amount';
   align?: 'left' | 'center' | 'right';
 }
 
