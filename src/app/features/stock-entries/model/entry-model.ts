@@ -30,6 +30,8 @@ export interface StockEntryModel {
   idTipoEntrega: number;
 
   numOrden: string | null;
+  noExpiente?: string | null;
+  noOrdenCompra?: string | null;
   noFactura: string;
   noConduce: string;
 

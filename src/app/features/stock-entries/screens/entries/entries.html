@@ -160,7 +160,8 @@
     [pageSize]="pagination().pageSize"
     (pageChange)="changePage($event)"
     (pageSizeChange)="changePageSize($event)"
-    (remove)="remove($event.idEntrada)"
-    (edit)="facade.editEntries($event.row.idEntrada)"
+    [basicActionRules]="facade.basicActionRules"
+    (remove)="removeEntry($event.row)"
+    (edit)="editEntry($event.row)"
   ></app-table-of-content>
 </div>

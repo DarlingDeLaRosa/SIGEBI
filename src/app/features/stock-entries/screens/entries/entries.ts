@@ -13,6 +13,7 @@ import { FormActions } from '../../../../shared/components/form-actions/form-act
 import { SearchSelect } from '../../../../shared/components/search-select/search-select';
 import { StockEntryFiltersForms } from '../../forms/stock-entry-filter-fomr';
 import { EntryDetails } from '../../dialog/entry-details/entry-details';
+import { StockEntryModel } from '../../model/entry-model';
 
 @Component({
   selector: 'app-entries',
@@ -45,6 +46,12 @@ export class Entries extends BaseCrud<any> implements OnInit {
   }
   
   openDialog(id: number) { this.dialogService.open(EntryDetails, id) }
+  editEntry(entry: StockEntryModel) {
+    if (this.facade.canModifyEntry(entry)) this.facade.editEntries(entry.idEntrada);
+  }
+  removeEntry(entry: StockEntryModel) {
+    if (this.facade.canModifyEntry(entry)) this.remove(entry.idEntrada);
+  }
   clearForm() {
     this.filterForm.reset();
     this.facade.clearFilterSelections();

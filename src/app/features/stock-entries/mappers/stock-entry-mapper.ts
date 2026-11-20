@@ -93,7 +93,7 @@ export class StockEntryMapper {
       itbisProducto: detail.itbisProducto,
       subTotal: detail.subTotal ,
       idEntrada: detail.idEntrada ,
-      // idTipoAlmcacen: detail,
+      idTipoAlmcacen: detail.tipoAlmacenObj ?? null,
       observacion: detail.observacion ,
       idDetalleOrden: detail.idDetalleOrden ?? 0,
     };
