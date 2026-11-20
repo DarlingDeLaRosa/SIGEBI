@@ -45,6 +45,8 @@ export const NameColumns: tableColumnsInterface[] = [
 ]
 
 export const EntryColumns: tableColumnsInterface[]= [
+    { key: 'noExpediente', label: 'Número de expediente' },
+    { key: 'noOrdenCompra', label: 'Número de orden de compra' },
     { key: 'fechaCreacion', label: 'Fecha de creación', format: 'date' },
     { key: 'fechaFactura', label: 'Fecha de factura', format: 'date' },
     { key: 'noFactura', label: 'No. Factura',  },
@@ -235,7 +237,6 @@ export const HomePurchaseColumns: tableColumnsInterface[] = [
     { key: 'noExpediente', label: 'Expediente' },
     { key: 'proveedorObj.razonSocial', label: 'Proveedor' },
     { key: 'total', label: 'Total', format: 'currency', align: 'right' },
-    { key: 'acciones', label: 'Acciones', align: 'center' },
 ];
 
 export const HomeAdjustmentColumns = InventoryAdjustmentColumns.slice(0, 4);

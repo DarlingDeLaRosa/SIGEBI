@@ -83,6 +83,7 @@ import { Alert } from "../../../core/service/alert-service/alert";
     addDetail(form: FormGroup) {
 
         const detail = form.getRawValue();
+        if (!this.validateOrderLine(detail.idDetalleOrden)) return;
         if (!this.validateQuantity(detail.cantidad, this.remainingQuantity(detail.idDetalleOrden, this.editingDetail()), detail.serial)) return;
         if (form.invalid) return;
 
@@ -113,8 +114,22 @@ import { Alert } from "../../../core/service/alert-service/alert";
         if (!Number.isInteger(saldo) || saldo < 0) return null;
 
         const quantity = (rows: any[]) => rows.reduce((total, row) =>
-            row !== excluded && row.idDetalleOrden === lineId ? total + Number(row.cantidad) : total, 0);
-        return Math.max(0, saldo + quantity(this.originalDetails) - quantity(this.details()));
+            row.idDetalleOrden === lineId ? total + Number(row.cantidad) : total, 0);
+        const limit = saldo + quantity(this.originalDetails) - quantity(this.details().filter(row => row !== excluded));
+        return Number.isInteger(limit) ? Math.max(0, limit) : null;
+    }
+
+    private validateOrderLine(lineId: number): boolean {
+        if (this.loading()) {
+            this.alert.error('Espera a que se cargue el saldo de la orden de compra.');
+            return false;
+        }
+        const order = this.purchaseContractById();
+        if (order && order.detalles?.filter(line => line.idOrdenCompra === lineId).length !== 1) {
+            this.alert.error('No se pudo identificar una única línea de la orden de compra para este detalle.');
+            return false;
+        }
+        return true;
     }
 
     private validateQuantity(value: unknown, limit: number | null, serial?: string | null): boolean {
@@ -141,6 +156,7 @@ import { Alert } from "../../../core/service/alert-service/alert";
             return false;
         }
         return this.details().every(row =>
+            this.validateOrderLine(row.idDetalleOrden) &&
             this.validateQuantity(row.cantidad, this.remainingQuantity(row.idDetalleOrden, row), row.serial));
     }
 
@@ -154,6 +170,10 @@ import { Alert } from "../../../core/service/alert-service/alert";
     });
 
     editDetail(product: any, form: FormGroup) {
+        if (this.loading()) {
+            this.alert.error('Espera a que se cargue el saldo de la orden de compra.');
+            return;
+        }
         if (this.activeLine() !== null || this.editingDetail()) {
             this.alert.error('Agrega o limpia el detalle actual antes de editar otro.');
             return;
@@ -245,8 +265,30 @@ import { Alert } from "../../../core/service/alert-service/alert";
         this.purchaseContractService.getById(id)
             .subscribe({
                 next: (data) => {
+                    if (!data.data || data.success === false) {
+                        this.loading.set(false);
+                        this.alert.error('No se pudo consultar el saldo de la orden de compra.');
+                        return;
+                    }
+                    const lines = data.data.detalles ?? [];
+                    if (this.originalDetails.length) {
+                        const resolvedDetails = new Map(this.originalDetails.map(detail => {
+                            const lineId = Number(detail.idDetalleOrden);
+                            if (Number.isInteger(lineId) && lineId > 0) {
+                                return [detail, { ...detail, idDetalleOrden: lineId }];
+                            }
+                            const matches = lines.filter((line: purchaseDetailContractModel) =>
+                                line.idProducto === detail.idProducto);
+                            const resolved = matches.length === 1
+                                ? { ...detail, idDetalleOrden: matches[0].idOrdenCompra }
+                                : detail;
+                            return [detail, resolved];
+                        }));
+                        this.originalDetails = [...resolvedDetails.values()];
+                        this.details.update(rows => rows.map(row => resolvedDetails.get(row) ?? row));
+                    }
                     this.purchaseContractById.set(data.data);
-                    this.detailsPurchasesDetails.set(data.data.detalles);
+                    this.detailsPurchasesDetails.set(lines);
 
                     this.sectionOpenGeneral.set(true);
                     this.sectionOpenDetail.set(true);

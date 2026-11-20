@@ -6,6 +6,7 @@ import { IntranetService } from "../../../shared/service/general.service";
 import { StockEntryTypeService } from "../../maintenance/services/stockEntry/stock-entry-type-service";
 import { Router } from "@angular/router";
 import { StockEntryModel } from "../model/entry-model";
+import { BasicActionRules } from "../../../interfaces/table-content-interface";
 
 @Injectable() export class EntriesFacade {
 
@@ -16,6 +17,27 @@ import { StockEntryModel } from "../model/entry-model";
     private supplierService = inject(SuppliersService);
     private entryTypeService = inject(StockEntryTypeService);
     private deliveryTypeService = inject(DeliveryTypeService);
+
+    private readonly creationMonthRule = {
+        disabled: (entry: StockEntryModel) => !this.canModifyEntry(entry),
+        disabledReason: () => 'Solo puedes editar o eliminar entradas del mes actual, salvo que estén habilitadas para edición.',
+    };
+
+    readonly basicActionRules: BasicActionRules = {
+        edit: this.creationMonthRule,
+        remove: this.creationMonthRule,
+    };
+
+    canModifyEntry(entry: StockEntryModel): boolean {
+        if (entry.isEditable === true) return true;
+
+        const createdAt = entry.fechaCreacion;
+        if (!createdAt || !Number.isFinite(Date.parse(createdAt))) return false;
+
+        const now = new Date();
+        const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+        return createdAt.slice(0, 7) === `${now.getFullYear()}-${currentMonth}`;
+    }
 
     entryType = signal<any[]>([]);
     suppliers = signal<any[]>([]);
